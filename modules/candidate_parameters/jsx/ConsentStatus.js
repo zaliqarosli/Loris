@@ -1,141 +1,29 @@
-import VerticalTabs from 'Tabs';
-import TabPane from 'Tabs';
-import Tabs from 'Tabs';
+import {VerticalTabs, TabPane} from 'Tabs';
 
-var ConsentStatus = React.createClass(
-  {
-    getInitialState: function() {
-      return {
-        consentOptions: {
-          yes: "Yes",
-          no: "No"
-        },
-        Data: {},
-        formData: {},
-        updateResult: null,
-        errorMessage: null,
-        isLoaded: false,
-        loadedData: 0
-      };
-    },
+var ConsentContent = React.createClass({
 
-    componentDidMount: function() {
-      var that = this;
-      $.ajax(
-        this.props.dataURL, {
-          dataType: 'json',
-          success: function(data) {
-            var formData = {};
-            var consentTypes = data.consentTypes;
-            for (var thisConsent in consentTypes) {
-              if (consentTypes.hasOwnProperty(thisConsent)) {
-                var consentValue = thisConsent + "_value";
-                var consentDate = thisConsent+"_date";
-                var consentDate2 = consentDate+"2";
-                var consentWithdrawal = thisConsent+"_withdrawal_date";
-                var consentWithdrawal2 = consentWithdrawal+"2";
-                formData[consentValue] = data.consentStatuses[thisConsent] ? data.consentStatuses[thisConsent] : null;
-                formData[consentDate] = data.consentDates[thisConsent] ? data.consentDates[thisConsent] : null;
-                formData[consentDate2] = data.consentDates[thisConsent] ? data.consentDates[thisConsent] : null;
-                formData[consentWithdrawal] = data.withdrawalDates[thisConsent] ? data.withdrawalDates[thisConsent] : null;
-                formData[consentWithdrawal2] = data.withdrawalDates[thisConsent] ? data.withdrawalDates[thisConsent] : null;
-              }
-            }
-
-            that.setState(
-              {
-                Data: data,
-                formData: formData,
-                isLoaded: true
-              }
-                        );
-          },
-          error: function(data, errorCode, errorMsg) {
-            that.setState(
-              {
-                error: 'An error occurred when loading the form!'
-              }
-                        );
-          }
-        }
-            );
-    },
-
-    setFormData: function(formElement,
-    value) {
-      var formData = this.state.formData;
-      formData[formElement] = value;
-      this.setState(
-        {
-          formData: formData
-        }
-      );
-    },
-
-    // get consent tabs
-    getTabPanes: function(tabList, consents) {
-      const tabPanes = Object.keys(tabList).map(function(key) {
-        return (
-          <div key="test-consent-tab-content">
-            <TabPane TabId={tabList[key].id} key={key}>
-              {consents[key]}
-            </TabPane>
-          </div>
-        );
-      });
-      return tabPanes;
-    },
-    onSubmit: function(e) {
-      e.preventDefault();
-    },
-    render: function() {
-      if (!this.state.isLoaded) {
-        if (this.state.error !== undefined) {
-          return (
-            <div className ="alert alert-danger text-center">
-                <strong>
-                    {this.state.error}
-                </strong>
-            </div>
-          );
-        }
-        return (
-          <button className ="btn-info has-spinner">
-              Loading
-              <span className ="glyphicon glyphicon-refresh glyphicon-refresh-animate">
-              </span>
-          </button>
-        );
-      }
-
-      var disabled = true;
-      var updateButton = null;
-      if (loris.userHasPermission('candidate_parameter_edit')) {
-        disabled = false;
-        updateButton = <ButtonElement label ="Update" />;
-      }
-
+  render: function() {
       // Set which select elements are required
       var dateRequired = [];
       var withdrawalRequired = [];
-      var consentTypes = this.state.Data.consentTypes; 
+      var consentTypes = this.props.consentTypes; 
       for (var thisConsent in consentTypes) {
         if (consentTypes.hasOwnProperty(thisConsent)) {
           var value = thisConsent + "_value";
           var withdrawal = thisConsent + "_withdrawal_date";
 
-          if (this.state.formData[value] === "yes") {
+          if (this.props.consentFormData[value] === "yes") {
             dateRequired[thisConsent] = true;
           }
-          if (this.state.formData[withdrawal] || this.state.formData[value] === "no") {
+          if (this.props.consentFormData[withdrawal] || this.props.consentFormData[value] === "no") {
             withdrawalRequired[thisConsent] = true;
           } else {
             withdrawalRequired[thisConsent] = false;
           }
         }
       }
-	
-      // Render consent tabs content
+      
+   // Render consent tabs content
       var consents  = [];
       var tabList = [];
       for (var thisConsent in consentTypes) {
@@ -156,59 +44,59 @@ var ConsentStatus = React.createClass(
               <SelectElement
                 label="Status"
                 name={consentValue}
-                options={this.state.consentOptions}
-                value={this.state.formData[consentValue]}
-                onUserInput={this.setFormData}
+                options={this.props.consentOptions}
+                value={this.props.consentFormData[consentValue]}
+                onUserInput={this.props.setFormData}
                 ref={consentValue}
-                disabled={disabled}
+                disabled={this.props.disabled}
                 required={false}
               />
               <DateElement
                 label="Date of Consent"
                 name={consentDate}
-                value={this.state.formData[consentDate]}
-                onUserInput={this.setFormData}
+                value={this.props.consentFormData[consentDate]}
+                onUserInput={this.props.setFormData}
                 ref={consentDate}
-                disabled={disabled}
+                disabled={this.props.disabled}
                 required={dateRequired[thisConsent]}
               />
               <DateElement
                 label="Confirm Date of Consent"
                 name={consentDate2}
-                value={this.state.formData[consentDate2]}
-                onUserInput={this.setFormData}
+                value={this.props.consentFormData[consentDate2]}
+                onUserInput={this.props.setFormData}
                 ref={consentDate2}
-                disabled={disabled}
+                disabled={this.props.disabled}
                 required={dateRequired[thisConsent]}
               />
               <DateElement
                 label="Date of Withdrawal"
                 name={consentWithdrawal}
-                value={this.state.formData[consentWithdrawal]}
-                onUserInput={this.setFormData}
+                value={this.props.consentFormData[consentWithdrawal]}
+                onUserInput={this.props.setFormData}
                 ref={consentWithdrawal}
-                disabled={disabled}
+                disabled={this.props.disabled}
                 required={withdrawalRequired[thisConsent]}
               />
               <DateElement
                 label="Confirm Date of Withdrawal"
                 name={consentWithdrawal2}
-                value={this.state.formData[consentWithdrawal2]}
-                onUserInput={this.setFormData}
+                value={this.props.consentFormData[consentWithdrawal2]}
+                onUserInput={this.props.setFormData}
                 ref={consentWithdrawal2}
-                disabled={disabled}
+                disabled={this.props.disabled}
                 required={withdrawalRequired[thisConsent]}
               />
               <hr/>
             </div>
           );
           consents.push(consent);
-          tabList.push({id:"study_consent", label:"Consent to Study"});
+          tabList.push({id:{thisConsent}, label:this.props.consentTypes[thisConsent]});
           
         }
       }
 
-      //Render consent history
+{/*      //Render consent history
       var formattedHistory = [];
       for (var consentKey in this.state.Data.history) {
         if (this.state.Data.history.hasOwnProperty(consentKey)) {
@@ -257,6 +145,129 @@ var ConsentStatus = React.createClass(
           }
         }
       }
+*/}
+ 
+  return (
+   <div>     
+     <VerticalTabs tabs={tabList} defaultTab={tabList[0].id} updateURL={false}>
+       {this.props.getTabPanes(tabList, consents)}
+     </VerticalTabs>
+   </div>
+  );
+  }
+});
+ 
+var ConsentStatus = React.createClass(
+  {
+
+    getInitialState: function() {
+      return {
+        consentOptions: {
+          yes: "Yes",
+          no: "No"
+        },
+        Data: {},
+        formData: {},
+        updateResult: null,
+        errorMessage: null,
+        isLoaded: false,
+        loadedData: 0
+      };
+    },
+    componentDidMount: function() {
+      var that = this;
+      $.ajax(
+        this.props.dataURL, {
+          dataType: 'json',
+          success: function(data) {
+            var formData = {};
+            var consentTypes = data.consentTypes;
+            for (var thisConsent in consentTypes) {
+              if (consentTypes.hasOwnProperty(thisConsent)) {
+                var consentValue = thisConsent + "_value";
+                var consentDate = thisConsent+"_date";
+                var consentDate2 = consentDate+"2";
+                var consentWithdrawal = thisConsent+"_withdrawal_date";
+                var consentWithdrawal2 = consentWithdrawal+"2";
+                formData[consentValue] = data.consentStatuses[thisConsent] ? data.consentStatuses[thisConsent] : null;
+                formData[consentDate] = data.consentDates[thisConsent] ? data.consentDates[thisConsent] : null;
+                formData[consentDate2] = data.consentDates[thisConsent] ? data.consentDates[thisConsent] : null;
+                formData[consentWithdrawal] = data.withdrawalDates[thisConsent] ? data.withdrawalDates[thisConsent] : null;
+                formData[consentWithdrawal2] = data.withdrawalDates[thisConsent] ? data.withdrawalDates[thisConsent] : null;
+              }
+            }
+
+            that.setState(
+              {
+                Data: data,
+                formData: formData,
+                isLoaded: true
+              }
+                        );
+          },
+          error: function(data, errorCode, errorMsg) {
+            that.setState(
+              {
+                error: 'An error occurred when loading the form!'
+              }
+                        );
+          }
+        }
+            );
+    },
+    setFormData: function(formElement,
+    value) {
+      var formData = this.state.formData;
+      formData[formElement] = value;
+      this.setState(
+        {
+          formData: formData
+        }
+      );
+    },
+    // get consent tabs
+    getTabPanes: function(tabList, consents) {
+      const tabPanes = Object.keys(tabList).map(function(key) {
+        return (
+          <div key="test-consent-tab-content">
+            <TabPane TabId={tabList[key].id} key={key}>
+              {consents[key]}
+            </TabPane>
+          </div>
+        );
+      });
+      return tabPanes;
+    },
+
+    onSubmit: function(e) {
+      e.preventDefault();
+    },
+    render: function() {
+      if (!this.state.isLoaded) {
+        if (this.state.error !== undefined) {
+          return (
+            <div className ="alert alert-danger text-center">
+                <strong>
+                    {this.state.error}
+                </strong>
+            </div>
+          );
+        }
+        return (
+          <button className ="btn-info has-spinner">
+              Loading
+              <span className ="glyphicon glyphicon-refresh glyphicon-refresh-animate">
+              </span>
+          </button>
+        );
+      }
+
+      var disabled = true;
+      var updateButton = null;
+      if (loris.userHasPermission('candidate_parameter_edit')) {
+        disabled = false;
+        updateButton = <ButtonElement label ="Update" />;
+      }
 
       var alertMessage = "";
       var alertClass = "alert text-center hide";
@@ -270,7 +281,7 @@ var ConsentStatus = React.createClass(
           alertMessage = errorMessage ? errorMessage : "Failed to update!";
         }
       }
-
+ 
       return (
         <div className="row">
           <div className={alertClass} role="alert" ref="alert-message">
@@ -284,11 +295,17 @@ var ConsentStatus = React.createClass(
           >
             <StaticElement label="PSCID" text={this.state.Data.pscid} />
             <StaticElement label="DCCID" text={this.state.Data.candID} />
-            <VerticalTabs tabs={tabList} defaultTab={tabList[0].id} updateURL={false}>
-              {this.getTabPanes(tabList, consents)}
-            </VerticalTabs>
+            <ConsentContent
+              consentOptions = {this.state.consentOptions}
+              consentData = {this.state.Data}
+              consentTypes = {this.state.Data.consentTypes}
+              consentFormData = {this.state.formData}
+              getTabPanes = {this.getTabPanes}
+              setFormData = {this.setFormData}
+              disabled = {disabled}
+            />
             {updateButton}
-            {formattedHistory}
+            {/*formattedHistory*/}
           </FormElement>
         </div>
       );
