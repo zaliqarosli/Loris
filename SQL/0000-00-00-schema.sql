@@ -2024,7 +2024,7 @@ CREATE TABLE `feedback_mri_comments` (
 -- ********************************
 
 CREATE TABLE `consent` (
-  `ConsentID` int(2) NOT NULL AUTO_INCREMENT,
+  `ConsentID` int(2) unsigned NOT NULL AUTO_INCREMENT,
   `Name` varchar(255) NOT NULL,
   `Label` varchar(255) NOT NULL,
   CONSTRAINT `PK_consent` PRIMARY KEY (`ConsentID`),

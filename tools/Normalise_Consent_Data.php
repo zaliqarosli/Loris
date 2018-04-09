@@ -84,7 +84,7 @@ foreach ($consentList as $consentName=>$consentLabel) {
     foreach ($psData as $entry) {
         $status     = $entry[$consentName];
         $date       = $entry[$consentDate];
-        $withdrawal = $entry[$consentWithdrawa];
+        $withdrawal = $entry[$consentWithdrawal];
         $consentID  = $entry['ID'];
         $candID     = $entry['CandID'];
         // Check if consent status is not_answered
@@ -107,12 +107,14 @@ foreach ($consentList as $consentName=>$consentLabel) {
                        [CandID] => " . $candID . "
                        All 'yes' statuses must have a consent date.");
         }
-        // Check if consent status is no but withdrawal date is empty
-        if($status === "no" && empty($withdrawal)) {
-            array_push($errors, "The date of withdrawal is missing for 
-                       [ID]     => " . $consentID . "
-                       [CandID] => " . $candID . "
-                       All 'no' statuses must have a withdrawal date.");
+        // Check if consent status is no and consent date given, but withdrawal date is empty
+        if($status === "no" && !empty($date) {
+            if(empty($withdrawal)) {
+                array_push($errors, "The date of withdrawal is missing for
+                           [ID]     => " . $consentID . "
+                           [CandID] => " . $candID . "
+                           All 'no' statuses must have a withdrawal date.");
+            }
         }
         // Check for zero dates
         if($date === "0000-00-00" || $withdrawal === "0000-00-00") {
