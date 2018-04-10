@@ -2,7 +2,7 @@ INSERT INTO ConfigSettings (Name, Description, Visible, AllowMultiple, DataType,
 INSERT INTO Config (ConfigID, Value) SELECT ID, 'false' FROM ConfigSettings WHERE Name='useConsent';
 
 CREATE TABLE `consent` (
-  `ConsentID` int(2) unsigned NOT NULL AUTO_INCREMENT,
+  `ConsentID` integer unsigned NOT NULL AUTO_INCREMENT,
   `Name` varchar(255) NOT NULL,
   `Label` varchar(255) NOT NULL,
   CONSTRAINT `PK_consent` PRIMARY KEY (`ConsentID`),
@@ -12,7 +12,7 @@ CREATE TABLE `consent` (
 
 CREATE TABLE `candidate_consent_rel` (
   `CandidateID` int(6) NOT NULL,
-  `ConsentID` int(2) NOT NULL,
+  `ConsentID` integer unsigned NOT NULL,
   `Status` enum('yes','no') DEFAULT NULL,
   `DateGiven` date DEFAULT NULL,
   `DateWithdrawn` date DEFAULT NULL,
