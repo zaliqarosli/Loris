@@ -108,7 +108,7 @@ foreach ($consentList as $consentName=>$consentLabel) {
                        All 'yes' statuses must have a consent date.");
         }
         // Check if consent status is no and consent date given, but withdrawal date is empty
-        if($status === "no" && !empty($date) {
+        if($status === "no" && !empty($date)) {
             if(empty($withdrawal)) {
                 array_push($errors, "The date of withdrawal is missing for
                            [ID]     => " . $consentID . "
