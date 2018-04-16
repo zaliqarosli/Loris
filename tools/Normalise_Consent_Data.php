@@ -89,20 +89,20 @@ foreach ($consentList as $consentName=>$consentLabel) {
         $candID     = $entry['CandID'];
         // Check if consent status is not_answered
         if($status === "not_answered") {
-            array_push($errors, "Deprecated consent status 'not_answered' found for
+            array_push($errors, "Deprecated consent status 'not_answered' found for " . $consentName . ":
                        [ID]     => " . $consentID . "
                        [CandID] => " . $candID . "
                        Please change to a valid status or remove data.");
         }
         // Check if consent status is null or empty but there are dates
         if(empty($status) && (!empty($date) || !empty($withdrawal))) {
-            array_push($errors, "Consent status not found for
+            array_push($errors, "Consent status not found for " . $consentName . ":
                        [ID]     => " . $consentID . "
                        [CandID] => " . $candID . " where there are dates.");
         }
         // Check if consent status is yes but consent date is empty
         if($status === "yes" && empty($date)) {
-            array_push($errors, "The date of consent is missing for
+            array_push($errors, "The date of consent is missing for " . $consentName . ":
                        [ID]     => " . $consentID . "
                        [CandID] => " . $candID . "
                        All 'yes' statuses must have a consent date.");
@@ -110,15 +110,15 @@ foreach ($consentList as $consentName=>$consentLabel) {
         // Check if consent status is no and consent date given, but withdrawal date is empty
         if($status === "no" && !empty($date)) {
             if(empty($withdrawal)) {
-                array_push($errors, "The date of withdrawal is missing for
+                array_push($errors, "The date of withdrawal is missing for " . $consentName . ":
                            [ID]     => " . $consentID . "
                            [CandID] => " . $candID . "
-                           All 'no' statuses must have a withdrawal date.");
+                           All 'no' statuses with given consent date must have a withdrawal date.");
             }
         }
         // Check for zero dates
         if($date === "0000-00-00" || $withdrawal === "0000-00-00") {
-            array_push($errors, "Zero dates found in participant_status for:
+            array_push($errors, "Zero dates found in participant_status for " . $consentName . ":
                        [ID]     => " . $consentID . "
                        [CandID] => " . $candID . "
                        Please remove date or run /tools/DB_date_zeros_removal.php.");
