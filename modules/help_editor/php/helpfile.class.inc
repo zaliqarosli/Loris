@@ -70,6 +70,8 @@ class HelpFile
         // set the help file
         $obj->data = $result;
 
+
+        echo "Enters helpfile::factory";
         return $obj;
     }
 
@@ -108,6 +110,7 @@ class HelpFile
         // update the help file
         $success = $DB->update('help', $set, array('helpID' => $this->helpID));
 
+        echo "Enters helpfile::update";
         return true;
     }
 

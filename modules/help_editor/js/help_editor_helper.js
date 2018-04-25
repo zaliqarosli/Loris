@@ -1,13 +1,14 @@
 $(document).ready(function(){
+    
+var title   = $('input[name="title"]').val(),
+    content = $('textarea[name="content"]').val();
 
 $("input[name=preview]").click(function(e) {
     if($('div.help-content').length) {
         $('div.help-content').remove();
         e.preventDefault();
     }
-    var title   = $('input[name="title"]').val(),
-        content = $('textarea[name="content"]').val(),
-        myDate  = new Date(),
+    var myDate  = new Date(),
         div     = document.createElement("div"),
         pre     = document.createElement("pre"),
         btn     = document.createElement("BUTTON"),
@@ -32,6 +33,31 @@ $("input[name=preview]").click(function(e) {
         }) ;
      e.preventDefault();
 
+});
+$('#save-help').click(function(e) {
+    e.preventDefault();
+    var form = $('form[name=edit_help_content]').serialize();
+    $.ajax({
+        type: 'POST',
+        url: loris.BaseURL + '/help_editor/ajax/process.php',
+        data: form,
+        success: function() {
+            swal({
+                title: "Content update successful!",
+                text: "Return to " + title,
+                type: "success",
+            });
+        },
+        error: function(xhr, err) {
+            console.log(xhr);
+            console.error(err);
+            swal({
+                title: "Content update unsuccessful!",
+                text: "Try again.",
+                type: "error",
+            });
+        }
+    });
 });
 });
 function goBack() {
