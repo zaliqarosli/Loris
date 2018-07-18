@@ -15,6 +15,9 @@ var ProbandInfo = React.createClass(
       };
     },
     componentDidMount: function() {
+      this.fetchData();
+    },
+    fetchData: function() {
       var that = this;
       $.ajax(
         this.props.dataURL,
@@ -276,6 +279,7 @@ var ProbandInfo = React.createClass(
               }
             );
             self.showAlertMessage();
+            self.fetchData();
           },
           error: function(err) {
             if (err.responseText !== "") {
