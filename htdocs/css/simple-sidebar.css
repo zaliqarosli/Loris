@@ -1,5 +1,5 @@
 #sidebar-content{
-  padding-left: 10px;
+  padding-left: 25px;
 }
 
 .wrapper {
@@ -13,12 +13,16 @@
   left: 250px;
   width: 250px;
   top: 0;
-  background: #064785;
+  background: #e4ebf2;
+  border: 1px solid #ccc;
   position: fixed;
   height: 100%;
   overflow-y: auto;
   z-index: 1000;
   transition: all 0.4s ease 0s;
+}
+#sidebar-wrapper>li:hover>a {
+  color: #ffab66;
 }
 
 #page-content-container{
@@ -99,14 +103,14 @@
   padding: 20px;
 }
 .sidebar-div{
-  color: white;
+  color: #064785;
 }
 
 .sidebar-div h3{
-  color: white;
+  color: #064785;
 }
 .sidebar-div a{
-  color: white;
+  color: #064785;
 }
 
 @media (max-width:884px) {

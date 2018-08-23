@@ -54,7 +54,7 @@ em {
 
 /* anchor tags */
 a, a:link, a:visited {
-	color: #064785; 
+	color: #246EB6; 
 	text-decoration: none;
  	}
 a:active {
@@ -671,7 +671,10 @@ tr.directentry {
 .help-content {
     max-height: 94%;
     width: 30%;
-    background: #064785;
+    background: #E4EBF2;
+    border-style: solid;
+    border-color: #246EB6;
+    border-width: 0px 0px 1px 1px;
     height: auto;
     position: fixed;
     top: 50px;
@@ -684,7 +687,7 @@ tr.directentry {
 .help-content #help-wrapper {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
-    color: #FFFFFF;
+    color: #064785;
     padding: 9.5px;
 }
 #help-seperator {
@@ -701,12 +704,12 @@ tr.directentry {
    margin: 10px;
 }
 .help-content h3 {
-    color: #FFFFFF;
+    color: #064785;
 }
 
 .help-content a {
    text-decoration: underline;
-   color: white;
+   color: #064785;
 
 }
 

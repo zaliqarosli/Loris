@@ -71,7 +71,7 @@
        	    <label>Visit Level Caveat</label>
        	    {if $subject.has_permission}{html_options options=$subject.caveat_options selected=$subject.mricaveat name=visit_caveat tabindex=3 class="form-control input-sm" style="width:100px"}{else}{if $subject.mricaveat=='true'}True{else}False{/if}{/if}
    <br>
-            {if $subject.has_permission}<input class="btn btn-default" type="submit" accesskey="s" value="Save" name="save_changes">{/if}
+            {if $subject.has_permission}<input class="btn btn-default" type="submit" accesskey="s" value="Save" id="save" name="save_changes">{/if}
         </div>
    </div>
 </td>
