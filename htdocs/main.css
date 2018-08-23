@@ -403,9 +403,9 @@ table.data {
 }
 
 .data tr th {
-    background: #1C70B6;
+    background: #E4EBF2;
     /* color: #CCC; */
-    color: white;
+    color: #064785;
     padding: 3px;
 }
 .data tr td {
