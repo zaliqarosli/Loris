@@ -1,4 +1,4 @@
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
 const fs = require('fs');
 
@@ -34,8 +34,7 @@ const config = [{
     './modules/genomic_browser/js/profileColumnFormatter.js': './modules/genomic_browser/jsx/profileColumnFormatter.js',
     './modules/imaging_browser/js/ImagePanel.js': './modules/imaging_browser/jsx/ImagePanel.js',
     './modules/imaging_browser/js/imagingBrowserIndex.js': './modules/imaging_browser/jsx/imagingBrowserIndex.js',
-    './modules/instrument_builder/js/react.instrument_builder.js': './modules/instrument_builder/jsx/react.instrument_builder.js',
-    './modules/instrument_builder/js/react.questions.js': './modules/instrument_builder/jsx/react.questions.js',
+    './modules/instrument_builder/js/instrumentBuilderIndex.js': './modules/instrument_builder/jsx/instrumentBuilderIndex.js',
     './modules/instrument_manager/js/instrumentManagerIndex.js': './modules/instrument_manager/jsx/instrumentManagerIndex.js',
     './modules/survey_accounts/js/surveyAccountsIndex.js': './modules/survey_accounts/jsx/surveyAccountsIndex.js',
     './modules/mri_violations/js/mri_protocol_check_violations_columnFormatter.js': './modules/mri_violations/jsx/mri_protocol_check_violations_columnFormatter.js',
@@ -59,6 +58,7 @@ const config = [{
   output: {
     path: __dirname + '/',
     filename: '[name]',
+    chunkFilename: '[name]',
   },
   module: {
     rules: [
@@ -111,11 +111,13 @@ const config = [{
   devtool: 'source-map',
   plugins: [],
   optimization: {
+    minimize: true,
     minimizer: [
-      new UglifyJsPlugin({
+      new TerserPlugin({
+        include: './modules/instrument_builder/js/instrumentBuilderIndex.js',
         cache: true,
         parallel: true,
-        uglifyOptions: {
+        terserOptions: {
           compress: false,
           ecma: 6,
           mangle: false,

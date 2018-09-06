@@ -1,19 +1,20 @@
 {
   "extends": "google",
   "parser": "babel-eslint",
+  "parserOptions": {
+    "sourceType": "module",
+    "allowImportExportEverywhere": true,
+    "ecmaFeatures": {
+      "jsx": true,
+      "globalReturn": false
+    }
+  },
   "plugins": [
     "react"
   ],
   "env": {
     "browser": true,
     "jquery": true
-  },
-  "parserOptions": {
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true,
-      "globalReturn": false
-    }
   },
   "rules": {
     "extends": ["eslint:recommended", "plugin:react/recommended", "google"],

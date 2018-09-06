@@ -10,6 +10,8 @@
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/aces/Loris-Trunk/
  */
+use \Psr\Http\Message\ServerRequestInterface;
+use \Psr\Http\Message\ResponseInterface;
 
 /**
  * Base class for all NeuroDB behavioural instruments
@@ -24,7 +26,6 @@
  */
 abstract class NDB_BVL_Instrument extends NDB_Page
 {
-
     /**
      * Determines whether this instrument should load data in
      * JSON format from the "Data" column of the flag table, or
@@ -206,6 +207,19 @@ abstract class NDB_BVL_Instrument extends NDB_Page
                 $commentID,
                 'test_form'
             );
+        } else if (\NDB_BVL_Instrument::isJSONInstrument($instrument)
+        ) {
+            include_once 'NDB_BVL_Instrument_JSON.class.inc';
+            $obj = new \Loris\Behavioural\NDB_BVL_Instrument_JSON(
+                // The module directory we use for instruments is arbitrary,
+                // since it isn't a real module, but it's required for the page
+                // constructor.
+                new Module($instrument, $base ."project/"),
+                $page,
+                $commentID,
+                $commentID,
+                'test_form'
+            );
         } else {
             if (!class_exists($class)
                 && ($guarantee_exists === true
@@ -216,6 +230,7 @@ abstract class NDB_BVL_Instrument extends NDB_Page
             if (!class_exists($class)) {
                 include_once $base."project/instruments/$class.class.inc";
             }
+
             // Now go ahead and instantiate it
             $obj = new $class(
                 new Module($instrument, $base ."project/"),
@@ -231,20 +246,12 @@ abstract class NDB_BVL_Instrument extends NDB_Page
             $obj->displayAllFields = true;
         }
 
+        // Set testName variable for linst and json instruments that
+        // do not already do this in its setup function
+        $obj->testName = $instrument;
+
         // Sets up page variables such as $this->commentID and $this->form
         $obj->setup($commentID, $page);
-
-        // Adds all of the form element and form rules to the page after
-        // having instantiated the form above
-        $obj->loadInstrumentFile(
-            $base . "project/instruments/$instrument.linst"
-        );
-        // Add rules only if they exist.
-        if (file_exists($base."project/instruments/$instrument.rules")) {
-            $obj->loadInstrumentRules(
-                $base . "project/instruments/$instrument.rules"
-            );
-        }
 
         $user   = \User::singleton();
         $access = $obj->_hasAccess($user);
@@ -771,7 +778,7 @@ abstract class NDB_BVL_Instrument extends NDB_Page
         } else {
             $oldData = array();
         }
-        $newData = array_merge($oldData, $values);
+        $newData = array_merge($oldData ?? array(), $values);
 
         // Save the JSON to the flag.Data column.
         //
@@ -2154,53 +2161,27 @@ abstract class NDB_BVL_Instrument extends NDB_Page
     }
 
     /**
-     * Parses a file that isn't written in PHP and loads it into a format
-     * that LORIS understands.
-     *
-     * This is intended to be overridden by a subclass of NDB_BVL_Instrument
-     * to add support for other file formats.
-     *
-     * @param string  $filename The filename to be loaded, or a base64 encoded
-     *                          string.
-     * @param boolean $base64   If true, read the filename as a base64 encoded
-     *                          string of the file content, used for preview.
-     *
-     * @return void
-     */
-    function loadInstrumentFile(string $filename, bool $base64 = false): void
-    {
-    }
-
-    /**
-     * Load the rules for an instrument from the file system.
-     *
-     * This is intended to be overridden by a subclass of NDB_BVL_Instrument
-     * to add support for other file formats.
-     *
-     * @param string $filename Either the path to a file, or a base64 encoded
-     *                         string which can be interpreted as a file by
-     *                         PHP and fopen()
-     * @param bool   $base64   If true, the "filename" is really a base64 encoded
-     *                         data URL, so we shouldn't check that the file exists
-     *                         on the filesystem. (Used by preview)
-     *
-     * @return void
-     */
-    function loadInstrumentRules(string $filename, bool $base64 = false): void
-    {
-    }
-
-    /**
      * Renders the HTML for the control panel for this instrument.
      *
      * @return string The HTML for the control panel
      */
     function getControlPanel(): string
     {
+        $sessionID = $this->getSessionID();
+        $timepoint = \TimePoint::singleton($sessionID);
+        $candID    = $timepoint->getCandID();
         if (!empty($_REQUEST['commentID'])) {
             // make the control panel object for the current instrument
-            $controlPanel = new NDB_BVL_InstrumentStatus_ControlPanel;
-            $controlPanel->select($_REQUEST['commentID']);
+            $controlPanel = new NDB_BVL_InstrumentStatus_ControlPanel(
+                $this->testName,
+                $this->getCommentID() ?? '',
+                $candID,
+                $sessionID,
+                $this->page ?? ''
+            );
+            $this->addHidden('test_name', $this->testName);
+            $this->addHidden('page', $this->page);
+            $this->addHidden('subtest', $this->page);
 
             $config = NDB_Config::singleton();
             $paths  = $config->getSetting('paths');
@@ -2213,6 +2194,7 @@ abstract class NDB_BVL_Instrument extends NDB_Page
                     . "NDB_BVL_Instrument_$TestName.class.inc"
             )
                 || file_exists($BasePath . "$TestName.linst")
+                || $this->isJSONInstrument($TestName)
             ) {
                 // save possible changes from the control panel...
                 $controlPanel->save();
@@ -2594,7 +2576,6 @@ abstract class NDB_BVL_Instrument extends NDB_Page
             )
         );
     }
-
     /**
      * Returns true if this instrument saves its data in JSON format to
      * the flag column, rather than directly in MySQL tables.
@@ -2605,5 +2586,39 @@ abstract class NDB_BVL_Instrument extends NDB_Page
     {
         return $this->jsonData;
     }
-}
 
+    /**
+     * A form extends the basic page handler to call save() on a POST request.
+     *
+     * @param ServerRequestInterface $request The incoming PSR7 request
+     *
+     * @return ResponseInterface The PSR15 response to the request.
+     */
+    public function handle(ServerRequestInterface $request) : ResponseInterface
+    {
+        if ($request->getMethod() === "POST") {
+            $this->save();
+        }
+
+        return (new \Zend\Diactoros\Response())
+            ->withBody(new \LORIS\Http\StringStream($this->display() ?? ""));
+    }
+
+    public static function isJSONInstrument(string $instName) : bool
+    {
+        $DB = \NDB_Factory::singleton()->database();
+
+        $query = "SELECT InstrumentSchemaID
+                    FROM test_names
+                    WHERE Test_name = :instName";
+        $param = array('instName' => $instName);
+
+        $result = $DB->pselect($query, $param);
+
+        if (!empty($result)) {
+            return true;
+        }
+
+        return false;
+    }
+}
