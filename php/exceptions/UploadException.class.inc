@@ -77,4 +77,3 @@ class UploadException extends \LorisException
         return $message;
     }
 }
-

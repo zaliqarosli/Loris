@@ -48,8 +48,27 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
     {
         $this->commentID = $commentID;
         $this->page      = $page;
-
         $this->form = new \LorisForm();
+
+        $config = \NDB_Factory::singleton()->config();
+        $base   = $config->getSetting('base');
+
+        // Move these calls from parent factory function to here now that
+        // testName variable is set. This is so that the below functions
+        // are only called if the instrument is a linst instrument.
+        //
+        // Adds all of the form element and form rules to the page after
+        // having instantiated the form above
+        $this->loadInstrumentFile(
+            $base . "project/instruments/$this->testName.linst"
+        );
+        // Add rules only if they exist.
+        if (file_exists($base."project/instruments/$this->testName.rules")) {
+            $this->loadInstrumentRules(
+                $base . "project/instruments/$this->testName.rules"
+            );
+        }
+
     }
     /**
      * Adds metadata fields (such as Examiner and Date_taken) to the
@@ -861,10 +880,12 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
                                           );
                     break;
                 case 'numeric':
+                    $minValue = isset($value[3]) ? (int)$value[3] : 0;
+                    $maxValue = isset($value[4]) ? (int)rtrim($value[4]) : 0;
                     $element['Options'] = array(
                                            'NumberType' => 'integer',
-                                           'MinValue'   => (int) $value[3],
-                                           'MaxValue'   => (int) rtrim($value[4]),
+                                           'MinValue'   => $minValue,
+                                           'MaxValue'   => $maxValue,
                                           );
                     break;
                 case 'score':

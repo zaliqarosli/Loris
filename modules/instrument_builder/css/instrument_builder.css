@@ -17,3 +17,31 @@
 .file-upload .input-group-btn {
     display: block;
 }
+
+.items {
+    border: 1px dashed #C3D5DB;
+}
+.items:hover {
+    border: 1px dashed #246EB6;
+}
+
+.placeholder-field {
+    border-radius: 2px;
+    border: 1px dashed #C3D5DB;
+    background: transparent;
+    padding: 10px;
+    margin: 15px;
+    color: #333;
+    height: 100px;
+}
+
+.placeholder-section {
+    border-radius: 2px;
+    border: 1px dashed #C3D5DB;
+    background: transparent;
+    padding: 10px 0px;
+    margin: 15px;
+    color: #333;
+    height: 100px;
+}
+

@@ -1,5 +1,5 @@
 /* exported FormElement, FieldsetElement, SelectElement, TagsElement, SearchableDropdown, TextareaElement,
-TextboxElement, DateElement, NumericElement, FileElement, StaticElement, LinkElement,
+TextboxElement, DateElement, NumericElement, FileElement, StaticElement, HeaderElement, LinkElement,
 CheckboxElement, ButtonElement, LorisElement
 */
 
@@ -472,13 +472,22 @@ class SelectElement extends Component {
     // Default to empty string for regular select and to empty array for 'multiple' select
     const value = this.props.value || (multiple ? [] : '');
 
-    return (
-      <div className={elementClass}>
+    let label = null;
+    let inputClass = 'col-sm-12';
+    if (this.props.label || this.props.label == '') {
+      label = (
         <label className="col-sm-3 control-label" htmlFor={this.props.label}>
           {this.props.label}
           {requiredHTML}
         </label>
-        <div className="col-sm-9">
+      );
+      inputClass = 'col-sm-9';
+    }
+
+    return (
+      <div className={elementClass}>
+        {label}
+        <div className={inputClass}>
           <select
             name={this.props.name}
             multiple={multiple}
@@ -508,7 +517,6 @@ SelectElement.propTypes = {
     PropTypes.array,
   ]),
   id: PropTypes.string,
-  class: PropTypes.string,
   multiple: PropTypes.bool,
   disabled: PropTypes.bool,
   required: PropTypes.bool,
@@ -521,10 +529,8 @@ SelectElement.propTypes = {
 SelectElement.defaultProps = {
   name: '',
   options: {},
-  label: '',
   value: undefined,
   id: null,
-  class: '',
   multiple: false,
   disabled: false,
   required: false,
@@ -909,18 +915,26 @@ class TextboxElement extends Component {
     }
 
     // Add error message
-    if (this.props.errorMessage) {
+    if (this.props.hasError || (this.props.required && this.props.value === '')) {
       errorMessage = <span>{this.props.errorMessage}</span>;
       elementClass = 'row form-group has-error';
     }
 
-    return (
-      <div className={elementClass}>
+    let label = null;
+    let inputClass = 'col-sm-12';
+    if (this.props.label || this.props.label == '') {
+      label = (
         <label className="col-sm-3 control-label" htmlFor={this.props.id}>
           {this.props.label}
           {requiredHTML}
         </label>
-        <div className="col-sm-9">
+      );
+      inputClass = 'col-sm-9';
+    }
+    return (
+      <div className={elementClass}>
+        {label}
+        <div className={inputClass}>
           <input
             type="text"
             className="form-control"
@@ -931,6 +945,7 @@ class TextboxElement extends Component {
             disabled={disabled}
             onChange={this.handleChange}
             onBlur={this.handleBlur}
+            placeholder={this.props.placeholder}
           />
           {errorMessage}
         </div>
@@ -946,24 +961,27 @@ TextboxElement.propTypes = {
   id: PropTypes.string,
   disabled: PropTypes.bool,
   required: PropTypes.bool,
+  hasError: PropTypes.bool,
   errorMessage: PropTypes.string,
   onUserInput: PropTypes.func,
   onUserBlur: PropTypes.func,
+  placeholder: PropTypes.func,
 };
 
 TextboxElement.defaultProps = {
   name: '',
-  label: '',
   value: '',
   id: null,
   disabled: false,
   required: false,
-  errorMessage: '',
+  hasError: false,
+  errorMessage: 'The field is required!',
   onUserInput: function() {
     console.warn('onUserInput() callback is not set');
   },
   onUserBlur: function() {
   },
+  placeholder: '',
 };
 
 /**
@@ -1187,9 +1205,28 @@ class NumericElement extends Component {
     let disabled = this.props.disabled ? 'disabled' : null;
     let required = this.props.required ? 'required' : null;
     let requiredHTML = null;
+    let errorMessage = null;
+    let elementClass = 'row form-group';
+
+    // Add required asterisk
+    if (required) {
+      requiredHTML = <span className="text-danger">*</span>;
+    }
+
+    // Add error message if element is required
+    if (this.props.required && this.props.value === '') {
+      errorMessage = <span>{'The field is required!'}</span>;
+      elementClass = 'row form-group has-error';
+    } else if (this.props.max != null && this.props.min != null
+      && (this.props.value > this.props.max || this.props.value < this.props.min)) {
+      // Add error message if value is not within min and max
+      errorMessage = <span>{'The value has to be between ' + this.props.min + ' and '
+        + this.props.max + '!'}</span>;
+      elementClass = 'row form-group has-error';
+    }
 
     return (
-      <div className="row form-group">
+      <div className={elementClass}>
         <label className="col-sm-3 control-label" htmlFor={this.props.id}>
           {this.props.label}
           {requiredHTML}
@@ -1207,6 +1244,7 @@ class NumericElement extends Component {
             required={required}
             onChange={this.handleChange}
           />
+          {errorMessage}
         </div>
       </div>
     );
@@ -1395,14 +1433,34 @@ class StaticElement extends Component {
     super(props);
   }
   render() {
-    return (
-      <div className="row form-group">
-        <label className="col-sm-3 control-label">
+    let labelClass = 'col-sm-3 control-label';
+    let textClass = 'col-sm-9';
+    if (!this.props.label && this.props.label != '') {
+      textClass = 'col-sm-12';
+    }
+    if (!this.props.text && this.props.text != '') {
+      labelClass = 'col-sm-12';
+    }
+    let label = null;
+    if (this.props.label || this.props.label === '') {
+      label = (
+        <label className={labelClass}>
           {this.props.label}
         </label>
-        <div className="col-sm-9">
+      );
+    }
+    let text = null;
+    if (this.props.text || this.props.text === '') {
+      text = (
+        <div className={textClass}>
           <p className="form-control-static">{this.props.text}</p>
         </div>
+      );
+    }
+    return (
+      <div className="row form-group">
+        {label}
+        {text}
       </div>
     );
   }
@@ -1417,8 +1475,41 @@ StaticElement.propTypes = {
 };
 
 StaticElement.defaultProps = {
-  label: '',
-  text: null,
+};
+
+/**
+ * Header element component.
+ * Used to display a header element with specific level (1-6) as part of a form
+ *
+ */
+class HeaderElement extends Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    const Tag = 'h' + this.props.headerLevel;
+    return (
+      <div className="row form-group">
+        <Tag className='col-xs-12'>
+          {this.props.text}
+        </Tag>
+      </div>
+    );
+  }
+}
+
+HeaderElement.propTypes = {
+  text: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.element,
+  ]).isRequired,
+  headerLevel: PropTypes.oneOf([
+    1, 2, 3, 4, 5, 6,
+  ]),
+};
+
+HeaderElement.defaultProps = {
+  headerLevel: 3,
 };
 
 /**
@@ -1494,7 +1585,7 @@ class CheckboxElement extends React.Component {
 
     return (
       <div className={elementClass}>
-        <label htmlFor={this.props.id}>
+        <label style={{marginLeft: '8px'}} htmlFor={this.props.id}>
           <input
             type="checkbox"
             name={this.props.name}
@@ -1552,7 +1643,7 @@ class ButtonElement extends Component {
 
   render() {
     return (
-      <div className="row form-group">
+      <div className={this.props.className}>
         <div className={this.props.columnSize}>
           <button
             name={this.props.name}
@@ -1572,12 +1663,17 @@ ButtonElement.propTypes = {
   name: PropTypes.string,
   label: PropTypes.string,
   type: PropTypes.string,
+  className: PropTypes.string,
+  buttonClass: PropTypes.string,
+  columnSize: PropTypes.string,
   onUserInput: PropTypes.func,
 };
 
 ButtonElement.defaultProps = {
+  name: '',
   label: 'Submit',
   type: 'submit',
+  className: 'row form-group',
   buttonClass: 'btn btn-primary',
   columnSize: 'col-sm-9 col-sm-offset-3',
   onUserInput: function() {
@@ -1661,6 +1757,9 @@ class LorisElement extends Component {
       case 'static':
         elementHtml = (<StaticElement {...elementProps} />);
         break;
+      case 'header':
+        elementHtml = (<HeaderElement {...elementProps} />);
+        break;
       case 'link':
         elementHtml = (<LinkElement {...elementProps} />);
         break;
@@ -1690,6 +1789,7 @@ window.TimeElement = TimeElement;
 window.NumericElement = NumericElement;
 window.FileElement = FileElement;
 window.StaticElement = StaticElement;
+window.HeaderElement = HeaderElement;
 window.LinkElement = LinkElement;
 window.CheckboxElement = CheckboxElement;
 window.ButtonElement = ButtonElement;
@@ -1709,6 +1809,7 @@ export default {
   NumericElement,
   FileElement,
   StaticElement,
+  HeaderElement,
   LinkElement,
   CheckboxElement,
   ButtonElement,

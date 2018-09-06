@@ -223,4 +223,7 @@ class FilesUploadHandler implements RequestHandlerInterface
                     ->withStatus(201);
     }
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> Add instruments module to load instruments through new router

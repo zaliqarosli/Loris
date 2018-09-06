@@ -1,39 +1,38 @@
 <?php
 /**
- * Instrument_builder
- * Stub class.. all this does is check permissions, since everything else is
- * done in the template/javascript
+ * Instrument_builder class
  *
- * PHP Version 5
+ * PHP Version 7
  *
- * @category Test
+ * @category Behavioural
  * @package  Loris
- * @author   Ted Strauss <ted.strauss@mcgill.ca>
- * @author   Wang Shen <wangshen.mcin@gmail.com>
+ * @author   Zaliqa Rosli <zaliqa.rosli@mcin.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
 
 namespace LORIS\instrument_builder;
+
+use \Psr\Http\Message\ServerRequestInterface;
+use \Psr\Http\Message\ResponseInterface;
+
 /**
- * Instrument_builder
- * Stub class.. all this does is check permissions, since everything else is
- * done in the template/javascript
+ * Instrument_builder class
  *
- * PHP Version 5
+ * PHP Version 7
  *
- * @category Test
+ * @category Behavioural
  * @package  Loris
- * @author   Ted Strauss <ted.strauss@mcgill.ca>
- * @author   Wang Shen <wangshen.mcin@gmail.com>
+ * @author   Zaliqa Rosli <zaliqa.rosli@mcin.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
-class Instrument_Builder extends \NDB_Form
+class Instrument_Builder extends \NDB_Menu_Filter_Form
 {
+    public $skipTemplate = true;
+
     /**
-     * Tests that, when loading the Instrument builder module, some
-     * text appears in the body.
+     * Checks access to user
      *
      * @param \User $user The user whose access is being checked
      *
@@ -45,8 +44,76 @@ class Instrument_Builder extends \NDB_Form
     }
 
     /**
-     * Include additional CSS files:
-     *  1. instrument_builder.css
+     * Does the setup required for this page
+     *
+     * @return void
+     */
+    function setup()
+    {
+        $this->form->addFormRule(array(&$this, '_validateLoadInstrument'));
+    }
+
+    /**
+     * Validates the load instrumnet value.
+     *
+     * @param array $values Load Instrument form values
+     *
+     * @return array $errors
+     */
+    function _validateLoadInstrument($values)
+    {
+        $file = $values['fileToLoad'];
+        if (empty($file)) {
+            $errors['fileEmpty'] = 'Instrument file is required.';
+        }
+        return $errors;
+    }
+
+    /**
+     * Processes the load instrument form values
+     *
+     * @param array $values load instrument form values
+     *
+     * @return void
+     */
+    function _process($values)
+    {
+
+    }
+
+    /**
+     * Gets the data source for this menu filter.
+     *
+     * @return \LORIS\Data\Provisioner
+     */
+    function getDataProvisioner() : \LORIS\Data\Provisioner
+    {
+        return new InstrumentRowProvisioner();
+    }
+
+    /**
+     * Converts the results of this menu filter to a JSON format to be retrieved
+     * with ?format=json
+     *
+     * @return string a json encoded string of the data from this table
+     */
+    function toJSON()
+    {
+        $db            = \NDB_Factory::singleton()->database();
+
+        $table = (new \LORIS\Data\Table())
+            ->withDataFrom($this->getDataProvisioner());
+        $arr   = array_map(
+            function ($row) {
+                return array_values($row);
+            },
+            json_decode($table->toJSON(\User::singleton()), true)
+        );
+        return json_encode(['data' => $arr]);
+    }
+
+    /**
+     * Include additional CSS files
      *
      * @return array of CSS to be inserted
      */
@@ -73,13 +140,7 @@ class Instrument_Builder extends \NDB_Form
         $depends = parent::getJSDependencies();
         return array_merge(
             $depends,
-            array(
-             $baseurl . "/instrument_builder/js/instrument_builder.instrument.js",
-             $baseurl . "/instrument_builder/js/instrument_builder.rules.js",
-             $baseurl . "/instrument_builder/js/react.questions.js",
-             $baseurl . "/instrument_builder/js/react.instrument_builder.js",
-            )
+            array($baseurl . "/instrument_builder/js/instrumentBuilderIndex.js")
         );
     }
 }
-

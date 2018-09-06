@@ -123,7 +123,7 @@ class BaseRouter extends PrefixRouter implements RequestHandlerInterface
                     $request    = $request
                     ->withAttribute(
                         "TimePoint",
-                        \TimePoint::singleton($components[1])
+                        \TimePoint::singleton(intval($components[1]))
                     );
                         $module = \Module::factory("instrument_list");
                         $mr     = new ModuleRouter($module, $this->moduledir);
