@@ -11,6 +11,8 @@
  * @link     https://github.com/aces/Loris
  */
 namespace LORIS\examiner;
+use \Psr\Http\Message\ServerRequestInterface;
+use \Psr\Http\Message\ResponseInterface;
 
 class EditExaminer extends \NDB_Form
 {
@@ -63,7 +65,41 @@ class EditExaminer extends \NDB_Form
             return $permitted || $permittedAllSites;
         }
         return false;
+    }
 
+    /**
+     * This acts as an AJAX endpoint.
+     *
+     * @param ServerRequestInterface $request The incoming PSR7 request
+     *
+     * @return ResponseInterface The outgoing PSR7 response
+     */
+    public function handle(ServerRequestInterface $request) : ResponseInterface
+    {
+      // The parent handles things like hasAccess checks.
+      $resp = parent::handle($request);
+      switch ($resp->getStatusCode()) {
+        case 200:
+          // If it was a 200 code, it just means display was called and
+          // access validated. We still need to do other validations
+          // and add the result body.
+          break;
+        default:
+          return $resp;
+      }
+
+      // Ensure it's a POST request.
+      if ($request->getMethod() != "POST") {
+        return (new \LORIS\Http\Response())
+          ->withHeader("Content-Type", "text/plain")
+          ->withStatus(405)
+          ->withHeader("Allow", "POST")
+          ->withBody(
+            new \LORIS\Http\StringStream(
+              "Only POST requests are allowed"
+            )
+          );
+      }
     }
 
     /**
