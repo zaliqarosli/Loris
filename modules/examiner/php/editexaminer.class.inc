@@ -65,6 +65,115 @@ class EditExaminer extends \NDB_Page
     }
 
     /**
+     * Fetches default certification form values from the database.
+     * Creates the certification history table ("Change Log").
+     *
+     * @return object JSON encoded array of default form values
+     */
+    function _getDefaults()
+    {
+      $db = \NDB_Factory::singleton()->database();
+
+      // Get the certification results for the given examiner
+      $result = $db-pselect(
+        "SELECT testID, pass, date_cert, comment
+         FROM certification
+         WHERE examinerID=:EID",
+        array('EID' => $this->identifier)
+      );
+
+      // Set the form defaults for the page
+      foreach ($result as $row) {
+        $defaults['date_cert[' . $row['testID'] . ']'] = $row['date_cert'];
+        $defaults['certStatus[' . $row['testID'] . ']'] = $row['pass'];
+        $defaults['comment[' . $row['testID'] . ']'] = $row['comment'];
+      }
+
+      return $defaults;
+    }
+
+    /**
+     * Does the setup required for this page. By default, sets up elements
+     * that are common to every type of page. May be overridden by a specific
+     * page or specific page type.
+     *
+     * @return void
+     */
+    function setup()
+    {
+      parent::setup();
+      $db     = \NDB_Factory::singleton()->database();
+      $config = \NDB_Config::singleton();
+
+      // Get the certification history from the database
+      $certification_history = $db->pselect(
+        "SELECT ch.userID, ch.changeDate, ch.old, ch.old_date,  
+         tn.Full_name as Measure, ch.primaryVals, ch.new, ch.new_date 
+         FROM certification_history ch  
+         LEFT JOIN test_names tn ON (ch.testID=tn.ID) 
+         LEFT JOIN certification c ON (c.certID=ch.primaryVals) 
+         WHERE c.examinerID=:EID  
+         ORDER BY changeDate DESC",
+        array('EID' => $this->identifier)
+      );
+      $minYear = $config->getSetting('startYear');
+      $maxYear = $config->getSetting('endYear');
+      $instruments = $this->getCertificationInstruments();
+
+      // Get the examiner name and site name, to be added to the form panel header
+      $row = $db->pselectRow(
+        "SELECT e.full_name
+         FROM examiners e
+         WHERE e.examinerID=:EID",
+        array('EID' => $this->identifier)
+      );
+      $this->form->addFormRule(array(&$this, '_validateEditExaminer'));
+    }
+
+    /**
+     * Validates the certification form values.
+     *
+     * @param array $values Certification from values
+     *
+     * @return array of error messages
+     */
+    function _validateEditExaminer($values)
+    {
+      $db = \NDB_Factory::singleton()->database();
+      $errors = array();
+
+      // Check that there is both a status and a date (neither can be null)
+      foreach ($values['certStatus'] as $instrumentID => $certificationStatus) {
+        if (empty($certificationStatus)
+          || empty($values['date_cert'][$instrumentID])
+        ) {
+          if (($certificationStatus == "certified")
+            && empty($values['date_cert'][$instrumentID])
+          ) {
+            $errors['certStatus[' . $instrumentID . ']'] = 'Both certification
+              status and date must be filled out';
+          }
+        }
+      }
+
+      // Check if previously recorded certification are all present
+      // (can not delete, only change status)
+      $rows = $db->pselect(
+        "SELECT c.testID
+         FROM certification c
+         WHERE c.examinerID=:EID",
+        array('EID' => $this->identifier)
+      );
+      foreach ($rows as $row) {
+        if ($values['certStatus'][$row['testID']] == "") {
+          $errors['certStatus[' . $row['testID'] . ']']
+            = 'You can not delete a status';
+        }
+      }
+      return $errors;
+    }
+
+    /**
      * This acts as an AJAX endpoint.
      *
      * @param ServerRequestInterface $request The incoming PSR7 request
