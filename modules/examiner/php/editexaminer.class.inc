@@ -121,12 +121,13 @@ class EditExaminer extends \NDB_Page
       $instruments = $this->getCertificationInstruments();
 
       // Get the examiner name and site name, to be added to the form panel header
-      $row = $db->pselectRow(
+      $nameRow = $db->pselectRow(
         "SELECT e.full_name
          FROM examiners e
          WHERE e.examinerID=:EID",
         array('EID' => $this->identifier)
       );
+      $examinerName = $nameRow['full_name'];
       $this->form->addFormRule(array(&$this, '_validateEditExaminer'));
     }
 
@@ -194,35 +195,52 @@ class EditExaminer extends \NDB_Page
           return $resp;
       }
 
-      // Ensure it's a POST request.
-      if ($request->getMethod() != "POST") {
+      // Ensure it's a GET request.
+      if ($request->getMethod() != "GET") {
         return (new \LORIS\Http\Response())
           ->withHeader("Content-Type", "text/plain")
           ->withStatus(405)
-          ->withHeader("Allow", "POST")
+          ->withHeader("Allow", "GET")
           ->withBody(
             new \LORIS\Http\StringStream(
-              "Only POST requests are allowed"
+              "Only GET requests are allowed"
             )
           );
-      }
-
-      // Get parameters
-      $posts = $request->getParsedBody();
-      $examinerID = $this->identifier;
-      $instruments = $this->getCertificationInstruments();
-
-      // Process form data
-      foreach ($instruments as $testID=>$row) {
-        $data = json_decode($posts[$testID], true) ?? null;
-        $this->process($data, $testID);
       }
 
       return (new \LORIS\Http\Response())
         ->withHeader("Content-Type", "application/json")
         ->withStatus(200);
     }
-
+    /**
+     * This acts as an AJAX endpoint for submission?.
+     *
+     * @param ServerRequestInterface $request The incoming PSR7 request
+     * @param RequestHandlerInterface $handler The something something
+     *
+     * @return ResponseInterface The outgoing PSR7 response
+     */
+//    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler) : ResponseInterface
+//    {
+//      $resp = parent::process($request, $handler);
+//      switch ($resp->getStatusCode()) {
+//        case 200:
+//          break;
+//        default:
+//          return $resp;
+//      }
+//      // Get parameters
+//      $posts = $request->getParsedBody();
+//      $examinerID = $this->identifier;
+//      $instruments = $this->getCertificationInstruments();
+//
+//      // Process form data
+//      foreach ($instruments as $testID=>$row) {
+//        $data = json_decode($posts[$testID], true) ?? null;
+//        $this->submitData($data, $testID);
+//      }
+//
+//    }
     /**
      * Handles the processing of the submitted data to DB
      *
@@ -233,7 +251,7 @@ class EditExaminer extends \NDB_Page
      *
      * @return none
      */
-    function process(array $data, int $testID)
+    function submitData(array $data, int $testID)
     {
       $db   = \NDB_Factory::singleton()->database();
       $user = \User::singleton();
@@ -299,7 +317,7 @@ class EditExaminer extends \NDB_Page
            ORDER BY changeDate DESC",
           array(
             'EID' => $this->identifier,
-            'TID' = > $testID,
+            'TID' => $testID,
           )
         );
         $oldStatus  = $oldVals['new'] ?? null;
@@ -340,7 +358,7 @@ class EditExaminer extends \NDB_Page
           // Add the change as new entry to the history table
           if ($oldDate != $date || $oldStatus != $status) {
             $data = array(
-              'col'         => 'pass'
+              'col'         => 'pass',
               'old'         => $oldStatus,
               'new'         => $status,
               'primaryVals' => $certID,
