@@ -14,7 +14,7 @@ namespace LORIS\examiner;
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
 
-class EditExaminer extends \NDB_Form
+class EditExaminer extends \NDB_Page
 {
     /**
      * Checks if the user has access to the edit examiner form
@@ -36,10 +36,7 @@ class EditExaminer extends \NDB_Form
         }
         $DB     = \NDB_Factory::singleton()->database();
         $config = \NDB_Config::singleton();
-
-        $user         = \User::singleton();
-        $userFullName = $user->getFullname();
-        $userCenter   = $user->getCenterIDs();
+        $user   = \User::singleton();
 
         $certification = $config->getSetting('Certification');
 
@@ -99,6 +96,163 @@ class EditExaminer extends \NDB_Form
               "Only POST requests are allowed"
             )
           );
+      }
+
+      // Get parameters
+      $posts = $request->getParsedBody();
+      $examinerID = $this->identifier;
+      $instruments = $this->getCertificationInstruments();
+
+      // Process form data
+      foreach ($instruments as $testID=>$row) {
+        $data = json_decode($posts[$testID], true) ?? null;
+        $this->process($data, $testID);
+      }
+
+      return (new \LORIS\Http\Response())
+        ->withHeader("Content-Type", "application/json")
+        ->withStatus(200);
+    }
+
+    /**
+     * Handles the processing of the submitted data to DB
+     *
+     * @param array $data   the array of decoded json object containing
+     *                      certification data
+     * @param int   $testID the ID of the instrument for which the examiner's
+     *                      certification is to be edited
+     *
+     * @return none
+     */
+    function process(array $data, int $testID)
+    {
+      $db   = \NDB_Factory::singleton()->database();
+      $user = \User::singleton();
+
+      // Set variables
+      $comments = $data['comments'] ?? null;
+      $date     = $data['date'] ?? null;
+      $status   = $data['status'] ?? null;
+
+      // Get the certificationID if it exists
+      $certID = $db->pselectOne(
+        "SELECT certID
+         FROM certification
+         WHERE examinerID=:EID AND testID=:TID",
+        array(
+          'EID' => $this->identifier,
+          'TID' => $testID,
+        )
+      );
+
+      // If the certification is for a new instrument for the examiner
+      if (empty($certID) && !empty($status)) {
+        // Insert a new certification entry
+        $newData = array(
+          'examinerID' => $this->identifier,
+          'testID'     => $testID,
+          'pass'       => $status,
+          'comment'    => $comments,
+        );
+        if ($date != "") {
+          $newData['date_cert'] = $date;
+        }
+        $db->insert(
+          'certification',
+          $newData
+        );
+
+        // Add a new entry to the certification history table
+        $data = array(
+          'col'         => 'pass',
+          'new'         => $status,
+          'primaryVals' => $certID,
+          'testID'      => $testID,
+          'visit_label' => null,
+          'changeDate'  => date("Y-m-d H:i:s"),
+          'userID'      => $user->getUsername(), 
+          'type'        => 'I',
+        );
+        if ($date != "") {
+          $data['new_date'] = $date;
+        }
+        $db->insert(
+          'certification_history',
+          $data
+        );
+      } else {  // Update an existing test certification for the examiner
+        // Select history events
+        $oldVals = $db->pselectRow(
+          "SELECT ch.new, ch.new_date
+           FROM certification_history ch
+           LEFT JOIN certification c ON (c.certID=ch.primaryVals)
+           WHERE c.examinerID=:EID AND ch.testID=:TID
+           ORDER BY changeDate DESC",
+          array(
+            'EID' => $this->identifier,
+            'TID' = > $testID,
+          )
+        );
+        $oldStatus  = $oldVals['new'] ?? null;
+        $oldDate    = $oldVals['new_date'] ?? null;
+        // Select existing test certification in db
+        $currentCert = $db->peselectRow(
+          "SELECT pass, date_cert, comment
+           FROM certification
+           WHERE examinerID=:EID AND testID=:TID",
+          array(
+            'EID' => $this->identifier,
+            'TID' => $testID,
+          )
+        );
+
+        // If one of the values of current certification
+        // was changed, update certification with new values
+        if ($currentCert['pass'] != $status
+          || $currentCert['comment'] != $comments
+          || $currentCert['date_cert'] != $date
+        ) {
+          // Update the certification entry
+          $data = array(
+            'pass'    => $status,
+            'comment' => $comments,
+          );
+          if ($date != "") {
+            $data['date_cert'] = $date;
+          }
+          $db->update(
+            'certification',
+            $data,
+            array(
+              'examinerID' => $examinerID,
+              'testID'     => $testID,
+            )
+          );
+          // Add the change as new entry to the history table
+          if ($oldDate != $date || $oldStatus != $status) {
+            $data = array(
+              'col'         => 'pass'
+              'old'         => $oldStatus,
+              'new'         => $status,
+              'primaryVals' => $certID,
+              'testID'      => $testID,
+              'visit_label' => null,
+              'changeDate'  => date("Y-m-d H:i:s"),
+              'userID'      => $user->getUsername(),
+              'type'        => 'U',
+            );
+            if ($oldDate != "") {
+              $data['old_date'] = $oldDate;
+            }
+            if ($date != "") {
+              $data['new_date'] = $date;
+            }
+            $db->insert(
+              'certification_history',
+              $data
+            );
+          }
+        }
       }
     }
 

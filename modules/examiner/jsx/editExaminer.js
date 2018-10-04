@@ -107,7 +107,7 @@ class EditExaminer extends React.Component {
         formObject.append('identifier', this.props.examinerID);
         $.ajax({
             type: 'POST',
-            url: `${loris.BaseURL}/examiner/ajax/editCertificate.php`,
+            url: `${loris.BaseURL}/examiner/editExaminer/?identifier=${this.props.examinerID}`,
             data: formObject,
             cache: false,
             contentType: false,
