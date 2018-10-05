@@ -37,9 +37,8 @@ class EditExaminer extends React.Component {
     fetchData() {
         const self = this;
         let formData = {};
-        $.ajax(this.props.DataURL, {
-            method: 'GET',
-            dataType: 'json',
+        $.get(loris.BaseURL + "/examiner/fetchCertification", {
+            identifier: this.props.examinerID,
             success: data => {
                 const instruments = data.instruments;
                 for (let instrumentID in instruments) {
@@ -325,7 +324,6 @@ class EditExaminer extends React.Component {
 
 EditExaminer.propTypes = {
   Module: React.PropTypes.string.isRequired,
-  DataURL: React.PropTypes.string.isRequired,
 };
 
 /**
@@ -337,7 +335,7 @@ window.onload = () => {
     <div id="page-editexaminer">
       <EditExaminer
         Module="examiner"
-        DataURL={`${loris.BaseURL}/examiner/editExaminer/?identifier=${args.identifier}&format=json`}
+        examinerID={args.identifier}
       />
     </div>
   );
