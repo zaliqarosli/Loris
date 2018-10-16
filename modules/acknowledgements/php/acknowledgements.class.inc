@@ -28,7 +28,7 @@ namespace LORIS\acknowledgements;
 
 class Acknowledgements extends \NDB_Menu_Filter_Form
 {
-
+    public $skipTemplate = true;
     /**
      * _has_access returns true
      * if the user has the specific permission
@@ -105,8 +105,6 @@ class Acknowledgements extends \NDB_Menu_Filter_Form
      */
     function _setupVariables()
     {
-        $config = \NDB_Config::singleton();
-
         $this->columns      = array(
                                'ordering',
                                'full_name',
@@ -147,7 +145,6 @@ class Acknowledgements extends \NDB_Menu_Filter_Form
                                'present'       => 'present',
                               );
 
-        $this->tpl_data['citation_policy'] = $config->getSetting('citation_policy');
     }
 
     /**
@@ -206,6 +203,23 @@ class Acknowledgements extends \NDB_Menu_Filter_Form
     }
 
     /**
+     * Converts the results of this menu filter to a JSON format to be retrieved
+     * with ?format=json
+     *
+     * @return string json
+     */
+    function toJSON()
+    {
+        $config = \NDB_Config::singleton();
+
+        $result                    = $this->toArray();
+        $result['form']            = $this->form->form;
+        $result['citation_policy'] = $config->getSetting('citation_policy');
+
+        return json_encode($result);
+    }
+
+    /**
      * Add dependency on default acknowledgements.js
      *
      * @return array of javascript files to be included
@@ -221,7 +235,7 @@ class Acknowledgements extends \NDB_Menu_Filter_Form
             $baseDeps,
             array(
              $baseurl . '/acknowledgements/js/acknowledgements_helper.js',
-             $baseurl . '/acknowledgements/js/columnFormatter.js',
+             $baseurl . '/acknowledgements/js/acknowledgements.js',
             )
         );
 

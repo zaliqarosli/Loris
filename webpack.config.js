@@ -50,7 +50,7 @@ var config = [{
     './modules/brainbrowser/js/Brainbrowser.js': './modules/brainbrowser/jsx/Brainbrowser.js',
     './modules/data_integrity_flag/js/index.js': './modules/data_integrity_flag/jsx/index.js',
     './modules/imaging_uploader/js/index.js': './modules/imaging_uploader/jsx/index.js',
-    './modules/acknowledgements/js/columnFormatter.js': './modules/acknowledgements/jsx/columnFormatter.js'
+    './modules/acknowledgements/js/acknowledgements.js': './modules/acknowledgements/jsx/acknowledgements.js'
   },
   output: {
     path: './',
