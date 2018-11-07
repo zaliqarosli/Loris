@@ -818,17 +818,27 @@ class Database
     /**
      * Runs a query as a prepared statement and returns the first row as an
      * associative array. Automatically adds a limit clause to the query being
-     * run for efficiency.
+     * run for efficiency. Limit clause can be disabled by setting false as
+     * the third argument.
      *
-     * @param string $query  The SQL SELECT query to be run
-     * @param array  $params Values to use for binding to prepared statement
+     * @param string $query           The SQL SELECT query to be run
+     * @param array  $params          Values to use for binding to prepared
+     *                                statement
+     * @param bool   $efficiencyLimit Determines whether to use LIMIT clause or not
      *
      * @return ?array Associative array of form ColumnName => Value for each column
      *                in the first row of the query
      */
-    function pselectRow(string $query, array $params) : ?array
-    {
-        $rows = $this->pselect($query . " LIMIT 2", $params);
+    function pselectRow(
+        string $query,
+        array $params,
+        bool $efficiencyLimit = true
+    ) : ?array {
+
+        if ($efficiencyLimit) {
+            $query .= " LIMIT 2";
+        }
+        $rows = $this->pselect($query, $params);
         if (count($rows) > 1) {
             throw new \DomainException(
                 "Attempt to use pselectRow on a query that returns multiple rows"
@@ -961,14 +971,17 @@ class Database
      * returning an array of a single element) so that we can properly enforce
      * types.
      *
-     * @param string $query  The SQL statement to run
-     * @param array  $params Values to use for binding in the prepared statement
+     * @param string $query           The SQL statement to run
+     * @param array  $params          Values to use for binding in the prepared
+     *                                statement
+     * @param bool   $efficiencyLimit Determines whether to use LIMIT clause in
+     *                                pselectRow
      *
      * @return mixed The value returned by the query: array, string, or false.
      */
     function pselectOne(string $query, array $params)
     {
-        $result = $this->pselectRow($query, $params);
+        $result = $this->pselectRow($query, $params, $efficiencyLimit);
         if (is_array($result) && count($result)) {
             $result = array_values($result)[0];
         }
