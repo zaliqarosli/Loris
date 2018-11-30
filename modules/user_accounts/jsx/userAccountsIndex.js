@@ -33,7 +33,17 @@ class UserAccountsIndex extends Component {
   fetchData() {
     return fetch(this.props.dataURL, {credentials: 'same-origin'})
       .then((resp) => resp.json())
-      .then((data) => this.setState({data}))
+      .then((data) => {
+        // Convert concatenated string of sites to array
+        for (let key in data.Data) {
+          if (data.Data.hasOwnProperty(key)) {
+            const sites = data.Data[key]['0'];
+            const siteArray = sites.split('; ');
+            data.Data[key]['0'] = siteArray;
+          }
+        }
+        this.setState({data});
+      })
       .catch((error) => {
         this.setState({error: true});
         console.error(error);
@@ -51,11 +61,18 @@ class UserAccountsIndex extends Component {
    */
   formatColumn(column, cell, row) {
     let url;
-    if (column === 'Username') {
-      url = loris.BaseURL + '/user_accounts/edit_user/' + row.Username;
-      return (<td><a href ={url}>{cell}</a></td>);
+    let result = <td>{cell}</td>;
+    switch (column) {
+      case 'Site':
+        // If user has multiple sites, join array of sites into string
+        result = <td>{cell.join('; ')}</td>;
+        break;
+      case 'Username':
+        url = loris.BaseURL + '/user_accounts/edit_user/' + row.Username;
+        result = <td><a href ={url}>{cell}</a></td>;
+        break;
     }
-    return <td>{cell}</td>;
+    return result;
   }
 
   render() {
@@ -111,6 +128,7 @@ class UserAccountsIndex extends Component {
           name="userAccounts"
           data={this.state.data.Data}
           fields={fields}
+          columns={2}
           getFormattedCell={this.formatColumn}
         />
       </div>
