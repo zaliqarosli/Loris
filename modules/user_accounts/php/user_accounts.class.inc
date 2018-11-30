@@ -110,29 +110,30 @@ class User_Accounts extends \NDB_Menu_Filter
         if ($user->hasPermission('user_accounts_multisite')) {
             // get the list of study sites - to be replaced by the Site object
             $list_of_sites = array();
-            $site_arr = \Utility::getSiteList(false);
+            $site_arr      = \Utility::getSiteList(false);
             foreach ($site_arr as $key=>$val) {
-              $list_of_sites[$val] = $val;
+                $list_of_sites[$val] = $val;
             }
         } else {
             // allow only to view own site data
             $list_of_sites = array();
             $site_arr      = $user->getData('CenterIDs');
             foreach ($site_arr as $key=>$val) {
-                $site[$key]          =& \Site::singleton($val);
-                $list_of_sites[$site[$key]->getCenterName()] =
-                    $site[$key]->getCenterName();
+                $site[$key] = \Site::singleton($val);
+                $list_of_sites[$site[$key]->getCenterName()]
+                    = $site[$key]->getCenterName();
             }
         }
         $yesNoOptions = array(
-                          'Y' => 'Y',
-                          'N' => 'N',
+                         'Y' => 'Yes',
+                         'N' => 'No',
                         );
+
         $this->fieldOptions = array(
-          'sites' => $list_of_sites,
-          'actives' => $yesNoOptions,
-          'pendingApprovals' => $yesNoOptions,
-        );
+                               'sites'            => $list_of_sites,
+                               'actives'          => $yesNoOptions,
+                               'pendingApprovals' => $yesNoOptions,
+                              );
         return true;
     }
     /**

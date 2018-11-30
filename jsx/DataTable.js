@@ -311,6 +311,9 @@ class DataTable extends Component {
       searchKey = filterData.toLowerCase();
       switch (typeof data) {
         case 'object':
+          // Handles the case where the data is an array
+          // and you want to search through it for
+          // the string you are filtering by
           let searchArray = data.map((e) => e.toLowerCase());
           if (exactMatch) {
             result = searchArray.includes(searchKey);
