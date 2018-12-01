@@ -1431,6 +1431,7 @@ class ButtonElement extends Component {
       <div className="row form-group">
         <div className={this.props.columnSize}>
           <button
+            name={this.props.name}
             type={this.props.type}
             className={this.props.buttonClass}
             onClick={this.handleClick}
@@ -1444,6 +1445,7 @@ class ButtonElement extends Component {
 }
 
 ButtonElement.propTypes = {
+  name: PropTypes.string,
   label: PropTypes.string,
   type: PropTypes.string,
   onUserInput: PropTypes.func,

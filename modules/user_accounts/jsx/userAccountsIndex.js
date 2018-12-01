@@ -140,6 +140,7 @@ class UserAccountsIndex extends Component {
       <div id="userAccountsIndex">
         <div id="addUser">
           <ButtonElement
+            name="addUser"
             label="Add User"
             type="button"
             buttonClass="btn btn-sm btn-primary col-xs-12 addCTA"

@@ -106,8 +106,8 @@ class UserAccountsIntegrationTest extends LorisIntegrationTest
      */
     function testSearchForUsers()
     {
-        $this->_assertSearchBy("userID", "my_nonexistent_user_ID", null);
-        $this->_assertSearchBy("userID", "UnitTester", "UnitTester");
+        $this->_assertSearchBy("username", "my_nonexistent_user_ID", null);
+        $this->_assertSearchBy("username", "UnitTester", "UnitTester");
     }
     /**
      * Tests various user account edit operations.
@@ -183,7 +183,7 @@ class UserAccountsIntegrationTest extends LorisIntegrationTest
     function testAddNewUser()
     {
         $this->safeGet($this->url . "/user_accounts/");
-        $this->safeClick(WebDriverBy::Name('button'));
+        $this->safeClick(WebDriverBy::Name('addUser'));
         $field = $this->safeFindElement(WebDriverBy::Name('UserID'));
         $field->clear();
         $field->sendKeys('userid');
