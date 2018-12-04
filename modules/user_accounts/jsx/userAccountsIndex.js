@@ -35,13 +35,10 @@ class UserAccountsIndex extends Component {
       .then((resp) => resp.json())
       .then((data) => {
         // Convert concatenated string of sites to array
-        for (let key in data.Data) {
-          if (data.Data.hasOwnProperty(key)) {
-            const sites = data.Data[key]['0'];
-            const siteArray = sites.split('; ');
-            data.Data[key]['0'] = siteArray;
-          }
-        }
+        data.Data = data.Data.map((row) => {
+          row[0] = row[0].split('; ');
+          return row;
+        });
         this.setState({data});
       })
       .catch((error) => {
