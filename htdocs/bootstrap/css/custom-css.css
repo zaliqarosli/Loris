@@ -714,8 +714,6 @@ a.btn.btn-primary:hover {
     background-color: white;
     border: 1px solid transparent;
     border-radius: 4px;
-    -webkit-box-shadow: 2px 3px 4px 1px rgba(0,0,0,0.175);
-    box-shadow: 2px 3px 4px 1px rgba(0,0,0,0.175);
 }
 
 .panel-default {

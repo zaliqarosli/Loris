@@ -549,7 +549,7 @@ class DataTable extends Component {
     );
 
     return (
-      <div className="panel panel-default">
+      <div>
         {header}
         <table className="table table-hover table-primary table-bordered" id="dynamictable">
           <thead>

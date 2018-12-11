@@ -4,7 +4,7 @@
     <div class="col-lg-8">
 
         <!-- Welcome panel -->
-        <div class="panel panel-default">
+        <div class="panel panel-default shadowedCard">
             <div class="panel-body">
                 <h3 class="welcome">Welcome, {$username}.</h3>
                 <p class="pull-right small login-time">Last login: {$last_login}</p>
@@ -24,7 +24,7 @@
         </div>
 
         <!-- Recruitment -->
-        <div class="panel panel-default">
+        <div class="panel panel-default shadowedCard">
             <div class="panel-heading">
                 <h3 class="panel-title">Recruitment</h3>
                 <span class="pull-right clickable glyphicon glyphicon-chevron-up"></span>
@@ -79,7 +79,7 @@
         </div>
 
         <!-- Charts -->
-        <div class="panel panel-default">
+        <div class="panel panel-default shadowedCard">
             <div class="panel-heading">
                 <h3 class="panel-title">Study Progression</h3>
                 <span class="pull-right clickable glyphicon glyphicon-chevron-up"></span>
@@ -122,7 +122,7 @@
         <!-- My Tasks -->
         {if $new_scans neq "" or $conflicts neq "" or $incomplete_forms neq "" or $radiology_review neq "" or $violated_scans neq "" or $pending_users neq "" or $issues_assigned neq ""}
             <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12">
-                <div class="panel panel-default">
+                <div class="panel panel-default shadowedCard">
                     <div class="panel-heading">
                         <h3 class="panel-title">My Tasks</h3>
                         <span class="pull-right clickable glyphicon glyphicon-chevron-up"></span>
@@ -245,7 +245,7 @@
         <!-- Document Repository -->
         {if $document_repository_notifications neq ""}
             <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12">
-                <div class="panel panel-default">
+                <div class="panel panel-default shadowedCard">
                     <div class="panel-heading">
                         <h3 class="panel-title">Document Repository Notifications</h3>
                         <span class="pull-right clickable glyphicon glyphicon-chevron-up"></span>
@@ -277,7 +277,7 @@
        <!-- Behavioural Feedback -->
         {if $bvl_feedback_notifications neq ""}
             <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12">
-                <div class="panel panel-default">
+                <div class="panel panel-default shadowedCard">
                     <div class="panel-heading">
                         <h3 class="panel-title">Behavioural Feedback Notifications</h3>
                         <span class="pull-right clickable glyphicon glyphicon-chevron-up"></span>

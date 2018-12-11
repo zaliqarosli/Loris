@@ -328,10 +328,12 @@ table.fancytable caption, table.listColorCoded caption {
    /*background-color: #9a5; /*#989;*/
 }
 
-/* Position module's main 'Add' call to action to be
-   above the selection filter panel */
-.addCTA {
-  margin-top: -31px;
+.shadowedCard {
+  margin-bottom: 20px;
+  background-color: white;
+  border: 1px solid #C3D5DB;
+  border-radius: 4px;
+  -webkit-box-shadow: 2px 3px 4px 1px rgba(0,0,0,0.175);
   box-shadow: 2px 3px 4px 1px rgba(0,0,0,0.175);
 }
 

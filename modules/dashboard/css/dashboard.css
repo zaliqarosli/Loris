@@ -79,3 +79,8 @@
     margin-top: 10px;
     float: left;
 }
+
+.shadowedCard {
+  -webkit-box-shadow: 2px 3px 4px 1px rgba(0,0,0,0.175);
+  box-shadow: 2px 3px 4px 1px rgba(0,0,0,0.175);
+}

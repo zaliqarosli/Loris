@@ -43,7 +43,17 @@ class FilterableDataTable extends Component {
 
   render() {
     return (
-      <div>
+      <div className="shadowedCard" id={this.props.name + 'Index'} style={{padding: '30px'}}>
+        <div id={this.props.name + 'AddBtn'}>
+          <ButtonElement
+            name="addBtn"
+            label={this.props.addButton}
+            type="button"
+            buttonClass="btn btn-sm btn-primary col-xs-12"
+            columnSize="col-sm-3 col-md-2 col-xs-12 pull-right"
+            onUserInput={this.props.callToAction}
+          />
+        </div>
         <Filter
           name={this.props.name + '_filter'}
           id={this.props.name + '_filter'}
@@ -53,6 +63,7 @@ class FilterableDataTable extends Component {
           updateFilter={this.updateFilter}
           clearFilter={this.clearFilter}
         />
+        <hr style={{color: '#ddd'}}/>
         <DataTable
           data={this.props.data}
           fields={this.props.fields}
@@ -74,6 +85,8 @@ FilterableDataTable.propTypes = {
   fields: PropTypes.object.isRequired,
   columns: PropTypes.number,
   getFormattedCell: PropTypes.func,
+  addButton: PropTypes.string,
+  callToAction: PropTypes.func,
 };
 
 export default FilterableDataTable;
