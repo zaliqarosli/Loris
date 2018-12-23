@@ -44,7 +44,7 @@
             backtrack_lexer: boolean  (optional: true ==> lexer regexes are tested in order and for each matching regex the action code is invoked; the lexer terminates the scan when a token is returned by the action code)
         },
 
-        performAction: function(yy, yy_, $avoiding_name_collisions, YY_START),
+        performAction: function(yy, yy_, $avoidingNameCollisions, YY_START),
         rules: [...],
         conditions: {associative list: name ==> set},
     }
@@ -590,7 +590,9 @@ test_match: function(match, indexedRule) {
         } else if (this._backtrack) {
             // recover context
             for (let k in backup) {
+              if (backup.hasOwnProperty(k)) {
                 this[k] = backup[k];
+              }
             }
             return false; // rule action called reject() implying the next rule should be tested instead.
         }
@@ -606,10 +608,10 @@ next: function() {
             this.done = true;
         }
 
-        let token,
-            match,
-            tempMatch,
-            index;
+        let token;
+        let match;
+        let tempMatch;
+        let index;
         if (!this._more) {
             this.yytext = '';
             this.match = '';
@@ -650,7 +652,7 @@ next: function() {
             return this.parseError('Lexical error on line ' + (this.yylineno + 1) + '. Unrecognized text.\n' + this.showPosition(), {
                 text: '',
                 token: null,
-                line: this.yylineno
+                line: this.yylineno,
             });
         }
     },
@@ -709,74 +711,74 @@ stateStackSize: function stateStackSize() {
         return this.conditionStack.length;
     },
 options: {},
-performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
-let YYSTATE=YY_START;
-switch($avoiding_name_collisions) {
-case 0:/* skip whitespace */
+performAction: function anonymous(yy, yy_, $avoidingNameCollisions, YY_START) {
+// let YYSTATE = YY_START;
+switch ($avoidingNameCollisions) {
+case 0: /* skip whitespace */
 break;
-case 1:return 39
+case 1: return 39;
 break;
-case 2:return 38
+case 2: return 38;
 break;
-case 3:return 37
+case 3: return 37;
 break;
-case 4:return 11
+case 4: return 11;
 break;
-case 5:return 12
+case 5: return 12;
 break;
-case 6:return 17
+case 6: return 17;
 break;
-case 7:return 27
+case 7: return 27;
 break;
-case 8:return 28
+case 8: return 28;
 break;
-case 9:return 26
+case 9: return 26;
 break;
-case 10:return 25
+case 10: return 25;
 break;
-case 11:return 29
+case 11: return 29;
 break;
-case 12:return 19
+case 12: return 19;
 break;
-case 13:return 34
+case 13: return 34;
 break;
-case 14:return 30
+case 14: return 30;
 break;
-case 15:return 16
+case 15: return 16;
 break;
-case 16:return 18
+case 16: return 18;
 break;
-case 17:return 7
+case 17: return 7;
 break;
-case 18:return 22
+case 18: return 22;
 break;
-case 19:return 23
+case 19: return 23;
 break;
-case 20:return 24
+case 20: return 24;
 break;
-case 21:return 20
+case 21: return 20;
 break;
-case 22:return 21
+case 22: return 21;
 break;
-case 23:return 31
+case 23: return 31;
 break;
-case 24:return 32
+case 24: return 32;
 break;
-case 25:return 33
+case 25: return 33;
 break;
-case 26:return 9
+case 26: return 9;
 break;
-case 27:return 36
+case 27: return 36;
 break;
-case 28:return 35
+case 28: return 35;
 break;
-case 29:return 14
+case 29: return 14;
 break;
-case 30:return 15
+case 30: return 15;
 break;
-case 31:return 5
+case 31: return 5;
 break;
-case 32:return 'INVALID'
+case 32: return 'INVALID';
 break;
 }
 },
@@ -784,9 +786,9 @@ rules: [/^(?:\s+)/, /^(?:null\b)/, /^(?:true\b)/, /^(?:false\b)/, /^(?:E\b)/, /^
 conditions: {
   'INITIAL': {
     'rules': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
-    'inclusive': true
-  }
-}
+    'inclusive': true,
+  },
+},
 });
 return lexer;
 })();
@@ -804,7 +806,7 @@ if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
 exports.parser = jsLogicParser;
 exports.Parser = jsLogicParser.Parser;
 exports.parse = function() {
-  return jsLogicParser.parse.apply(jsLogicParser, arguments);
+  return jsLogicParser.parse(...arguments);
 };
 exports.main = function commonjsMain(args) {
     if (!args[1]) {
