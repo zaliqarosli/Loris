@@ -2,6 +2,17 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import Loader from 'Loader';
 
+import InstrumentFormContainer from '../../../jsx/InstrumentFormContainer';
+
+const INPUT_ELEMENT_TYPES = ['select', 'date', 'radio', 'text', 'calc', 'checkbox', 'numeric'];
+
+function getAgeInMonths(dob) {
+  function monthsBetween(date1, date2) {
+    return date2.getMonth() - date1.getMonth() + (12 * (date2.getFullYear() - date1.getFullYear()));
+  }
+  return monthsBetween(dob, new Date());
+}
+
 class InstrumentViewerIndex extends Component {
   constructor(props) {
     super(props);
@@ -10,6 +21,15 @@ class InstrumentViewerIndex extends Component {
       data: {},
       error: false,
       isLoaded: false,
+      options: {
+        surveyMode: false,
+      },
+      lang: 'en-ca',
+      context: {
+        age_mths: 161,
+        dob: '2005-07-06',
+        lang: '2',
+      },
     };
 
     this.fetchData = this.fetchData.bind(this);
@@ -49,7 +69,13 @@ class InstrumentViewerIndex extends Component {
 
     return (
       <div name='instrumentView' className='panel panel-primary'>
-        <h3> This works </h3>
+        <InstrumentFormContainer
+          instrument={this.state.data}
+          options={this.state.options}
+          initialData={getInitialData(this.state.data)}
+          lang={this.state.lang}
+          context={this.state.context}
+        />
       </div>
     );
   }
