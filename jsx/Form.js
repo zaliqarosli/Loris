@@ -3,6 +3,9 @@ TextboxElement, DateElement, NumericElement, FileElement, StaticElement, LinkEle
 CheckboxElement, ButtonElement, LorisElement
 */
 
+import {RadioGroup, Radio} from 'react-radio-group';
+import {Checkbox, CheckboxGroup} from 'react-checkbox-group';
+
 /**
  * This file contains React components for Loris form elements.
  *
@@ -144,6 +147,235 @@ FormElement.defaultProps = {
     console.warn('onSubmit() callback is not set!');
   },
 };
+
+const RadioGroupLabels = ({labels}) => (
+  <div className="row form-group">
+    <label className="col-sm-3 control-label">
+      &nbsp;
+    </label>
+    <div style={{marginTop: 30, display: 'flex', justifyContent: 'space-around'}} className="col-sm-9">
+      {labels.map((label, index) => (
+        <div key={index} style={{color: 'brown', textAlign: 'center', minWidth: '6em', maxWidth: '6em'}}>
+          {label}
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+/**
+ * RadioGroup Component
+ * React wrapper for a group of radio buttons
+ */
+const RadioGroupElement = React.createClass({
+  propTypes: {
+    name: React.PropTypes.string.isRequired,
+    options: React.PropTypes.oneOfType([
+        React.PropTypes.object,
+        React.PropTypes.array,
+    ]),
+    label: React.PropTypes.string,
+    value: React.PropTypes.string,
+    order: React.PropTypes.oneOfType([
+        React.PropTypes.object,
+        React.PropTypes.array,
+    ]),
+    id: React.PropTypes.string,
+    class: React.PropTypes.string,
+    disabled: React.PropTypes.bool,
+    showRequired: React.PropTypes.bool,
+    required: React.PropTypes.bool,
+    hasError: React.PropTypes.bool,
+    orientation: React.PropTypes.string,
+    errorMessage: React.PropTypes.string,
+    onUserInput: React.PropTypes.func,
+    elementClassOverride: React.PropTypes.bool,
+  },
+
+  getDefaultProps: function() {
+    return {
+      name: '',
+      options: {},
+      order: {},
+      label: '',
+      value: undefined,
+      id: '',
+      class: '',
+      disabled: false,
+      required: false,
+      showRequired: false,
+      hasError: false,
+      orientation: 'horizontal',
+      errorMessage: 'The field is required!',
+      onUserInput: function() {
+        console.warn('onUserInput() callback is not set');
+      },
+      elementClassOverride: false,
+    };
+  },
+
+  handleChange: function(value) {
+    this.props.onUserInput(this.props.name, value);
+  },
+
+  render: function() {
+    let required = this.props.required ? 'required' : null;
+    let disabled = this.props.disabled ? 'disabled' : null;
+    let isHorizontal = this.props.orientation === 'horizontal';
+    let options = this.props.options;
+    let order = this.props.order;
+    let errorMessage = null;
+    let requiredHTML = '';
+    let elementClass = 'row form-group';
+
+    // Add required asterix
+    if (required) {
+      requiredHTML = '<em>*</em>';
+    }
+
+    // Add error message
+    if (this.props.hasError || (this.props.showRequired && this.props.required && this.props.value === '')) {
+      errorMessage = <span className='warning'>{this.props.errorMessage}</span>;
+      elementClass = 'row form-group has-error';
+    }
+
+    return (
+      <div className={this.props.elementClassOverride ? '' : elementClass}>
+        <label className='col-sm-3 control-label radio-label' dangerouslySetInnerHTML={{__html: this.props.label + requiredHTML}}/>
+        <div className='col-sm-9'>
+          <RadioGroup
+            name={this.props.name}
+            selectedValue={this.props.value}
+            onChange={this.handleChange}
+            id={this.props.label}
+            required={required}
+            disabled={disabled}
+          >
+            <div style={{display: isHorizontal ? 'flex' : '', justifyContent: 'space-around'}}>
+              {Object.keys(options).map(function(optionValue, index) {
+                optionValue = order[index] ? order[index] : optionValue;
+                return (
+                  <div key={index}>
+                    <Radio value={optionValue} key={optionValue} disabled={disabled}/> {options[optionValue]}
+                  </div>
+                );
+              })}
+            </div>
+          </RadioGroup>
+          {errorMessage}
+        </div>
+      </div>
+    );
+  },
+});
+
+/**
+ * CheckboxGroupElement Component
+ * React wrapper for a group of checkboxes
+ */
+const CheckboxGroupElement = React.createClass({
+  propTypes: {
+    name: React.PropTypes.string.isRequired,
+    options: React.PropTypes.oneOfType([
+      React.PropTypes.array,
+      React.PropTypes.object,
+    ]),
+    label: React.PropTypes.string,
+    value: React.PropTypes.oneOfType([
+        React.PropTypes.string,
+        React.PropTypes.array,
+    ]),
+    order: React.PropTypes.oneOfType([
+        React.PropTypes.object,
+        React.PropTypes.array,
+    ]),
+    id: React.PropTypes.string,
+    class: React.PropTypes.string,
+    disabled: React.PropTypes.bool,
+    required: React.PropTypes.bool,
+    showRequired: React.PropTypes.bool,
+    hasError: React.PropTypes.bool,
+    orientation: React.PropTypes.string,
+    errorMessage: React.PropTypes.string,
+    onUserInput: React.PropTypes.func,
+  },
+
+  getDefaultProps: function() {
+    return {
+      name: '',
+      options: {},
+      order: {},
+      label: '',
+      value: undefined,
+      id: '',
+      class: '',
+      disabled: false,
+      required: false,
+      showRequired: false,
+      hasError: false,
+      orientation: 'vertical',
+      errorMessage: 'The field is required!',
+      onUserInput: function() {
+        console.warn('onUserInput() callback is not set');
+      },
+    };
+  },
+
+  handleChange: function(value) {
+    this.props.onUserInput(this.props.name, value);
+  },
+
+  render: function() {
+    let required = this.props.required ? 'required' : null;
+    let disabled = this.props.disabled ? 'disabled' : null;
+    let isHorizontal = this.props.orientation === 'horizontal';
+    let options = this.props.options;
+    let order = this.props.order;
+    let errorMessage = null;
+    let requiredHTML = null;
+    let elementClass = 'row form-group';
+
+    // Add required asterix
+    if (required) {
+      // requiredHTML = <span className="text-danger">*</span>;
+    }
+
+    // Add error message
+    if (this.props.hasError || (this.props.showRequired
+                             && this.props.required
+                             && (!this.props.value || this.props.value.length == 0))) {
+      errorMessage = <span className="warning">{this.props.errorMessage}</span>;
+      elementClass = 'row form-group has-error';
+    }
+
+    return (
+      <div className={elementClass}>
+        <label className="col-sm-3 control-label" dangerouslySetInnerHTML={{__html: this.props.label}}>
+          {requiredHTML}
+        </label>
+        <div className="col-sm-9">
+          <CheckboxGroup
+            name={this.props.name}
+            value={this.props.value}
+            onChange={this.handleChange}>
+            <div style={{display: isHorizontal ? 'flex' : '', justifyContent: 'space-around'}}>
+              {Object.keys(options).map(function(optionValue, index) {
+                optionValue = order[index] ? order[index] : optionValue;
+                let cbValue = optionValue;
+                return (
+                  <div key={`${optionValue}-${index}`} >
+                    <Checkbox value={cbValue} disabled={disabled}/> {options[optionValue]}
+                  </div>
+                );
+              })}
+            </div>
+          </CheckboxGroup>
+          {errorMessage}
+        </div>
+      </div>
+    );
+  },
+});
 
 /**
  * FieldsetElement Component.
@@ -1656,4 +1888,7 @@ export default {
   ButtonElement,
   CTA,
   LorisElement,
+  RadioGroupLabels,
+  RadioGroupElement,
+  CheckboxGroupElement,
 };

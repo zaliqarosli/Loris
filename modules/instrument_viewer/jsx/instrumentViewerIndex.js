@@ -6,11 +6,15 @@ import InstrumentFormContainer from '../../../jsx/InstrumentFormContainer';
 
 const INPUT_ELEMENT_TYPES = ['select', 'date', 'radio', 'text', 'calc', 'checkbox', 'numeric'];
 
-function getAgeInMonths(dob) {
-  function monthsBetween(date1, date2) {
-    return date2.getMonth() - date1.getMonth() + (12 * (date2.getFullYear() - date1.getFullYear()));
-  }
-  return monthsBetween(dob, new Date());
+function getInitialData(instrument) {
+  return instrument.Elements.filter((element) => (
+    INPUT_ELEMENT_TYPES.includes(element.Type)
+  )).map((element) => (
+    element.Name
+  )).reduce((result, element) => {
+    result[element] = null;
+    return result;
+  }, {});
 }
 
 class InstrumentViewerIndex extends Component {
