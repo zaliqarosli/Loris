@@ -148,8 +148,9 @@ function renderRadio(element, key, onUpdate, showRequired, isRequired, isDisable
     elementClass='row form-group has-error';
   }
   return (
-      <div className={elementClass} key={key}>
+      <div className={elementClass}>
         <RadioGroupElement
+          key={key}
           name={element.Name}
           label={element.Description}
           options={element.Options.Values}

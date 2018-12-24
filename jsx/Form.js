@@ -3,6 +3,8 @@ TextboxElement, DateElement, NumericElement, FileElement, StaticElement, LinkEle
 CheckboxElement, ButtonElement, LorisElement
 */
 
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {RadioGroup, Radio} from 'react-radio-group';
 import {Checkbox, CheckboxGroup} from 'react-checkbox-group';
 
@@ -25,9 +27,6 @@ import {Checkbox, CheckboxGroup} from 'react-checkbox-group';
  * Note that if both are passed `this.props.formElements` is displayed first.
  *
  */
-
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
 
 class FormElement extends Component {
   constructor(props) {
@@ -167,58 +166,17 @@ const RadioGroupLabels = ({labels}) => (
  * RadioGroup Component
  * React wrapper for a group of radio buttons
  */
-const RadioGroupElement = React.createClass({
-  propTypes: {
-    name: React.PropTypes.string.isRequired,
-    options: React.PropTypes.oneOfType([
-        React.PropTypes.object,
-        React.PropTypes.array,
-    ]),
-    label: React.PropTypes.string,
-    value: React.PropTypes.string,
-    order: React.PropTypes.oneOfType([
-        React.PropTypes.object,
-        React.PropTypes.array,
-    ]),
-    id: React.PropTypes.string,
-    class: React.PropTypes.string,
-    disabled: React.PropTypes.bool,
-    showRequired: React.PropTypes.bool,
-    required: React.PropTypes.bool,
-    hasError: React.PropTypes.bool,
-    orientation: React.PropTypes.string,
-    errorMessage: React.PropTypes.string,
-    onUserInput: React.PropTypes.func,
-    elementClassOverride: React.PropTypes.bool,
-  },
+class RadioGroupElement extends Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+  }
 
-  getDefaultProps: function() {
-    return {
-      name: '',
-      options: {},
-      order: {},
-      label: '',
-      value: undefined,
-      id: '',
-      class: '',
-      disabled: false,
-      required: false,
-      showRequired: false,
-      hasError: false,
-      orientation: 'horizontal',
-      errorMessage: 'The field is required!',
-      onUserInput: function() {
-        console.warn('onUserInput() callback is not set');
-      },
-      elementClassOverride: false,
-    };
-  },
-
-  handleChange: function(value) {
+  handleChange(value) {
     this.props.onUserInput(this.props.name, value);
-  },
+  }
 
-  render: function() {
+  render() {
     let required = this.props.required ? 'required' : null;
     let disabled = this.props.disabled ? 'disabled' : null;
     let isHorizontal = this.props.orientation === 'horizontal';
@@ -266,66 +224,68 @@ const RadioGroupElement = React.createClass({
         </div>
       </div>
     );
+  }
+}
+
+RadioGroupElement.propTypes = {
+  name: PropTypes.string.isRequired,
+  options: PropTypes.oneOfType([
+      PropTypes.object,
+      PropTypes.array,
+  ]),
+  label: PropTypes.string,
+  value: PropTypes.string,
+  order: PropTypes.oneOfType([
+      PropTypes.object,
+      PropTypes.array,
+  ]),
+  id: PropTypes.string,
+  class: PropTypes.string,
+  disabled: PropTypes.bool,
+  showRequired: PropTypes.bool,
+  required: PropTypes.bool,
+  hasError: PropTypes.bool,
+  orientation: PropTypes.string,
+  errorMessage: PropTypes.string,
+  onUserInput: PropTypes.func,
+  elementClassOverride: PropTypes.bool,
+};
+
+RadioGroupElement.defaultProps = {
+  name: '',
+  options: {},
+  order: {},
+  label: '',
+  value: undefined,
+  id: '',
+  class: '',
+  disabled: false,
+  required: false,
+  showRequired: false,
+  hasError: false,
+  orientation: 'horizontal',
+  errorMessage: 'The field is required!',
+  onUserInput: function() {
+    console.warn('onUserInput() callback is not set');
   },
-});
+  elementClassOverride: false,
+};
 
 /**
  * CheckboxGroupElement Component
  * React wrapper for a group of checkboxes
  */
-const CheckboxGroupElement = React.createClass({
-  propTypes: {
-    name: React.PropTypes.string.isRequired,
-    options: React.PropTypes.oneOfType([
-      React.PropTypes.array,
-      React.PropTypes.object,
-    ]),
-    label: React.PropTypes.string,
-    value: React.PropTypes.oneOfType([
-        React.PropTypes.string,
-        React.PropTypes.array,
-    ]),
-    order: React.PropTypes.oneOfType([
-        React.PropTypes.object,
-        React.PropTypes.array,
-    ]),
-    id: React.PropTypes.string,
-    class: React.PropTypes.string,
-    disabled: React.PropTypes.bool,
-    required: React.PropTypes.bool,
-    showRequired: React.PropTypes.bool,
-    hasError: React.PropTypes.bool,
-    orientation: React.PropTypes.string,
-    errorMessage: React.PropTypes.string,
-    onUserInput: React.PropTypes.func,
-  },
+class CheckboxGroupElement extends Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+  }
 
-  getDefaultProps: function() {
-    return {
-      name: '',
-      options: {},
-      order: {},
-      label: '',
-      value: undefined,
-      id: '',
-      class: '',
-      disabled: false,
-      required: false,
-      showRequired: false,
-      hasError: false,
-      orientation: 'vertical',
-      errorMessage: 'The field is required!',
-      onUserInput: function() {
-        console.warn('onUserInput() callback is not set');
-      },
-    };
-  },
-
-  handleChange: function(value) {
+  handleChange(value) {
     this.props.onUserInput(this.props.name, value);
-  },
+  }
 
-  render: function() {
+  render() {
     let required = this.props.required ? 'required' : null;
     let disabled = this.props.disabled ? 'disabled' : null;
     let isHorizontal = this.props.orientation === 'horizontal';
@@ -374,8 +334,53 @@ const CheckboxGroupElement = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
+CheckboxGroupElement.propTypes = {
+  name: PropTypes.string.isRequired,
+  options: PropTypes.oneOfType([
+    PropTypes.array,
+    PropTypes.object,
+  ]),
+  label: PropTypes.string,
+  value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.array,
+  ]),
+  order: PropTypes.oneOfType([
+      PropTypes.object,
+      PropTypes.array,
+  ]),
+  id: PropTypes.string,
+  class: PropTypes.string,
+  disabled: PropTypes.bool,
+  required: PropTypes.bool,
+  showRequired: PropTypes.bool,
+  hasError: PropTypes.bool,
+  orientation: PropTypes.string,
+  errorMessage: PropTypes.string,
+  onUserInput: PropTypes.func,
+};
+
+CheckboxGroupElement.defaultProps = {
+    name: '',
+    options: {},
+    order: {},
+    label: '',
+    value: undefined,
+    id: '',
+    class: '',
+    disabled: false,
+    required: false,
+    showRequired: false,
+    hasError: false,
+    orientation: 'vertical',
+    errorMessage: 'The field is required!',
+    onUserInput: function() {
+      console.warn('onUserInput() callback is not set');
+    },
+};
 
 /**
  * FieldsetElement Component.

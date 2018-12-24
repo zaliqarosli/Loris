@@ -231,13 +231,12 @@ class InstrumentFormContainer extends React.Component {
     try {
       return evaluator(element.DisplayIf, {...instrumentDataCopy, context});
     } catch (e) {
-//      console.log(element.DisplayIf);
+      console.warn(element.DisplayIf);
       if (!(e instanceof NullVariableError)) {
-//        console.log(`Error evaluating DisplayIf property of element ${index}.\n${e}`);
+        console.error(`Error evaluating DisplayIf property of element ${index}.\n${e}`);
       } else {
-//        console.log(`${e}`);
+        console.error(`${e}`);
       }
-
       return false;
     }
   }
@@ -333,16 +332,15 @@ class InstrumentFormContainer extends React.Component {
   render() {
     const {data, localizedInstrument} = this.state;
     const {context, options, lang} = this.props;
+    const elements = this.annotateElements(
+                      this.filterElements(localizedInstrument.Elements, data, context, options.surveyMode),
+                      data,
+                      context
+                    );
     return (
       <InstrumentForm
         meta={localizedInstrument.Meta}
-        elements={
-          this.annotateElements(
-            this.filterElements(localizedInstrument.Elements, data, context, options.surveyMode),
-            data,
-            context
-          )
-        }
+        elements={elements}
         showRequired={this.state.showRequired}
         errorMessage={this.state.errorMessage}
         onUpdate={this.updateInstrumentData}
