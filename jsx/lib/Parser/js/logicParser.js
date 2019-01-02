@@ -838,7 +838,7 @@ if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
 exports.parser = jsLogicParser;
 exports.Parser = jsLogicParser.Parser;
 exports.parse = function() {
-  return jsLogicParser.parse(...arguments);
+  return jsLogicParser.parse.apply(jsLogicParser, arguments);
 };
 exports.main = function commonjsMain(args) {
     if (!args[1]) {

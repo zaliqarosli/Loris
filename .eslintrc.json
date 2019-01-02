@@ -31,7 +31,8 @@
     }],
     "no-console": ["warn", {
       "allow": ["info", "warn", "error"]
-    }]
+    }],
+    "prefer-spread": 0
   },
   "globals": {
     "React": true,
