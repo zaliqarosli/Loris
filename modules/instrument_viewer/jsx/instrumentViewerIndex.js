@@ -72,7 +72,7 @@ class InstrumentViewerIndex extends Component {
     }
 
     return (
-      <div name='instrumentView' className='panel panel-primary'>
+      <div name='instrumentView' className='panel panel-primary' style={{padding: '20px'}}>
         <InstrumentFormContainer
           instrument={this.state.data}
           options={this.state.options}
