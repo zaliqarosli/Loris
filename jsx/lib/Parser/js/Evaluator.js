@@ -75,7 +75,7 @@ export default function Evaluator(stringExpression, scope = {}) {
   try {
       tree = parser.parse(stringExpression);
   } catch (e) {
-      throw new ParseError(`Parsing error; please review Syntax\n${e}`);
+      throw new ParseError(e.message);
   }
   return evalAST(tree, scope);
 }

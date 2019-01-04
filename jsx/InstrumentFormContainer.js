@@ -229,11 +229,11 @@ class InstrumentFormContainer extends React.Component {
 
     let instrumentDataCopy = Object.assign({}, data, multiElementVals);
     try {
-      Evaluator(element.DisplayIf, {...instrumentDataCopy, context});
+      return Evaluator(element.DisplayIf, {...instrumentDataCopy, context});
     } catch (e) {
       console.warn(element.DisplayIf);
       if (!(e instanceof NullVariableError)) {
-        console.error(`Error evaluating DisplayIf property of element ${index}.\n${e}`);
+        console.error(e);
       } else {
         console.error(`${e}`);
       }
