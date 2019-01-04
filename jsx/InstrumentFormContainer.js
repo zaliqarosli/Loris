@@ -1,5 +1,5 @@
 import InstrumentForm from './InstrumentForm';
-import {evaluator, NullVariableError, UndefinedVariableError} from './lib/Parser';
+import Evaluator, {NullVariableError, UndefinedVariableError} from './lib/Parser/js/Evaluator';
 import localizeInstrument from './lib/localize-instrument';
 
 const INPUT_TYPES = ['select', 'date', 'radio', 'text', 'calc', 'checkbox', 'numeric'];
@@ -139,11 +139,11 @@ class InstrumentFormContainer extends React.Component {
     let instrumentDataCopy = Object.assign({}, instrumentData, multiElementVals);
     const evaluatorContext = {...instrumentDataCopy, context: this.props.context};
     const calculatedValues = calcElements.reduce((result, element) => {
-      if (!evaluator(element.DisplayIf, evaluatorContext) && element.DisplayIf != '') {
+      if (!Evaluator(element.DisplayIf, evaluatorContext) && element.DisplayIf != '') {
         return result;
       }
       try {
-        result[element.Name] = String((evaluator(element.Formula, evaluatorContext))) || '0';
+        result[element.Name] = String((Evaluator(element.Formula, evaluatorContext))) || '0';
       } catch (e) {
         if (!(e instanceof NullVariableError) && !(e instanceof UndefinedVariableError)) {
           throw e;
@@ -229,7 +229,7 @@ class InstrumentFormContainer extends React.Component {
 
     let instrumentDataCopy = Object.assign({}, data, multiElementVals);
     try {
-      return evaluator(element.DisplayIf, {...instrumentDataCopy, context});
+      Evaluator(element.DisplayIf, {...instrumentDataCopy, context});
     } catch (e) {
       console.warn(element.DisplayIf);
       if (!(e instanceof NullVariableError)) {
@@ -260,7 +260,7 @@ class InstrumentFormContainer extends React.Component {
     if (typeof(requireResponse) === 'boolean') return requireResponse;
 
     try {
-      return evaluator(requireResponse, {...data, context});
+      return Evaluator(requireResponse, {...data, context});
     } catch (e) {
       if (!(e instanceof NullVariableError)) {
 //        console.log(`Error evaluating RequireResponse property of element ${index}.\n${e}`);

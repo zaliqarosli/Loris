@@ -27,7 +27,7 @@
     "no-invalid-this": 0,
     "no-alert": 0,
     "new-cap": ["error", {
-      "capIsNewExceptions": ["DynamicTable"]
+      "capIsNewExceptions": ["DynamicTable", "Evaluator"]
     }],
     "no-console": ["warn", {
       "allow": ["info", "warn", "error"]
