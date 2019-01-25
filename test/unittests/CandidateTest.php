@@ -349,7 +349,7 @@ class CandidateTest extends TestCase
         $this->_setUpTestDoublesForSelectCandidate();
 
         $this->_dbMock->expects($this->at(2))
-            ->method('pselectOne')
+            ->method('pselectCol')
             ->willReturn('V01');
 
         $this->_candidate->select(969664);
