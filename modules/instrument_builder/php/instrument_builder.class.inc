@@ -1,39 +1,35 @@
 <?php
 /**
- * Instrument_builder
- * Stub class.. all this does is check permissions, since everything else is
- * done in the template/javascript
+ * Reactified Instrument Builder
  *
- * PHP Version 5
+ * PHP Version 7
  *
- * @category Test
+ * @category Behavioural
  * @package  Loris
- * @author   Ted Strauss <ted.strauss@mcgill.ca>
- * @author   Wang Shen <wangshen.mcin@gmail.com>
+ * @author   Zaliqa Rosli <zaliqa.rosli@mcin.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
 
 namespace LORIS\instrument_builder;
 /**
- * Instrument_builder
- * Stub class.. all this does is check permissions, since everything else is
- * done in the template/javascript
+ * Reactified Instrument Builder
  *
- * PHP Version 5
+ * PHP Version 7
  *
- * @category Test
+ * @category Behavioural
  * @package  Loris
- * @author   Ted Strauss <ted.strauss@mcgill.ca>
- * @author   Wang Shen <wangshen.mcin@gmail.com>
+ * @author   Zaliqa Rosli <zaliqa.rosli@mcin.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
-class Instrument_Builder extends \NDB_Form
+
+class Instrument_Builder extends \NDB_Menu_Filter
 {
+
+    public $skipTemplate = true;
     /**
-     * Tests that, when loading the Instrument builder module, some
-     * text appears in the body.
+     * Allow access with permission
      *
      * @param \User $user The user whose access is being checked
      *
@@ -45,20 +41,35 @@ class Instrument_Builder extends \NDB_Form
     }
 
     /**
-     * Include additional CSS files:
-     *  1. instrument_builder.css
+     * Setup Variables
      *
-     * @return array of CSS to be inserted
+     * @note   Setup Variables
+     * @return void
      */
-    function getCSSDependencies()
+    function _setupVariables()
     {
-        $factory = \NDB_Factory::singleton();
-        $baseURL = $factory->settings()->getBaseURL();
-        $deps    = parent::getCSSDependencies();
-        return array_merge(
-            $deps,
-            [$baseURL . "/instrument_builder/css/instrument_builder.css"]
-        );
+        $user =& \User::singleton();
+        // the base query
+        $query = " FROM test_names";
+
+        // set the class variables
+        $this->columns      = array(
+                               'ID AS instrumentID',
+                               'Test_name AS instrumentName',
+                               'Full_name AS description',
+                              );
+        $this->query        = $query;
+        $this->validFilters = array(
+                               'test_names.ID',
+                               'test_names.Test_name',
+                               'test_names.Full_name',
+                              );
+
+        $this->formToFilter = array(
+                               'instrumentID'  => 'test_names.ID',
+                               'instrumentName'    => 'test_names.Test_name',
+                               'description'    => 'test_names.Full_name',
+                              );
     }
 
     /**
@@ -73,12 +84,7 @@ class Instrument_Builder extends \NDB_Form
         $depends = parent::getJSDependencies();
         return array_merge(
             $depends,
-            array(
-             $baseurl . "/instrument_builder/js/instrument_builder.instrument.js",
-             $baseurl . "/instrument_builder/js/instrument_builder.rules.js",
-             $baseurl . "/instrument_builder/js/react.questions.js",
-             $baseurl . "/instrument_builder/js/react.instrument_builder.js",
-            )
+            array($baseurl . "/instrument_builder/js/instrumentBuilderIndex.js")
         );
     }
 }
