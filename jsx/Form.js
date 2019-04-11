@@ -147,14 +147,14 @@ FormElement.defaultProps = {
   },
 };
 
-const RadioGroupLabels = ({labels}) => (
+const RadioGroupLabels = ({keyprop, labels}) => (
   <div className="row form-group">
     <label className="col-sm-3 control-label">
       &nbsp;
     </label>
     <div style={{marginTop: 30, display: 'flex', justifyContent: 'space-around'}} className="col-sm-9">
       {labels.map((label, index) => (
-        <div key={index} style={{color: 'brown', textAlign: 'center', minWidth: '6em', maxWidth: '6em'}}>
+        <div key={index+'_'+keyprop} style={{color: 'brown', textAlign: 'center', minWidth: '6em', maxWidth: '6em'}}>
           {label}
         </div>
       ))}
@@ -202,6 +202,7 @@ class RadioGroupElement extends Component {
         <label className='col-sm-3 control-label radio-label' dangerouslySetInnerHTML={{__html: this.props.label + requiredHTML}}/>
         <div className='col-sm-9'>
           <RadioGroup
+            key={this.props.name}
             name={this.props.name}
             selectedValue={this.props.value}
             onChange={this.handleChange}
@@ -213,11 +214,16 @@ class RadioGroupElement extends Component {
               {Object.keys(options).map(function(optionValue, index) {
                 optionValue = order[index] ? order[index] : optionValue;
                 return (
-                  <div key={index}>
-                    <Radio value={optionValue} key={optionValue} disabled={disabled}/> {options[optionValue]}
+                  <div key={index + '_' + this.props.name}>
+                    <Radio
+                      value={optionValue}
+                      key={optionValue + '_' + this.props.name}
+                      disabled={disabled}
+                    />
+                    {options[optionValue]}
                   </div>
                 );
-              })}
+              }.bind(this))}
             </div>
           </RadioGroup>
           {errorMessage}

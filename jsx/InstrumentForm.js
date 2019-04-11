@@ -95,37 +95,51 @@ function renderElement(element, key, onUpdate, showRequired = false, required = 
   } else if (element.Type === 'radio-labels') {
     return renderRadioLabels(element, key);
   } else if (element.Type === 'radio') {
-    return (<div className='hoverRow'>
-             {renderRadio(element, key, onUpdate, showRequired, required, disabled)}
-           </div>);
+    return (
+      <div className='hoverRow' key={key + '_div'}>
+        {renderRadio(element, key, onUpdate, showRequired, required, disabled)}
+      </div>
+    );
   } else if (element.Type === 'select') {
-    return (<div className='hoverRow'>
-             {renderSelect(element, key, onUpdate, showRequired, required, disabled)}
-           </div>);
+    return (
+      <div className='hoverRow' key={key + '_div'}>
+        {renderSelect(element, key, onUpdate, showRequired, required, disabled)}
+      </div>
+    );
   } else if (element.Type === 'checkbox') {
-    return (<div className='hoverRow'>
-             {renderCheckbox(element, key, onUpdate, showRequired, required, disabled)}
-           </div>);
+    return (
+      <div className='hoverRow' key={key + '_div'}>
+        {renderCheckbox(element, key, onUpdate, showRequired, required, disabled)}
+      </div>
+    );
   } else if (element.Type === 'text') {
     if (element.Options['Type'] === 'large') {
-        return (<div className='hoverRow'>
-                 {renderTextArea(element, key, onUpdate, showRequired, required, disabled)}
-               </div>);
+        return (
+          <div className='hoverRow' key={key + '_div'}>
+            {renderTextArea(element, key, onUpdate, showRequired, required, disabled)}
+          </div>
+        );
     } else {
-        return (<div className='hoverRow'>
-                 {renderText(element, key, onUpdate, showRequired, required, disabled)}
-               </div>);
+        return (
+          <div className='hoverRow' key={key + '_div'}>
+            {renderText(element, key, onUpdate, showRequired, required, disabled)}
+          </div>
+        );
     }
   } else if (element.Type === 'calc') {
     return renderCalc(element, key, onUpdate);
   } else if (element.Type === 'date') {
-    return (<div className='hoverRow'>
-             {renderDate(element, key, onUpdate, showRequired, required, disabled)}
-           </div>);
+    return (
+      <div className='hoverRow' key={key + '_div'}>
+        {renderDate(element, key, onUpdate, showRequired, required, disabled)}
+      </div>
+    );
   } else if (element.Type === 'numeric') {
-    return (<div className='hoverRow'>
-             {renderNumeric(element, key, onUpdate, showRequired, required, disabled)}
-           </div>);
+    return (
+      <div className='hoverRow' key={key + '_div'}>
+        {renderNumeric(element, key, onUpdate, showRequired, required, disabled)}
+      </div>
+    );
   } else {
     return <span>Missing Field</span>;
   }
@@ -133,12 +147,21 @@ function renderElement(element, key, onUpdate, showRequired = false, required = 
 
 function renderLabel(element, key) {
   // Form's StaticElement doesn't allow us to set HTML.
-  return (<div className='instrument-label' key={key} dangerouslySetInnerHTML={{__html: element.Description}} />);
+  return (
+    <div className='instrument-label'
+      key={key}
+      dangerouslySetInnerHTML={{__html: element.Description}}
+    />
+  );
 }
 
 function renderRadioLabels(element, key) {
   return (
-    <RadioGroupLabels key={key} labels={element.Labels}/>
+    <RadioGroupLabels
+      key={key}
+      keyprop={key}
+      labels={element.Labels}
+    />
   );
 }
 
@@ -164,15 +187,16 @@ function renderRadio(element, key, onUpdate, showRequired, isRequired, isDisable
           showRequired={showRequired}
           required={isRequired}
         />
-        {renderReset(isDisabled, onUpdate, element)}
+        {renderReset(key, isDisabled, onUpdate, element)}
       </div>
   );
 }
 
-function renderReset(disabled = false, onUpdate, element) {
+function renderReset(key, disabled = false, onUpdate, element) {
   if (!disabled) {
     return (
       <button
+        key={'reset_'+key}
         className='asText'
         onClick={() => {
           onUpdate(element.Name, null);
@@ -317,8 +341,14 @@ function renderNumeric(element, key, onUpdate, showRequired, isRequired, isDisab
 const SaveButton = ({onClick, saveText, saveWarning}) => {
   return (
     <div>
-      <button onClick={onClick} id='save' type='button' className='btn btn-default btn-lg'>
-        <span className='' aria-hidden='true'></span> {saveText}
+      <button
+        onClick={onClick}
+        id='save'
+        type='button'
+        className='btn btn-default btn-lg'
+      >
+        <span className='' aria-hidden='true'></span>
+        {saveText}
       </button>
       <center><p id='warning'>{saveWarning}</p></center>
     </div>
