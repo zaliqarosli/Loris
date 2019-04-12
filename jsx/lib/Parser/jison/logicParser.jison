@@ -24,9 +24,9 @@
 "("                                 return '('
 ")"                                 return ')'
 ","                                 return ','
-"<>"								                return '<>'
-"<="								                return '<='
-">="								                return '>='
+"<>"                return '<>'
+"<="                return '<='
+">="                return '>='
 "<"                                 return '<'
 ">"                                 return '>'
 "and"                               return 'and'
@@ -109,7 +109,7 @@ e
         { $$ = {tag: 'BinaryOp', op: 'leq', args: [$1, $3]}; }
     | e '>=' e
         { $$ = {tag: 'BinaryOp', op: 'geq', args: [$1, $3]}; }
-	  | e '+' e
+  | e '+' e
         { $$ = {tag: 'BinaryOp', op: 'add', args: [$1, $3]}; }
     | e '-' e
         { $$ = {tag: 'BinaryOp', op: 'sub', args: [$1, $3]}; }
@@ -127,7 +127,7 @@ e
         { $$ = {tag: 'BinaryOp', op: 'or', args: [$1, $3]}; }
     | 'not' e
         { $$ = {tag: 'UnaryOp', op: 'not', args: [$2]}; }
-	  | e '%'
+  | e '%'
         { $$ = {tag: 'UnaryOp', op: 'per', args: [$1]}; }
     | e '!'
         { $$ = {tag: 'UnaryOp', op: 'fact', args: [$1]}; }
@@ -149,7 +149,7 @@ e
         { $$ = {tag: 'NestedVariables', args: [$2, [$4]]}; }
     | "[" variable "(" variable ")" "]"
         { $$ = {tag: 'NestedVariables', args: [$2, [$4]]}; }
-	  | constant
+  | constant
         { $$ = {tag: 'Literal', args: [$1]}; }
     | NUMBER
         { $$ = {tag: 'Literal', args: [Number(yytext)]}; }
