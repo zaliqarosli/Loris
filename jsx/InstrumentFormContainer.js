@@ -211,7 +211,7 @@ class InstrumentFormContainer extends React.Component {
       return false;
     }
 
-    if (element.DisplayIf === '') return true;
+    if ((element.DisplayIf === '') || (typeof element.DisplayIf === 'undefined')) return true;
 
     const multiElements = this.props.instrument.Elements.filter(
       (element) => (element.Type === 'checkbox') // if other multi-select elements are added they should be listed here

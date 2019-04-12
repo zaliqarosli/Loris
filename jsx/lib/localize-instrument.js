@@ -12,29 +12,30 @@ function localizeInstrument(rawInstrument, lang = 'en-ca') {
   }
 
   try {
-    instrument['Meta']['LongName'] = instrument['Meta']['LongName'][lang];
+    instrument['Meta']['LongName'] = instrument['Meta']['LongName'][lang] || instrument['Meta']['LongName'];
 
     const convertedElements = [];
 
     instrument['Elements'].forEach((element) => {
+    const description = element['Description'][lang];
       if (['label', 'text', 'calc', 'date', 'select', 'radio', 'checkbox', 'numeric'].includes(element.Type)) {
-        if (element['Description'][lang] && element['Description'][lang] !== ' ' && element['Comment']) {
-          element['Description'] = fixhtml(element['Description'][lang]) + '; ' + fixhtml(element['Comment']);
-        } else if (element['Description'][lang] && element['Description'][lang] !== ' ' && !element['Comment']) {
-          element['Description'] = element['Description'][lang];
+        if (description && description !== ' ' && element['Comment']) {
+          element['Description'] = fixhtml(description) + '; ' + fixhtml(element['Comment']);
+        } else if (description && description !== ' ' && !element['Comment']) {
+          element['Description'] = description;
         } else {
           if (['text', 'date', 'numeric'].includes(element.Type)) {
-            element['Description'] = element.Comment ? element.Comment : '';
+            element['Description'] = description ? description : '';
           } else if (['select', 'radio', 'checkbox'].includes(element.Type)) {
             element['Description'] = '';
           } else if (['label'].includes(element.Type)) {
-            element['Description'] = '';
+            element['Description'] = description;
           } else if (['calc'].includes(element.Type)) {
-            element['Description'] = element.Comment ? element.Comment : '';
+            element['Description'] = description ? description : '';
           }
         }
         if (['select', 'radio', 'checkbox'].includes(element.Type)) {
-          element['Options']['Values'] = element['Options']['Values'][lang];
+          element['Options']['Values'] = element['Options']['Values'][lang] || element['Options']['Values'];
         }
         convertedElements.push(element);
       } else if (['radio-labels'].includes(element.Type) && element['Labels'][lang]) {
@@ -46,7 +47,7 @@ function localizeInstrument(rawInstrument, lang = 'en-ca') {
     instrument['Elements'] = convertedElements;
     return instrument;
   } catch (e) {
-//    console.log(e);
+    console.error(e);
   }
 }
 

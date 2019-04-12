@@ -6,7 +6,6 @@ use \Psr\Http\Message\ResponseInterface;
 class FetchInstrument extends \NDB_Page
 {
     public $skipTemplate = true;
-    var $instrumentName = "asdsp";
 
     function _hasAccess(\User $user) : bool
     {
@@ -35,7 +34,9 @@ class FetchInstrument extends \NDB_Page
         }
 
         // Fetch data.
-        $jsonInstrument = file_get_contents(__DIR__."/../../../project/instruments/examples/{$this->instrumentName}.json");
+        $jsonInstrument = file_get_contents(__DIR__."/../../../project/instruments/examples/adir.json");
+        // $instrument = \NDB_BVL_Instrument::factory('bmi');
+        // $jsonInstrument = json_encode(json_decode($instrument->toJSON()));
         return (new \LORIS\Http\Response())
             ->withHeader("Content-Type", "application/json")
             ->withStatus(200)

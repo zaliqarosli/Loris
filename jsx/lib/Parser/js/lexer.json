@@ -1,68 +1,61 @@
-/* using JISON Lexical analysis with Flex pattern matching (http://dinosaur.compilertools.net/flex/flex_11.html) */
+{
+  "lex": {
+    "rules": [
+      ["\\s+",               "/* skip whitespace */"],
+      ["null",               "return 'null';"],
+      ["true",               "return 'true';"], 
+      ["false",              "return 'false';"],
+      ["E\\b",               "return 'E';"],
+      ["PI\\b",              "return 'PI';"],
+      ["\\d+(?:\\.\\d+)?\b", "return 'NUMBER';"],
+      ["\\*",                "return '*';"],
+      ["\\/" ,               "return '/';"],
+      ["-",                  "return '-';"],
+      ["\\+",                "return '+';"],
+      ["\\^",                "return '^';"],
+      ["=",                  "return '=';"],
+      ["!",                  "return '!';"],
+      ["%",                  "return '%';"],
+      ["\\(",                "return '(';"],
+      ["\\)",                "return ')';"],
+      [",",                  "return ',';"],
+      ["<>",								 "return '<>';"],
+      ["<=",								 "return '<=';"],
+      [">=",								 "return '>=';"],
+      ["<",                  "return '<';"],
+      [">",                  "return '>';"],
+      ["and",                "return 'and';"],
+      ["or",                 "return 'or';"],
+      ["not",                "return 'not';"],
+      ["[_a-zA-Z0-9]\w*",    "return 'VARIABLE';"],
+      [""\""[^"]*"\"",       "return 'ESTRING';"],
+      ["'"[^']*"'",          "return 'STRING';"],
+      ["[",                  "return '[';"],
+      ["]",                  "return ']';"],
+      ["$",                  "return 'EOF';"],
+      [.                     "return 'INVALID';"]
+    ]
+  },
 
-/* description: Parses end executes mathematical expressions. */
+  "operators": [
+    ["left", "and", "or"],
+    ["right", "not"],
+    ["left", "=", "<", ">", "<>", "<=", ">="],
+    ["left", "+", "-"],
+    ["left", "*", "/"],
+    ["left", "^"],
+    ["right", "!"],
+    ["right", "%"],
+    ["left", "UMINUS"]
+  ],
+  
+  "bnf": {
+    "expressions": [[ "e EOF", "return $1;"]],
 
-/* lexical grammar */
-%lex
-%%
-
-\s+                                 /* skip whitespace */
-"null"                              return 'null'
-"true"                              return 'true'
-"false"                             return 'false'
-"E"                                 return 'E'
-"PI"                                return 'PI'
-\d+("."\d+)?\b                      return 'NUMBER'
-"*"                                 return '*'
-"/"                                 return '/'
-"-"                                 return '-'
-"+"                                 return '+'
-"^"                                 return '^'
-"="                                 return '='
-"!"                                 return '!'
-"%"                                 return '%'
-"("                                 return '('
-")"                                 return ')'
-","                                 return ','
-"<>"								                return '<>'
-"<="								                return '<='
-">="								                return '>='
-"<"                                 return '<'
-">"                                 return '>'
-"and"                               return 'and'
-"or"                                return 'or'
-"not"                               return 'not'
-[_a-zA-Z0-9]\w*                     return 'VARIABLE'
-"\""[^"]*"\""                       return 'ESTRING'
-"'"[^']*"'"                         return 'STRING'
-"["                                 return '['
-"]"                                 return ']'
-<<EOF>>                             return 'EOF'
-.                                   return 'INVALID'
-
-/lex
-
-/* operator associations and precedence */
-
-%left 'and' 'or'
-%right 'not'
-%left '=' '<' '>' '<>' '<=' '>='
-%left '+' '-'
-%left '*' '/'
-%left '^'
-%right '!'
-%right '%'
-%left UMINUS
-
-%start expressions
-
-%% /* language grammar */
-
-expressions
-    : e EOF
-        { return $1; }
-    ;
-
+    "e": [
+      [],
+      []
+    ]
 arguments
     : e ',' arguments
         { $$ = [$1].concat($3); }
@@ -109,7 +102,7 @@ e
         { $$ = {tag: 'BinaryOp', op: 'leq', args: [$1, $3]}; }
     | e '>=' e
         { $$ = {tag: 'BinaryOp', op: 'geq', args: [$1, $3]}; }
-	  | e '+' e
+	| e '+' e
         { $$ = {tag: 'BinaryOp', op: 'add', args: [$1, $3]}; }
     | e '-' e
         { $$ = {tag: 'BinaryOp', op: 'sub', args: [$1, $3]}; }
@@ -127,7 +120,7 @@ e
         { $$ = {tag: 'BinaryOp', op: 'or', args: [$1, $3]}; }
     | 'not' e
         { $$ = {tag: 'UnaryOp', op: 'not', args: [$2]}; }
-	  | e '%'
+	| e '%'
         { $$ = {tag: 'UnaryOp', op: 'per', args: [$1]}; }
     | e '!'
         { $$ = {tag: 'UnaryOp', op: 'fact', args: [$1]}; }
@@ -149,7 +142,7 @@ e
         { $$ = {tag: 'NestedVariables', args: [$2, [$4]]}; }
     | "[" variable "(" variable ")" "]"
         { $$ = {tag: 'NestedVariables', args: [$2, [$4]]}; }
-	  | constant
+	| constant
         { $$ = {tag: 'Literal', args: [$1]}; }
     | NUMBER
         { $$ = {tag: 'Literal', args: [Number(yytext)]}; }
@@ -164,3 +157,5 @@ e
     | 'null'
         { $$ = {tag: 'Literal', args: [null]}; }
     ;
+  }
+}
