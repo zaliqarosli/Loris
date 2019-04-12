@@ -2,6 +2,8 @@ node_modules/*
 modules/*/js/*.js
 htdocs/js/components/*
 jsx/lib/Parser/js/logicParser.js
+jsx/lib/Parser/js/Evaluator.js
+jsx/lib/Parser/js/Functions.js
 
 # Ignore until ESLint is run
 modules/dataquery/

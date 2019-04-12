@@ -1,5 +1,5 @@
 import InstrumentForm from './InstrumentForm';
-import Evaluator, {NullVariableError, UndefinedVariableError} from './lib/Parser/js/Evaluator';
+import {Evaluator} from './lib/Parser';
 import localizeInstrument from './lib/localize-instrument';
 
 const INPUT_TYPES = ['select', 'date', 'radio', 'text', 'calc', 'checkbox', 'numeric'];
@@ -145,9 +145,6 @@ class InstrumentFormContainer extends React.Component {
       try {
         result[element.Name] = String((Evaluator(element.Formula, evaluatorContext))) || '0';
       } catch (e) {
-        if (!(e instanceof NullVariableError) && !(e instanceof UndefinedVariableError)) {
-          throw e;
-        }
       }
       return result;
     }, {});
@@ -232,11 +229,7 @@ class InstrumentFormContainer extends React.Component {
       return Evaluator(element.DisplayIf, {...instrumentDataCopy, context});
     } catch (e) {
       console.warn(element.DisplayIf);
-      if (!(e instanceof NullVariableError)) {
-        console.error(e);
-      } else {
-        console.error(`${e}`);
-      }
+      console.error(e);
       return false;
     }
   }
@@ -262,9 +255,7 @@ class InstrumentFormContainer extends React.Component {
     try {
       return Evaluator(requireResponse, {...data, context});
     } catch (e) {
-      if (!(e instanceof NullVariableError)) {
-//        console.log(`Error evaluating RequireResponse property of element ${index}.\n${e}`);
-      }
+        console.error(`Error evaluating RequireResponse property of element ${index}.\n${e}`);
 
       return false;
     }

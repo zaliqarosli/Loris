@@ -1,5 +1,3 @@
-
-
 import Functions from './Functions';
 import { parser } from './logicParser';
 
