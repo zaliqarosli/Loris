@@ -219,7 +219,7 @@ class AddSurvey extends \NDB_Form
 
             $msg_data = array(
                          'study'     => $config->getSetting("title"),
-                         'url'       => $www['url'] . '/survey.php?key=' .
+                         'url'       => $www['url'] . '/survey_module/?key=' .
                                          urlencode($key),
                          'EmailForm' => $values['email_dialog'],
                         );

@@ -15,7 +15,7 @@ function formatColumn(column, cell, rowData, rowHeaders) {
     row[header] = rowData[index];
   }, this);
   if (column === 'URL') {
-    let url = loris.BaseURL + '/survey.php?key=' + row.URL;
+    let url = loris.BaseURL + '/survey_module/?key=' + row.URL;
     return (<td><a href={url}>{cell}</a></td>);
   }
   return <td>{cell}</td>;

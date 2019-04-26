@@ -56,6 +56,7 @@ const config = [{
     './modules/server_processes_manager/js/server_processes_managerIndex.js': './modules/server_processes_manager/jsx/server_processes_managerIndex.js',
     './modules/publication/js/publicationIndex.js': './modules/publication/jsx/publicationIndex.js',
     './modules/publication/js/viewProjectIndex.js': './modules/publication/jsx/viewProjectIndex.js',
+    './modules/survey_module/js/DirectEntry.js': './modules/survey_module/jsx/DirectEntry.js',
     './htdocs/js/modules/instrument-preview.compiled.js': './htdocs/js/modules/instrument-preview.js',
     './htdocs/js/modules/instrument-view.compiled.js': './htdocs/js/modules/instrument-view.js',
   },
