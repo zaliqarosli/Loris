@@ -112,6 +112,13 @@ class DirectDataEntryMainPage
         $json_instrument = json_decode($this->tpl_data['InstrumentJSON']);
         // $this->unsetScores($Values, $json_instrument->Elements, $json_instrument->ScoreLabels);
 
+        // Unset examiner field
+        for ($json_instrument['Elements'] as $key) {
+            if ($json_instrument['Elements'][$key]['Name'] == 'Examiner') {
+                unset($json_instrument['Elements'][$key]);
+            }
+        }
+
         $this->tpl_data['Values'] = json_encode($Values);
         $this->tpl_data['InstrumentJSON'] = json_encode($json_instrument);
 
