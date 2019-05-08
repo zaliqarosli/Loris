@@ -399,7 +399,6 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
             if (!isset($this->form)) {
                 $this->form = new \HTML_Quickform('test_form');
             }
-
             $this->dateTimeFields = array("Date_taken");
             $this->formType       = 'XIN';
 
@@ -411,7 +410,7 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
             // parse the whole file for table{@} and other meta elements
             $addElements = true;
             if (!empty($this->page)) {
-                $currentPage = $_REQUEST['subtest'];
+                $currentPage = $this->page;
                 $addElements = false;
             } else {
                 $currentPage = 'top';
