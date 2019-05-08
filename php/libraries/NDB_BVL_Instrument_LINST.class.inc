@@ -411,7 +411,7 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
             // parse the whole file for table{@} and other meta elements
             $addElements = true;
             if (!empty($this->page)) {
-                $currentPage = $this->page;
+                $currentPage = $_REQUEST['subtest'];
                 $addElements = false;
             } else {
                 $currentPage = 'top';
