@@ -2208,7 +2208,7 @@ abstract class NDB_BVL_Instrument extends NDB_Page
                 $this->getSessionID(),
                 $this->page ?? ''
             );
-               $this->addHidden('test_name', $this->testName);
+            $this->addHidden('test_name', $this->testName);
             $this->addHidden('page', $this->page);
             $this->addHidden('subtest', $this->page);
 
