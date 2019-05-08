@@ -2236,6 +2236,7 @@ abstract class NDB_BVL_Instrument extends NDB_Page
                     . "NDB_BVL_Instrument_$TestName.class.inc"
             )
                 || file_exists($BasePath . "$TestName.linst")
+                || $this->isJSONInstrument($TestName)
             ) {
                 // save possible changes from the control panel...
                 $controlPanel->save();
