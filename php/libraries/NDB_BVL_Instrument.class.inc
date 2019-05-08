@@ -207,6 +207,19 @@ abstract class NDB_BVL_Instrument extends NDB_Page
                 $commentID,
                 'test_form'
             );
+        } else if ($this->isJSONInstrument($instrument)
+        ) {
+            include_once 'NDB_BVL_Instrument_JSON.class.inc';
+            $obj = new \Loris\Behavioural\NDB_BVL_Instrument_JSON(
+                // The module directory we use for instruments is arbitrary,
+                // since it isn't a real module, but it's required for the page
+                // constructor.
+                new Module($instrument, $base ."project/"),
+                $page,
+                $commentID,
+                $commentID,
+                'test_form'
+            );
         } else {
             if (!class_exists($class)
                 && ($guarantee_exists === true
@@ -2208,7 +2221,7 @@ abstract class NDB_BVL_Instrument extends NDB_Page
                 $this->getSessionID(),
                 $this->page ?? ''
             );
-               $this->addHidden('test_name', $this->testName);
+            $this->addHidden('test_name', $this->testName);
             $this->addHidden('page', $this->page);
             $this->addHidden('subtest', $this->page);
 
@@ -2633,4 +2646,22 @@ abstract class NDB_BVL_Instrument extends NDB_Page
             ->withBody(new \LORIS\Http\StringStream($this->display() ?? ""));
     }
 
+    public function isJSONInstrument(string $instName) : bool
+    {
+        $DB = \NDB_Factory::singleton()->database();
+
+        $query = "SELECT ij.InstrumentJSONID
+                    FROM instrument_json ij
+                    JOIN test_names tn ON ij.TestNamesID = tn.ID
+                    WHERE tn.Test_name = :instName";
+        $param = array('instName' => $instName);
+
+        $result = $DB->pselect($query, $param);
+
+        if (!empty($result)) {
+            return true;
+        }
+
+        return false;
+    }
 }
