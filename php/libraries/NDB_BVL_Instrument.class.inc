@@ -2199,13 +2199,16 @@ abstract class NDB_BVL_Instrument extends NDB_Page
      */
     function getControlPanel(): string
     {
+        $sessionID = $this->getSessionID();
+        $timepoint = \TimePoint::singleton($sessionID);
+        $candID    = $timepoint->getCandID();
         if (!empty($_REQUEST['commentID'])) {
             // make the control panel object for the current instrument
             $controlPanel = new NDB_BVL_InstrumentStatus_ControlPanel(
                 $this->testName,
                 $this->getCommentID() ?? '',
-                0,
-                $this->getSessionID(),
+                $candID,
+                $sessionID,
                 $this->page ?? ''
             );
             $this->addHidden('test_name', $this->testName);
