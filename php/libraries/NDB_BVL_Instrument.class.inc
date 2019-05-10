@@ -2624,7 +2624,6 @@ abstract class NDB_BVL_Instrument extends NDB_Page
      */
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
-        $this->setup($this->commentID, $this->page);
         if ($request->getMethod() === "POST") {
             $this->save();
         }
