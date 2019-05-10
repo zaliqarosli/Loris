@@ -42,11 +42,11 @@ class NDB_BVL_InstrumentStatus_ControlPanel extends NDB_BVL_InstrumentStatus
         int $sessionid,
         ?string $subtest
     ) {
-        $this->candID    = $candid;
-        $this->testname  = $testname;
+        $this->candID     = $candid;
+        $this->testname   = $testname;
         $this->_commentID = $commentid;
-        $this->sessionID = $sessionid;
-        $this->subtest   = $subtest;
+        $this->sessionID  = $sessionid;
+        $this->subtest    = $subtest;
     }
 
     /**
