@@ -207,7 +207,7 @@ abstract class NDB_BVL_Instrument extends NDB_Page
                 $commentID,
                 'test_form'
             );
-        } else if ($this->isJSONInstrument($instrument)
+        } else if (\NDB_BVL_Instrument::isJSONInstrument($instrument)
         ) {
             include_once 'NDB_BVL_Instrument_JSON.class.inc';
             $obj = new \Loris\Behavioural\NDB_BVL_Instrument_JSON(
@@ -2649,21 +2649,21 @@ abstract class NDB_BVL_Instrument extends NDB_Page
             ->withBody(new \LORIS\Http\StringStream($this->display() ?? ""));
     }
 
-    public function isJSONInstrument(string $instName) : bool
+    public static function isJSONInstrument(string $instName) : bool
     {
-        $DB = \NDB_Factory::singleton()->database();
-
-        $query = "SELECT ij.InstrumentJSONID
-                    FROM instrument_json ij
-                    JOIN test_names tn ON ij.TestNamesID = tn.ID
-                    WHERE tn.Test_name = :instName";
-        $param = array('instName' => $instName);
-
-        $result = $DB->pselect($query, $param);
-
-        if (!empty($result)) {
-            return true;
-        }
+//        $DB = \NDB_Factory::singleton()->database();
+//
+//        $query = "SELECT ij.InstrumentJSONID
+//                    FROM instrument_json ij
+//                    JOIN test_names tn ON ij.TestNamesID = tn.ID
+//                    WHERE tn.Test_name = :instName";
+//        $param = array('instName' => $instName);
+//
+//        $result = $DB->pselect($query, $param);
+//
+//        if (!empty($result)) {
+//            return true;
+//        }
 
         return false;
     }
