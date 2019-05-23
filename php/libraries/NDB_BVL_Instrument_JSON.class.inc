@@ -50,10 +50,6 @@ class NDB_BVL_Instrument_JSON extends \NDB_BVL_Instrument
     {
         $this->commentID = $commentID;
         $this->page      = $page;
-
-        // $this->form = new \LorisForm();
-        // either something different in this setup function
-        // or have no setup function at all if only sets commentID and page
     }
 
     /**
@@ -64,8 +60,9 @@ class NDB_BVL_Instrument_JSON extends \NDB_BVL_Instrument
      */
     public function getFullName(): string
     {
-        // get JSON schema
-        // return schema['fullName]
+        $jsonschema = $this->getJSONSchema();
+        
+        return $jsonschema['skos:prefLabel'];
     }
 
     /**
@@ -82,10 +79,28 @@ class NDB_BVL_Instrument_JSON extends \NDB_BVL_Instrument
       // return schema['order'] where type=page plus ['description']
     }
 
-    function getJSONSchema(): string
+    /**
+     * Returns the schema JSON object
+     *
+     * @return array
+     */
+    function getJSONSchema(): array
     {
+        $DB = \NDB_Factory::singleton()->database();
 
+        $query = "SELECT is.InstrumentSchemaID
+                    FROM instrument_schema is
+                    LEFT JOIN test_names tn
+                    USING (InstrumentSchemaID)
+                    WHERE tn.Test_name = :instrument";
+        $param = array('instrument' => $this->testName);
+
+        $uri = $DB->pselect($query, $param);
+
+        ini_set('allow_url_fopen', true);
+        $jsonschema = file_get_contents($uri);
     }
+
 }
 
 

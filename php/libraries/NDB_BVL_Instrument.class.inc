@@ -246,20 +246,12 @@ abstract class NDB_BVL_Instrument extends NDB_Page
             $obj->displayAllFields = true;
         }
 
+        // Set testName variable for linst and json instruments that
+        // do not already do this in its setup function
+        $obj->testName = $instrument;
+
         // Sets up page variables such as $this->commentID and $this->form
         $obj->setup($commentID, $page);
-
-        // Adds all of the form element and form rules to the page after
-        // having instantiated the form above
-        $obj->loadInstrumentFile(
-            $base . "project/instruments/$instrument.linst"
-        );
-        // Add rules only if they exist.
-        if (file_exists($base."project/instruments/$instrument.rules")) {
-            $obj->loadInstrumentRules(
-                $base . "project/instruments/$instrument.rules"
-            );
-        }
 
         $user   = \User::singleton();
         $access = $obj->_hasAccess($user);
@@ -2169,43 +2161,6 @@ abstract class NDB_BVL_Instrument extends NDB_Page
     }
 
     /**
-     * Parses a file that isn't written in PHP and loads it into a format
-     * that LORIS understands.
-     *
-     * This is intended to be overridden by a subclass of NDB_BVL_Instrument
-     * to add support for other file formats.
-     *
-     * @param string  $filename The filename to be loaded, or a base64 encoded
-     *                          string.
-     * @param boolean $base64   If true, read the filename as a base64 encoded
-     *                          string of the file content, used for preview.
-     *
-     * @return void
-     */
-    function loadInstrumentFile(string $filename, bool $base64 = false): void
-    {
-    }
-
-    /**
-     * Load the rules for an instrument from the file system.
-     *
-     * This is intended to be overridden by a subclass of NDB_BVL_Instrument
-     * to add support for other file formats.
-     *
-     * @param string $filename Either the path to a file, or a base64 encoded
-     *                         string which can be interpreted as a file by
-     *                         PHP and fopen()
-     * @param bool   $base64   If true, the "filename" is really a base64 encoded
-     *                         data URL, so we shouldn't check that the file exists
-     *                         on the filesystem. (Used by preview)
-     *
-     * @return void
-     */
-    function loadInstrumentRules(string $filename, bool $base64 = false): void
-    {
-    }
-
-    /**
      * Renders the HTML for the control panel for this instrument.
      *
      * @return string The HTML for the control panel
@@ -2651,19 +2606,18 @@ abstract class NDB_BVL_Instrument extends NDB_Page
 
     public static function isJSONInstrument(string $instName) : bool
     {
-//        $DB = \NDB_Factory::singleton()->database();
-//
-//        $query = "SELECT ij.InstrumentJSONID
-//                    FROM instrument_json ij
-//                    JOIN test_names tn ON ij.TestNamesID = tn.ID
-//                    WHERE tn.Test_name = :instName";
-//        $param = array('instName' => $instName);
-//
-//        $result = $DB->pselect($query, $param);
-//
-//        if (!empty($result)) {
-//            return true;
-//        }
+        $DB = \NDB_Factory::singleton()->database();
+
+        $query = "SELECT InstrumentSchemaID
+                    FROM test_names
+                    WHERE Test_name = :instName";
+        $param = array('instName' => $instName);
+
+        $result = $DB->pselect($query, $param);
+
+        if (!empty($result)) {
+            return true;
+        }
 
         return false;
     }
