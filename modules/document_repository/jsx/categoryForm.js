@@ -45,7 +45,7 @@ class DocCategoryForm extends React.Component {
   render() {
     // Data loading error
     if (this.state.error) {
-       return <h3>An error occured while loading the page.</h3>;
+       return <h3>An error occurred while loading the page.</h3>;
      }
     // Waiting for data to load
     if (!this.state.isLoaded) {

@@ -129,7 +129,7 @@ class NewProfileIndex extends React.Component {
   render() {
     // If error occurs, return a message.
     if (this.state.error) {
-      return <h3>An error occured while loading the page.</h3>;
+      return <h3>An error occurred while loading the page.</h3>;
     }
 
     // Waiting for async data to load
