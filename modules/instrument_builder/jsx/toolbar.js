@@ -103,12 +103,12 @@ class Toolbar extends Component {
 
   render() {
     const style = {
-      background: '#E4EBF2',
+      background: 'white',
       border: '1px solid #C3D5DB',
       padding: '10px',
       marginLeft: '-1px',
       marginTop: '-1px',
-      zIndex: 1000,
+      zIndex: 2,
       order: 1,
       flex: '1',
     };
