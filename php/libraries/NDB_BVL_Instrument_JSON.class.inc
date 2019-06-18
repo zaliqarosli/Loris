@@ -75,8 +75,10 @@ class NDB_BVL_Instrument_JSON extends \NDB_BVL_Instrument
      */
     function getSubtestList(): array
     {
-      // get JSON schema
-      // return schema['order'] where type=page plus ['description']
+        $jsonschema = $this->getJSONSchema();
+        
+        // return schema['order'] where type=page plus ['description']
+        return $jsonschema['ui']['order'];
     }
 
     /**
@@ -99,6 +101,8 @@ class NDB_BVL_Instrument_JSON extends \NDB_BVL_Instrument
 
         ini_set('allow_url_fopen', true);
         $jsonschema = file_get_contents($uri);
+
+        // need to expand schema
     }
 
 }
