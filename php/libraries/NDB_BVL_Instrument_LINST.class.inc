@@ -891,10 +891,12 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
                                           );
                     break;
                 case 'numeric':
+                    $minValue = isset($value[3]) ? (int)$value[3] : 0;
+                    $maxValue = isset($value[4]) ? (int)rtrim($value[4]) : 0;
                     $element['Options'] = array(
                                            'NumberType' => 'integer',
-                                           'MinValue'   => (int) $value[3],
-                                           'MaxValue'   => (int) rtrim($value[4]),
+                                           'MinValue'   => $minValue,
+                                           'MaxValue'   => $maxValue,
                                           );
                     break;
                 case 'score':
