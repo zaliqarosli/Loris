@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
+import swal from 'sweetalert2';
+import Modal from 'Modal';
 import Loader from 'Loader';
 import {Tabs, TabPane} from 'Tabs';
 import FilterableDataTable from 'FilterableDataTable';
@@ -15,10 +17,19 @@ class InstrumentBuilderIndex extends Component {
       data: {},
       error: false,
       isLoaded: false,
+      formData: {
+        fileToLoad: null,
+      },
+      showModal: false,
+      disableLoad: true,
     };
 
     this.fetchData = this.fetchData.bind(this);
+    this.chooseFile = this.chooseFile.bind(this);
+    this.loadFile = this.loadFile.bind(this);
     this.formatColumn = this.formatColumn.bind(this);
+    this.openModal = this.openModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
     this.loadInstrument = this.loadInstrument.bind(this);
   }
 
@@ -45,6 +56,60 @@ class InstrumentBuilderIndex extends Component {
   }
 
   /**
+   * Store the value of the element in this.state.formData
+   *
+   * @param {string} formElement - name of the form element
+   * @param {string} value - value of the form element
+   */
+  chooseFile(formElement, value) {
+    let formData = Object.assign({}, this.state.formData);
+    formData[formElement] = value;
+    this.setState(formData);
+    if (!this.state.formData.fileToLoad === null) {
+      this.setState({disableLoad: false});
+    }
+  }
+
+  /**
+   * Handles the submission of the Load Instrument Form
+   *
+   * @param {event} e - event of the form
+   */
+  loadFile() {
+    let formData = Object.assign({}, this.state.formData);
+    let formObject = new FormData();
+    for (let key in formData) {
+      if (formData[key] !== '') {
+        formObject.append(key, formData[key]);
+      }
+    }
+    formObject.append('fire_away', 'Load');
+
+    fetch(this.props.loadURL, {
+      method: 'POST',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      body: formObject,
+    })
+    .then((resp) => {
+      if (resp.ok && resp.status === 200) {
+        swal('Success!', 'Instrument loaded.', 'success').then((result) => {
+          if (result.value) {
+            this.fetchData();
+          }
+        });
+      } else {
+        resp.text().then((message) => {
+          swal('Error!', message, 'error');
+        });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  }
+
+  /**
    * Modify behaviour of specified column cells in the Data Table component
    *
    * @param {string} column - column name
@@ -57,8 +122,45 @@ class InstrumentBuilderIndex extends Component {
     return <td>{cell}</td>;
   }
 
-  loadInstrument() {
+  openModal() {
+    this.setState({showModal: true});
+  }
 
+  closeModal() {
+    this.setState({showModal: false});
+  }
+
+  loadInstrument() {
+    return (
+      <Modal
+        title='Load Instrument'
+        onClose={this.closeModal}
+        show={this.state.showModal}
+      >
+        <FormElement
+          Module="instrumentBuilder"
+          name="loadInstrument"
+          id="loadInstrumentForm"
+          onSubmit={this.loadFile}
+          method="POST"
+        >
+          <FileElement
+            name='instrumentFileUpload'
+            id='instrumentFileUpload'
+            onUserInput={this.chooseFile}
+            label='Instrument to load'
+            required={true}
+            value={this.state.formData.fileToLoad}
+            disable={this.state.disableLoad}
+          />
+          <ButtonElement
+            name="fire_away"
+            label="Load Instrument"
+            type="submit"
+          /> 
+        </FormElement>
+      </Modal>
+    );
   }
 
   render() {
@@ -130,14 +232,14 @@ class InstrumentBuilderIndex extends Component {
 
 InstrumentBuilderIndex.propTypes = {
   fetchURL: PropTypes.string.isRequired,
-  submitURL: PropTypes.string.isRequired,
+  loadURL: PropTypes.string.isRequired,
 };
 
 window.addEventListener('load', () => {
   ReactDOM.render(
     <InstrumentBuilderIndex
       fetchURL={`${loris.BaseURL}/instrument_builder/?format=json`}
-      submitURL={`${loris.BaseURL}/instrument_buider/`}
+      loadURL={`${loris.BaseURL}/instrument_buider/`}
     />,
     document.getElementById('lorisworkspace')
   );

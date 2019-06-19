@@ -27,6 +27,7 @@ class InstrumentBuilderTab extends Component {
       display: 'flex',
       flexFlow: 'row nowrap',
       alignItems: 'stretch',
+      background: '#FCFCFC',
     };
 
     return (

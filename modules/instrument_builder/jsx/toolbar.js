@@ -111,6 +111,7 @@ class Toolbar extends Component {
       zIndex: 2,
       order: 1,
       flex: '1',
+      overflow: 'auto',
     };
 
     return (

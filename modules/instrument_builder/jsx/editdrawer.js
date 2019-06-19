@@ -17,7 +17,8 @@ class EditDrawer extends Component {
       border: '1px solid #C3D5DB',
       order: 3,
       flex: '1',
-      margin: '-1px -1px 0 -2px',
+      margin: '-1px -1px 0 0px',
+      zIndex: 2,
     };
 
     return (

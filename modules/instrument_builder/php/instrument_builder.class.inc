@@ -40,9 +40,8 @@ class Instrument_Builder extends \NDB_Menu_Filter
     }
 
     /**
-     * Setup Variables
+     * Setup Variables for the menu filter
      *
-     * @note   Setup Variables
      * @return void
      */
     function _setupVariables()
@@ -69,6 +68,49 @@ class Instrument_Builder extends \NDB_Menu_Filter
                                'instrumentName'    => 'test_names.Test_name',
                                'description'    => 'test_names.Full_name',
                               );
+    }
+
+    /**
+     * Does the setup required for this page
+     *
+     * @return void
+     */
+    function setup()
+    {
+        parent::setup();
+        $user = \User::singleton();
+
+        $this->form->addFormRule(array(&$this, '_validateLoadInstrument'));
+    }
+
+    /**
+     * Validates the load instrumnet value.
+     *
+     * @param array $values Load Instrument form values
+     *
+     * @return array $errors
+     */
+    function _validateLoadInstrument($values)
+    {
+        $file = $values['fileToLoad'];
+
+        if (empty($file) {
+            $errors['fileEmpty'] = 'Instrument file is required.';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Processes the load instrument form values
+     *
+     * @param array $values load instrument form values
+     *
+     * @return void
+     */
+    function _process($values)
+    {
+
     }
 
     /**
