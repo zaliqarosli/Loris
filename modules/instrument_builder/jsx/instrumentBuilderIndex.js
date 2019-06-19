@@ -21,7 +21,6 @@ class InstrumentBuilderIndex extends Component {
         fileToLoad: null,
       },
       showModal: false,
-      disableLoad: true,
     };
 
     this.fetchData = this.fetchData.bind(this);
@@ -65,9 +64,6 @@ class InstrumentBuilderIndex extends Component {
     let formData = Object.assign({}, this.state.formData);
     formData[formElement] = value;
     this.setState(formData);
-    if (!this.state.formData.fileToLoad === null) {
-      this.setState({disableLoad: false});
-    }
   }
 
   /**
@@ -148,16 +144,15 @@ class InstrumentBuilderIndex extends Component {
             name='instrumentFileUpload'
             id='instrumentFileUpload'
             onUserInput={this.chooseFile}
-            label='Instrument to load'
+            label='Instrument'
             required={true}
             value={this.state.formData.fileToLoad}
-            disable={this.state.disableLoad}
           />
           <ButtonElement
             name="fire_away"
             label="Load Instrument"
             type="submit"
-          /> 
+          />
         </FormElement>
       </Modal>
     );
@@ -199,7 +194,7 @@ class InstrumentBuilderIndex extends Component {
       }},
     ];
     const actions = [
-      {label: 'Load Instrument', action: this.loadInstrument},
+      {name: 'loadInstrument', label: 'Load Instrument', action: this.openModal},
     ];
 
     return (
@@ -210,9 +205,10 @@ class InstrumentBuilderIndex extends Component {
         <TabPane
           TabId={'browseInstruments'}
         >
+          {this.loadInstrument()}
           <FilterableDataTable
             name='instrumentBuilder'
-            data={this.state.data.Data}
+            data={this.state.data.data}
             fields={fields}
             getFormattedCell={this.formatColumn}
             actions={actions}

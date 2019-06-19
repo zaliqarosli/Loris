@@ -43,15 +43,13 @@ class Toolbar extends Component {
         >
           <TextboxElement
             name='instrumentName'
-            class='col-sm-12'
-            placeholder='Name'
+            label='Name'
             required={false}
             // errorMessage='Please enter name of instrument.'
           />
           <TextboxElement
             name='instrumentDesc'
-            class='col-sm-12'
-            placeholder='Description'
+            label='Description'
             required={false}
             // errorMessage="Please enter instrument's description"
           />

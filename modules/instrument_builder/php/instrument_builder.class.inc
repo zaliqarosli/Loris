@@ -40,46 +40,12 @@ class Instrument_Builder extends \NDB_Menu_Filter
     }
 
     /**
-     * Setup Variables for the menu filter
-     *
-     * @return void
-     */
-    function _setupVariables()
-    {
-        $user =& \User::singleton();
-        // the base query
-        $query = " FROM test_names";
-
-        // set the class variables
-        $this->columns      = array(
-                               'ID AS instrumentID',
-                               'Test_name AS instrumentName',
-                               'Full_name AS description',
-                              );
-        $this->query        = $query;
-        $this->validFilters = array(
-                               'test_names.ID',
-                               'test_names.Test_name',
-                               'test_names.Full_name',
-                              );
-
-        $this->formToFilter = array(
-                               'instrumentID'  => 'test_names.ID',
-                               'instrumentName'    => 'test_names.Test_name',
-                               'description'    => 'test_names.Full_name',
-                              );
-    }
-
-    /**
      * Does the setup required for this page
      *
      * @return void
      */
     function setup()
     {
-        parent::setup();
-        $user = \User::singleton();
-
         $this->form->addFormRule(array(&$this, '_validateLoadInstrument'));
     }
 
@@ -93,11 +59,9 @@ class Instrument_Builder extends \NDB_Menu_Filter
     function _validateLoadInstrument($values)
     {
         $file = $values['fileToLoad'];
-
-        if (empty($file) {
+        if (empty($file)) {
             $errors['fileEmpty'] = 'Instrument file is required.';
         }
-
         return $errors;
     }
 
@@ -111,6 +75,33 @@ class Instrument_Builder extends \NDB_Menu_Filter
     function _process($values)
     {
 
+    }
+
+    /**
+     * Gets the data source for this menu filter.
+     *
+     * @return \LORIS\Data\Provisioner
+     */
+    function getDataProvisioner() : \LORIS\Data\Provisioner
+    {
+        return new InstrumentRowProvisioner();
+    }
+
+    /**
+     * Converts the results of this menu filter to a JSON format to be retrieved
+     * with ?format=json
+     *
+     * @return string a json encoded string of the data from this table
+     */
+    function toJSON()
+    {
+        $user = \User::singleton();
+        $db   = \NDB_Factory::singleton()->database();
+
+        $table = (new \LORIS\Data\Table())
+            ->withDataFrom($this->getDataProvisioner());
+        $arr   = array('data' => $table->toArray($user));
+        return json_encode($arr);
     }
 
     /**
