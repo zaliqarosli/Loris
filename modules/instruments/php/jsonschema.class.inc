@@ -13,7 +13,7 @@
  * @link       https://www.github.com/aces/Loris/
  */
 
-namespace LORIS\instrument_builder;
+namespace LORIS\instruments;
 
 /**
  * An JsonSchema represents a JSON schema for an instrument.

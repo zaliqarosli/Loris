@@ -22,7 +22,8 @@ namespace Loris\Behavioural;
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/aces/Loris-Trunk/
  */
-use \LORIS\Data\DataInstance;
+
+use \LORIS\instruments\JsonSchemaProvisioner;
 
 class NDB_BVL_Instrument_JSON extends \NDB_BVL_Instrument
 {
@@ -82,29 +83,49 @@ class NDB_BVL_Instrument_JSON extends \NDB_BVL_Instrument
     }
 
     /**
-     * Returns the schema JSON object
+     * Returns the \LORIS\instruments\JsonSchema object
      *
-     * @return array
+     * @return int this instrument's current schemaID
      */
-    function getJSONSchema(): array
+    function getSchemaID(): int
     {
         $DB = \NDB_Factory::singleton()->database();
 
-        $query = "SELECT is.InstrumentSchemaID
-                    FROM instrument_schema is
-                    LEFT JOIN test_names tn
-                    USING (InstrumentSchemaID)
-                    WHERE tn.Test_name = :instrument";
-        $param = array('instrument' => $this->testName);
-
-        $uri = $DB->pselect($query, $param);
-
-        ini_set('allow_url_fopen', true);
-        $jsonschema = file_get_contents($uri);
-
-        // need to expand schema
+        $schemaID = $DB->pselectOne(
+            "SELECT InstrumentSchemaID
+                FROM test_names
+                WHERE Test_name = :testName",
+            array('testName' => $this->testName)
+        );
+        return $schemaID;
     }
 
+    /**
+     * Returns the \LORIS\instruments\JsonSchema object
+     *
+     * @return array
+     */
+    function getJsonSchemaEntity(): array
+    {
+        $user        = \User::singleton();
+        $schemaID    = $this->getSchemaID();
+        $provisioner = new JsonSchemaProvisioner($schemaID);
+
+        return $provisioner->toArray($user);
+    }
+
+    function getSchemaURI(): string
+    {
+        $jsonschema = $this->getJsonSchemaEntity();
+        $uri = $jsonschema['jsonSchema'];
+
+        return $uri;
+    }
+
+    function getSchemaJSON(): string
+    { 
+        // open uri, expand schema with tool and convert to json string
+        ini_set('allow_url_fopen', true);
+        $jsonschema = file_get_contents($uri);
+    }
 }
-
-
