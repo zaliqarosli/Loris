@@ -95,13 +95,17 @@ class Instrument_Builder extends \NDB_Menu_Filter
      */
     function toJSON()
     {
-        $user = \User::singleton();
-        $db   = \NDB_Factory::singleton()->database();
+        $db            = \NDB_Factory::singleton()->database();
 
         $table = (new \LORIS\Data\Table())
             ->withDataFrom($this->getDataProvisioner());
-        $arr   = array('data' => $table->toArray($user));
-        return json_encode($arr);
+        $arr   = array_map(
+            function ($row) {
+                return array_values($row);
+            },
+            json_decode($table->toJSON(\User::singleton()), true)
+        );
+        return json_encode(['data' => $arr]);
     }
 
     /**

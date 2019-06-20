@@ -177,7 +177,7 @@ class InstrumentBuilderIndex extends Component {
 
     /**
     * XXX: Currently, the order of these fields MUST match the order of the
-    * queried columns in _setupVariables() in instrument_builder.class.inc
+    * queried columns in _construct() in instrumentrowprovisioner.class.inc
     */
     const fields = [
       {label: 'Instrument ID', show: true, filter: {
@@ -192,6 +192,8 @@ class InstrumentBuilderIndex extends Component {
         name: 'description',
         type: 'text',
       }},
+      {label: 'Date Updated', show: true},
+      {label: 'Updated By', show: true},
     ];
     const actions = [
       {name: 'loadInstrument', label: 'Load Instrument', action: this.openModal},

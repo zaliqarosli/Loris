@@ -16,7 +16,7 @@
 namespace LORIS\instrument_builder;
 
 /**
- * An InstrumentRow represents a row in the Instrument Builder  menu table.
+ * An InstrumentRow represents a row in the Instrument Builder menu table.
  *
  * @category   Behavioural
  * @package    Main
@@ -30,23 +30,21 @@ class InstrumentRow implements \LORIS\Data\DataInstance
     protected $DBRow;
 
     /**
-     * Create a new InstrumentRow
+     * Create a new Instrument Row Instance.
      *
-     * @param array   $row The row (in the same format as \Database::pselectRow
-     *
-     * @return void
+     * @param array $row The Instrument Row Instance
      */
     public function __construct(array $row)
     {
-        $this->DBRow    = $row;
+        $this->DBRow = $row;
     }
 
     /**
      * Implements \LORIS\Data\DataInstance interface for this row.
      *
-     * @return string the row data.
+     * @return string the instance data.
      */
-    public function toJSON() : string
+    public function toJSON(): string
     {
         return json_encode($this->DBRow);
     }

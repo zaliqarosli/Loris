@@ -35,17 +35,19 @@ class InstrumentRowProvisioner extends \LORIS\Data\Provisioners\DBRowProvisioner
      */
     function __construct()
     {
-        //note that this needs to be in the same order as the headers array
+        // TODO: update description to be meaningful
         parent::__construct(
-            "SELECT tn.InstrumentSchemaID AS instrumentID,
-                    tn.Test_name AS instrumentName,
-                    tn.Full_name AS fullName,
-                    i_s.SchemaJson AS jsonSchema,
+            "SELECT tn.ID AS instrumentID,
+                    tn.Full_name AS instrumentName,
+                    tn.Full_name AS description,
                     i_s.DateUpdated AS dateUpdated,
-                    i_s.UsersID AS updatedBy
+                    u.Real_name AS updatedBy
             FROM test_names tn
-            LEFT JOIN instrument_schema i_s
-              USING (InstrumentSchemaID)",
+                LEFT JOIN instrument_schema i_s USING
+                    (InstrumentSchemaID)
+                LEFT JOIN users u ON
+                    (u.ID=i_s.UsersID)
+            WHERE tn.InstrumentSchemaID IS NOT NULL",
             array()
         );
     }
@@ -60,6 +62,6 @@ class InstrumentRowProvisioner extends \LORIS\Data\Provisioners\DBRowProvisioner
      */
     public function getInstance($row) : \LORIS\Data\DataInstance
     {
-            return new InstrumentRow($row);
+        return new InstrumentRow($row);
     }
 }
