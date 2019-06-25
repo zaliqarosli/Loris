@@ -115,7 +115,15 @@ class InstrumentBuilderIndex extends Component {
    * @return {*} a formated table cell for a given column
    */
   formatColumn(column, cell, row) {
-    return <td>{cell}</td>;
+    let result = <td>{cell}</td>;
+    switch (column) {
+      case 'Instrument':
+        const url = loris.BaseURL + '/instrument_builder?schemaID=' +
+                      row.ID + '#buildInstruments';
+        result = <td><a href={url}>{cell}</a></td>;
+        break;
+    }
+    return result;
   }
 
   openModal() {
@@ -180,12 +188,9 @@ class InstrumentBuilderIndex extends Component {
     * queried columns in _construct() in instrumentrowprovisioner.class.inc
     */
     const fields = [
-      {label: 'Instrument ID', show: true, filter: {
-        name: 'instrumentID',
-        type: 'text',
-      }},
-      {label: 'Instrument Name', show: true, filter: {
-        name: 'instrumentName',
+      {label: 'ID', show: false},
+      {label: 'Instrument', show: true, filter: {
+        name: 'name',
         type: 'text',
       }},
       {label: 'Description', show: true, filter: {
@@ -220,7 +225,7 @@ class InstrumentBuilderIndex extends Component {
           TabId={'buildInstruments'}
         >
           <InstrumentBuilderTab
-
+            fetchURL={`${loris.BaseURL}/instrument_builder/fetchschema/`}
           />
         </TabPane>
       </Tabs>

@@ -37,8 +37,8 @@ class InstrumentRowProvisioner extends \LORIS\Data\Provisioners\DBRowProvisioner
     {
         // TODO: update description to be meaningful
         parent::__construct(
-            "SELECT tn.ID AS instrumentID,
-                    tn.Full_name AS instrumentName,
+            "SELECT i_s.InstrumentSchemaID AS id,
+                    tn.Full_name AS name,
                     tn.Full_name AS description,
                     i_s.DateUpdated AS dateUpdated,
                     u.Real_name AS updatedBy

@@ -109,7 +109,9 @@ class NDB_Menu_Filter_Form extends NDB_Menu_Filter
         if ($request->getMethod() === "POST") {
             $this->save();
         }
-        return parent::handle($request);
+
+        return (new \LORIS\Http\Response())
+            ->withBody(new \LORIS\Http\StringStream($this->display() ?? ""));
     }
 
 }

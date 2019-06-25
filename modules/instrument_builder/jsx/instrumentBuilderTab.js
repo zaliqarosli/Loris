@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 
 import Toolbar from './toolbar';
 import Canvas from './canvas';
@@ -10,12 +10,36 @@ class InstrumentBuilderTab extends Component {
     super(props);
 
     this.state = {
-
+      data: {},
+      schemaID: null,
+      error: false,
     };
+
+    this.fetchData = this.fetchData.bind(this);
   }
 
   componentDidMount() {
+    this.fetchData();
+  }
 
+  /**
+   * Retrieve data from the provided URL and save it in state
+   *
+   * @return {object}
+   */
+  fetchData() {
+     return fetch(this.props.fetchURL, {credentials: 'same-origin'})
+    .then((resp) => resp.json())
+    .then((data) => {
+      this.setState({
+        data: data.data,
+        schemaID: data.schemaID,
+      });
+    })
+    .catch((error) => {
+      this.setState({error: true});
+      console.error(error);
+    });
   }
 
   render() {
@@ -48,7 +72,11 @@ class InstrumentBuilderTab extends Component {
 }
 
 InstrumentBuilderTab.propTypes = {
+  fetchURL: PropTypes.string.isRequired,
+};
 
+InstrumentBuilderTab.defaultProps = {
+  fetchURL: null,
 };
 
 export default InstrumentBuilderTab;

@@ -12,6 +12,10 @@
  */
 
 namespace LORIS\instrument_builder;
+
+use \Psr\Http\Message\ServerRequestInterface;
+use \Psr\Http\Message\ResponseInterface;
+
 /**
  * Instrument_builder class
  *
@@ -23,7 +27,7 @@ namespace LORIS\instrument_builder;
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
-class Instrument_Builder extends \NDB_Menu_Filter
+class Instrument_Builder extends \NDB_Menu_Filter_Form
 {
     public $skipTemplate = true;
 
