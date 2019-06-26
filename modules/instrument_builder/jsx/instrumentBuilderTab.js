@@ -37,8 +37,10 @@ class InstrumentBuilderTab extends Component {
       });
     })
     .catch((error) => {
-      this.setState({error: true});
-      console.error(error);
+      // if response is not json but instead html from display(),
+      // catch error. this should probably be updated to be more robust
+      // this.setState({error: true});
+      // console.error(error);
     });
   }
 

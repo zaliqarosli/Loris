@@ -205,6 +205,8 @@ class InstrumentBuilderIndex extends Component {
       {name: 'loadInstrument', label: 'Load Instrument', action: this.openModal},
     ];
 
+    const schemaID = this.props.schemaID || '';
+
     return (
       <Tabs
         tabs={tabList}
@@ -226,7 +228,7 @@ class InstrumentBuilderIndex extends Component {
           TabId={'buildInstruments'}
         >
           <InstrumentBuilderTab
-            fetchURL={`${loris.BaseURL}/instrument_builder/fetchschema/?schemaID=` + this.props.schemaID}
+            fetchURL={`${loris.BaseURL}/instrument_builder/fetchschema/?schemaID=` + schemaID}
           />
         </TabPane>
       </Tabs>
