@@ -113,6 +113,22 @@ class Instrument_Builder extends \NDB_Menu_Filter_Form
     }
 
     /**
+     * Include additional CSS files
+     *
+     * @return array of CSS to be inserted
+     */
+    function getCSSDependencies()
+    {
+        $factory = \NDB_Factory::singleton();
+        $baseURL = $factory->settings()->getBaseURL();
+        $deps    = parent::getCSSDependencies();
+        return array_merge(
+            $deps,
+            [$baseURL . "/instrument_builder/css/instrument_builder.css"]
+        );
+    }
+
+    /**
      * Include additional JS files
      *
      * @return array of JS to be inserted
@@ -128,4 +144,3 @@ class Instrument_Builder extends \NDB_Menu_Filter_Form
         );
     }
 }
-

@@ -6,8 +6,49 @@ class Canvas extends Component {
     super(props);
 
     this.state = {
-
+      items: [],
+      pages: [],
     };
+    this.onDragOver = this.onDragOver.bind(this);
+    this.onDrop = this.onDrop.bind(this);
+    this.renderItems = this.renderItems.bind(this);
+  }
+
+  onDragOver(e) {
+    e.preventDefault();
+  }
+
+  onDrop(e) {
+    let target = e.dataTransfer.getData('text');
+    let items = Object.assign([], this.state.items);
+    items.push(target);
+    this.setState({items});
+  }
+
+  renderItems() {
+    return this.state.items.map((item, key) => {
+      const itemStyle = {
+        border: '1px dashed #246EB6',
+        borderRadius: '2px',
+        background: 'transparent',
+        padding: '10px',
+        margin: '15px',
+        color: '#333',
+        textAlign: 'center',
+        alignSelf: 'center',
+        order: {key} + 1,
+        minWidth: '90%',
+        minHeight: '20%',
+      };
+      return (
+        <div
+          className="items"
+          key={key}
+          style={itemStyle}
+        >
+        </div>
+      );
+    });
   }
 
   render() {
@@ -31,11 +72,17 @@ class Canvas extends Component {
       width: '612px',
       zIndex: 2,
       alignSelf: 'center',
+      display: 'flex',
+      flexDirection: 'column',
     };
     return (
       <div style={dragNDropField}>
-        <div style={paper}>
-
+        <div
+          style={paper}
+          onDragOver={this.onDragOver}
+          onDrop={this.onDrop}
+        >
+          {this.renderItems()}
         </div>
       </div>
     );

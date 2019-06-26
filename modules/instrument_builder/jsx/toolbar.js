@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 // import PropTypes from 'prop-types';
 
 import Panel from 'Panel';
+// import Modal from 'Modal';
 
 class Toolbar extends Component {
   constructor(props) {
@@ -25,6 +26,8 @@ class Toolbar extends Component {
     this.renderProfilePanel = this.renderProfilePanel.bind(this);
     this.renderFieldsLibrary = this.renderFieldsLibrary.bind(this);
     this.renderFieldChips = this.renderFieldChips.bind(this);
+    this.onDragStart = this.onDragStart.bind(this);
+    this.onDragEnd = this.onDragEnd.bind(this);
   }
 
   componentDidMount() {
@@ -88,15 +91,29 @@ class Toolbar extends Component {
       color: '#246EB6',
       textAlign: 'center',
     };
-    // const fieldTypes = Object.assign({}, this.state.fieldTypes);
 
     return this.state.fieldTypes.map((fieldType, key) => {
       return (
-        <div key={fieldType.type} style={chipStyle}>
+        <div
+          key={fieldType.type}
+          style={chipStyle}
+          draggable={true}
+          onDragStart={this.onDragStart}
+        >
           <label>{fieldType.label}</label>
         </div>
       );
     });
+  }
+
+  onDragStart(e) {
+    e.dataTransfer.effectAllowed = 'move';
+    // Firefox requires dataTransfer data to be set
+    e.dataTransfer.setData('text/html', e.currentTarget);
+  }
+
+  onDragEnd(e) {
+    // show form modal for attributes
   }
 
   render() {
