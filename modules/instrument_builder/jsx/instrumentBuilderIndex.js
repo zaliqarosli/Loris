@@ -21,6 +21,7 @@ class InstrumentBuilderIndex extends Component {
         fileToLoad: null,
       },
       showModal: false,
+
     };
 
     this.fetchData = this.fetchData.bind(this);
@@ -225,7 +226,7 @@ class InstrumentBuilderIndex extends Component {
           TabId={'buildInstruments'}
         >
           <InstrumentBuilderTab
-            fetchURL={`${loris.BaseURL}/instrument_builder/fetchschema/`}
+            fetchURL={`${loris.BaseURL}/instrument_builder/fetchschema/?schemaID=` + this.props.schemaID}
           />
         </TabPane>
       </Tabs>
@@ -238,11 +239,13 @@ InstrumentBuilderIndex.propTypes = {
   loadURL: PropTypes.string.isRequired,
 };
 
+const param = QueryString.get(document.currentScript.src);
 window.addEventListener('load', () => {
   ReactDOM.render(
     <InstrumentBuilderIndex
       fetchURL={`${loris.BaseURL}/instrument_builder/?format=json`}
       loadURL={`${loris.BaseURL}/instrument_buider/`}
+      schemaID={param.schemaID}
     />,
     document.getElementById('lorisworkspace')
   );

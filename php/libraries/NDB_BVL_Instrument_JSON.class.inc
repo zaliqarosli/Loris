@@ -23,7 +23,7 @@ namespace Loris\Behavioural;
  * @link     https://www.github.com/aces/Loris-Trunk/
  */
 
-use \LORIS\instrument_builder\JsonSchemaProvisioner;
+require_once __DIR__ . '/../../modules/instruments/php/jsonschemaprovisioner.class.inc';
 
 class NDB_BVL_Instrument_JSON extends \NDB_BVL_Instrument
 {
@@ -107,7 +107,7 @@ class NDB_BVL_Instrument_JSON extends \NDB_BVL_Instrument
      *
      * @return array
      */
-    static function getSchemaEntityByID(int $schemaID=$this->getSchemaID()): array
+    static function getSchemaEntityByID(int $schemaID): array
     {
         $user        = \User::singleton();
         $provisioner = new \LORIS\instruments\JsonSchemaProvisioner($schemaID);
@@ -117,7 +117,7 @@ class NDB_BVL_Instrument_JSON extends \NDB_BVL_Instrument
 
     static function getSchemaURIByID(int $schemaID): string
     {
-        $jsonschema = $this->getSchemaEntityByID($schemaID)[0];
+        $jsonschema = self::getSchemaEntityByID($schemaID)[0];
         $uri = $jsonschema['schemaJson'];
 
         return $uri;
@@ -126,7 +126,7 @@ class NDB_BVL_Instrument_JSON extends \NDB_BVL_Instrument
     static function getSchemaJSONByID(int $schemaID): string
     {
         // open uri, expand schema with tool and convert to json string
-        $uri        = $this->getSchemaURIByID($schemaID);
+        $uri        = self::getSchemaURIByID($schemaID);
         $client     = new \LORIS\Http\Client($uri);
         $res        = $client->sendRequest(
             new \LORIS\Http\Request('GET', '')

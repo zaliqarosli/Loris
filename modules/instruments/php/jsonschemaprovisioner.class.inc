@@ -15,6 +15,8 @@
 
 namespace LORIS\instruments;
 
+require_once 'jsonschema.class.inc';
+
 /**
  * This class implements a data provisioner to get all possible
  * JsonSchema instances.

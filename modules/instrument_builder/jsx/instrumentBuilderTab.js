@@ -10,7 +10,7 @@ class InstrumentBuilderTab extends Component {
     super(props);
 
     this.state = {
-      data: {},
+      schemaJson: {},
       schemaID: null,
       error: false,
     };
@@ -32,7 +32,7 @@ class InstrumentBuilderTab extends Component {
     .then((resp) => resp.json())
     .then((data) => {
       this.setState({
-        data: data.data,
+        schemaJson: data.schemaJSON,
         schemaID: data.schemaID,
       });
     })

@@ -69,19 +69,16 @@ class FetchSchema extends \NDB_Page
         $params = $request->getQueryParams();
         if (isset($params['schemaID'])) {
             $schemaID   = $params['schemaID'];
-            $schemaJSON = \NDB_BVL_Instrument_JSON::getSchemaJSONByID($schemaID);
+            $schemaJSON = \Loris\Behavioural\NDB_BVL_Instrument_JSON::getSchemaJSONByID($schemaID);
 
             $result = array(
-                'data'     => json_decode($schemaJSON),
-                'schemaID' => $schemaID,
+                'schemaJSON' => json_decode($schemaJSON),
+                'schemaID'   => $schemaID,
             );
             return (new \LORIS\Http\Response())
                 ->withHeader("Content-Type", "application/json")
                 ->withStatus(200)
-                ->withBody(new \LORIS\Http\StringStream($schemaJSON));
+                ->withBody(new \LORIS\Http\StringStream(json_encode($result)));
         }
-
-        return (new \LORIS\Http\Response())
-            ->withBody(new \LORIS\Http\StringStream($this->display() ?? ""));
     }
 }
