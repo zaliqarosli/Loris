@@ -21,11 +21,16 @@ class Toolbar extends Component {
         {type: 'boolean', label: 'Boolean'},
         {type: 'score', label: 'Score'},
       ],
+      filter: {
+        searchFieldType: '',
+      },
     };
 
     this.renderProfilePanel = this.renderProfilePanel.bind(this);
     this.renderFieldsLibrary = this.renderFieldsLibrary.bind(this);
     this.renderFieldChips = this.renderFieldChips.bind(this);
+    this.updateFilter = this.updateFilter.bind(this);
+    this.isFiltered = this.isFiltered.bind(this);
     this.onDragStart = this.onDragStart.bind(this);
     this.onDragEnd = this.onDragEnd.bind(this);
   }
@@ -61,6 +66,19 @@ class Toolbar extends Component {
     );
   }
 
+  updateFilter(name, value) {
+    let filter = Object.assign({}, this.state.filter);
+    filter.searchFieldType = value;
+    this.setState({filter});
+  }
+
+  isFiltered(keyword) {
+    let filter = this.state.filter.searchFieldType.toLowerCase();
+    keyword = keyword.toLowerCase();
+
+    return (keyword.indexOf(filter) > -1);
+  }
+
   renderFieldsLibrary() {
     return (
       <Panel
@@ -72,9 +90,11 @@ class Toolbar extends Component {
           columns={1}
         >
           <TextboxElement
-            name='fieldType'
+            name='searchFieldType'
             label='Search'
             placeholder='Name of Field Type'
+            value={this.state.filter.searchFieldType}
+            onUserInput={this.updateFilter}
           />
         </FormElement>
         {this.renderFieldChips()}
@@ -93,16 +113,18 @@ class Toolbar extends Component {
     };
 
     return this.state.fieldTypes.map((fieldType, key) => {
-      return (
-        <div
-          key={fieldType.type}
-          style={chipStyle}
-          draggable={true}
-          onDragStart={this.onDragStart}
-        >
-          <label>{fieldType.label}</label>
-        </div>
-      );
+      if (this.isFiltered(fieldType.label)) {
+        return (
+          <div
+            key={fieldType.type}
+            style={chipStyle}
+            draggable={true}
+            onDragStart={this.onDragStart}
+          >
+            <label>{fieldType.label}</label>
+          </div>
+        );
+      }
     });
   }
 

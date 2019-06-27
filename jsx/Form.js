@@ -931,6 +931,7 @@ class TextboxElement extends Component {
             disabled={disabled}
             onChange={this.handleChange}
             onBlur={this.handleBlur}
+            placeholder={this.props.placeholder}
           />
           {errorMessage}
         </div>
@@ -949,6 +950,7 @@ TextboxElement.propTypes = {
   errorMessage: PropTypes.string,
   onUserInput: PropTypes.func,
   onUserBlur: PropTypes.func,
+  placeholder: PropTypes.func,
 };
 
 TextboxElement.defaultProps = {
@@ -964,6 +966,7 @@ TextboxElement.defaultProps = {
   },
   onUserBlur: function() {
   },
+  placeholder: '',
 };
 
 /**
