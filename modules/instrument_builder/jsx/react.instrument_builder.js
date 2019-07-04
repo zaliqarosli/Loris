@@ -253,7 +253,7 @@ class DisplayElements extends Component {
     this.dragged = this.getTableRow(e.currentTarget);
     e.dataTransfer.effectAllowed = 'move';
     // Firefox requires dataTransfer data to be set
-    e.dataTransfer.setData('text/html', e.currentTarget);
+    e.dataTransfer.setData('text/plain', e.currentTarget);
   }
   // Used for the drag and drop rows
   dragEnd(e) {

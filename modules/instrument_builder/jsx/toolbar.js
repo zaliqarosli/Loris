@@ -121,6 +121,7 @@ class Toolbar extends Component {
       if (this.isFiltered(fieldType.label)) {
         return (
           <div
+            id={fieldType.type}
             key={fieldType.type}
             style={chipStyle}
             draggable={true}
@@ -136,7 +137,7 @@ class Toolbar extends Component {
   onDragStart(e) {
     e.dataTransfer.effectAllowed = 'move';
     // Firefox requires dataTransfer data to be set
-    e.dataTransfer.setData('text/html', e.currentTarget);
+    e.dataTransfer.setData('text/plain', e.target.id);
   }
 
   onDragEnd(e) {

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 // import PropTypes from 'prop-types';
 
 import Modal from 'Modal';
+import AddListItemForm from './addListItemForm';
 
 class Canvas extends Component {
   constructor(props) {
@@ -11,6 +12,7 @@ class Canvas extends Component {
       items: [],
       pages: [],
       showModal: false,
+      selectedFieldType: null,
     };
     this.onDragOver = this.onDragOver.bind(this);
     this.onDrop = this.onDrop.bind(this);
@@ -28,8 +30,12 @@ class Canvas extends Component {
     let target = e.dataTransfer.getData('text');
     let items = Object.assign([], this.state.items);
     items.push(target);
-    this.setState({items});
+    this.setState({
+      items: items,
+      selectedFieldType: target,
+    });
     this.openModal();
+    e.dataTransfer.clearData();
   }
 
   openModal() {
@@ -41,21 +47,28 @@ class Canvas extends Component {
   }
 
   renderModal() {
+    let addItemForm = null;
+    switch (this.state.selectedFieldType) {
+      case 'pageBreak':
+
+        break;
+      case 'section':
+
+        break;
+      case 'select':
+        addItemForm = <AddListItemForm uiType='select'/>;
+        break;
+      case 'radio':
+        addItemForm = <AddListItemForm uiType='radio'/>;
+        break;
+    }
     return (
       <Modal
         title='Add Field'
         onClose={this.closeModal}
         show={this.state.showModal}
       >
-        <FormElement
-          name="addField"
-          id="addField"
-        >
-          <StaticElement
-            label="Field Type"
-            text="test"
-          />
-        </FormElement>
+        {addItemForm}
       </Modal>
     );
   }
