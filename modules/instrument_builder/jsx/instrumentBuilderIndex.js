@@ -31,6 +31,7 @@ class InstrumentBuilderIndex extends Component {
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.loadInstrument = this.loadInstrument.bind(this);
+    this.addItem = this.addItem.bind(this);
   }
 
   componentDidMount() {
@@ -161,6 +162,26 @@ class InstrumentBuilderIndex extends Component {
             name="fire_away"
             label="Load Instrument"
             type="submit"
+          />
+        </FormElement>
+      </Modal>
+    );
+  }
+
+  addItem() {
+    return (
+      <Modal
+        title='Add Field'
+        onClose={this.closeModal}
+        show={this.state.showModal}
+      >
+        <FormElement
+          name="addField"
+          id="addField"
+        >
+          <StaticElement
+            label="Field Type"
+            text="test"
           />
         </FormElement>
       </Modal>

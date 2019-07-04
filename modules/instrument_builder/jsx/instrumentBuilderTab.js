@@ -13,9 +13,11 @@ class InstrumentBuilderTab extends Component {
       schemaJson: {},
       schemaID: null,
       error: false,
+      formData: {},
     };
 
     this.fetchData = this.fetchData.bind(this);
+    this.updateFormData = this.updateFormData.bind(this);
   }
 
   componentDidMount() {
@@ -34,6 +36,7 @@ class InstrumentBuilderTab extends Component {
       this.setState({
         schemaJson: data.schemaJSON,
         schemaID: data.schemaID,
+        formData: data.schemaJSON,
       });
     })
     .catch((error) => {
@@ -42,6 +45,12 @@ class InstrumentBuilderTab extends Component {
       // this.setState({error: true});
       // console.error(error);
     });
+  }
+
+  updateFormData(element, value) {
+    let formData = Object.assign({}, this.state.formData);
+    formData[element] = value;
+    this.setState({formData});
   }
 
   render() {
@@ -56,9 +65,16 @@ class InstrumentBuilderTab extends Component {
       background: '#FCFCFC',
     };
 
+    const profile = {
+      name: this.state.formData['@id'] || '',
+      description: this.state.formData['schema:description'] || '',
+    };
+
     return (
       <div style={divStyle}>
         <Toolbar
+          profile={profile}
+          onUpdate={this.updateFormData}
         >
         </Toolbar>
         <Canvas

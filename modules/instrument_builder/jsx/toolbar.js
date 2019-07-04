@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 
 import Panel from 'Panel';
 // import Modal from 'Modal';
@@ -53,12 +53,16 @@ class Toolbar extends Component {
             name='instrumentName'
             label='Name'
             required={false}
+            value={this.props.profile.name}
+            onUserInput={this.props.onUpdate}
             // errorMessage='Please enter name of instrument.'
           />
           <TextboxElement
             name='instrumentDesc'
             label='Description'
             required={false}
+            value={this.props.profile.description}
+            onUserInput={this.props.onUpdate}
             // errorMessage="Please enter instrument's description"
           />
         </FormElement>
@@ -66,7 +70,7 @@ class Toolbar extends Component {
     );
   }
 
-  updateFilter(name, value) {
+  updateFilter(element, value) {
     let filter = Object.assign({}, this.state.filter);
     filter.searchFieldType = value;
     this.setState({filter});
@@ -104,11 +108,12 @@ class Toolbar extends Component {
 
   renderFieldChips() {
     const chipStyle = {
-      border: '1px solid #064785',
-      borderRadius: '2px',
-      background: 'white',
+      border: '1px solid #CCC',
+      borderRadius: '20px',
+      background: '#F3F3F3',
       padding: '5px',
-      color: '#246EB6',
+      margin: '2px',
+      color: '#064785',
       textAlign: 'center',
     };
 
@@ -145,7 +150,6 @@ class Toolbar extends Component {
       padding: '10px',
       marginLeft: '-1px',
       marginTop: '-1px',
-      zIndex: 2,
       order: 1,
       flex: '1',
       overflow: 'auto',
@@ -161,7 +165,8 @@ class Toolbar extends Component {
 }
 
 Toolbar.propTypes = {
-
+  profile: PropTypes.object,
+  onUpdate: PropTypes.func,
 };
 
 export default Toolbar;

@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 // import PropTypes from 'prop-types';
 
+import Modal from 'Modal';
+
 class Canvas extends Component {
   constructor(props) {
     super(props);
@@ -8,10 +10,14 @@ class Canvas extends Component {
     this.state = {
       items: [],
       pages: [],
+      showModal: false,
     };
     this.onDragOver = this.onDragOver.bind(this);
     this.onDrop = this.onDrop.bind(this);
     this.renderItems = this.renderItems.bind(this);
+    this.openModal = this.openModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+    this.renderModal = this.renderModal.bind(this);
   }
 
   onDragOver(e) {
@@ -23,12 +29,40 @@ class Canvas extends Component {
     let items = Object.assign([], this.state.items);
     items.push(target);
     this.setState({items});
+    this.openModal();
+  }
+
+  openModal() {
+    this.setState({showModal: true});
+  }
+
+  closeModal() {
+    this.setState({showModal: false});
+  }
+
+  renderModal() {
+    return (
+      <Modal
+        title='Add Field'
+        onClose={this.closeModal}
+        show={this.state.showModal}
+      >
+        <FormElement
+          name="addField"
+          id="addField"
+        >
+          <StaticElement
+            label="Field Type"
+            text="test"
+          />
+        </FormElement>
+      </Modal>
+    );
   }
 
   renderItems() {
     return this.state.items.map((item, key) => {
       const itemStyle = {
-        border: '1px dashed #246EB6',
         borderRadius: '2px',
         background: 'transparent',
         padding: '10px',
@@ -55,13 +89,12 @@ class Canvas extends Component {
     const dragNDropField = {
       background: 'transparent',
       border: '1px solid #C3D5DB',
-      zIndex: 2,
       order: 2,
       flex: '3',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'auto',
-      margin: '-1px -1px 0 -1px',
+      margin: '-1px 0px 0 -1px',
     };
     const paper = {
       background: 'white',
@@ -70,13 +103,13 @@ class Canvas extends Component {
       flex: '1',
       height: '792px',
       width: '612px',
-      zIndex: 2,
       alignSelf: 'center',
       display: 'flex',
       flexDirection: 'column',
     };
     return (
       <div style={dragNDropField}>
+        {this.renderModal()}
         <div
           style={paper}
           onDragOver={this.onDragOver}
@@ -90,7 +123,6 @@ class Canvas extends Component {
 }
 
 Canvas.propTypes = {
-
 };
 
 export default Canvas;

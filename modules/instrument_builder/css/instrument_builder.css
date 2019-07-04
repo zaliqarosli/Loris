@@ -17,3 +17,10 @@
 .file-upload .input-group-btn {
     display: block;
 }
+
+.items {
+    border: 1px dashed #C3D5DB;
+}
+.items:hover {
+    border: 1px dashed #246EB6;
+}

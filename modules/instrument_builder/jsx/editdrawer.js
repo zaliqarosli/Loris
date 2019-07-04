@@ -18,7 +18,6 @@ class EditDrawer extends Component {
       order: 3,
       flex: '1',
       margin: '-1px -1px 0 -1px',
-      zIndex: 2,
     };
 
     return (
