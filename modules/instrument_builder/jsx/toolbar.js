@@ -50,7 +50,7 @@ class Toolbar extends Component {
           columns={1}
         >
           <TextboxElement
-            name='instrumentName'
+            name='altLabel'
             label='Name'
             required={false}
             value={this.props.profile.name}
@@ -58,7 +58,7 @@ class Toolbar extends Component {
             // errorMessage='Please enter name of instrument.'
           />
           <TextboxElement
-            name='instrumentDesc'
+            name='prefLabel'
             label='Description'
             required={false}
             value={this.props.profile.description}
