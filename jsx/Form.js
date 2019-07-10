@@ -1497,7 +1497,7 @@ class CheckboxElement extends React.Component {
 
     return (
       <div className={elementClass}>
-        <label htmlFor={this.props.id}>
+        <label style={{marginLeft: '8px'}} htmlFor={this.props.id}>
           <input
             type="checkbox"
             name={this.props.name}
