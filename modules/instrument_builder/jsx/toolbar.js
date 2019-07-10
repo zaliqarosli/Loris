@@ -15,6 +15,7 @@ class Toolbar extends Component {
         {type: 'header', label: 'Header'},
         {type: 'text', label: 'Text'},
         {type: 'select', label: 'Select'},
+        {type: 'radio', label: 'Radio'},
         {type: 'label', label: 'Label'},
         {type: 'numeric', label: 'Numeric'},
         {type: 'date', label: 'Date'},
@@ -152,7 +153,7 @@ class Toolbar extends Component {
       marginLeft: '-1px',
       marginTop: '-1px',
       order: 1,
-      flex: '1',
+      flex: '6',
       overflow: 'auto',
     };
 

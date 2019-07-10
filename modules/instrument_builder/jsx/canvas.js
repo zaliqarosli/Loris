@@ -16,10 +16,11 @@ class Canvas extends Component {
     };
     this.onDragOver = this.onDragOver.bind(this);
     this.onDrop = this.onDrop.bind(this);
-    this.renderItems = this.renderItems.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.renderModal = this.renderModal.bind(this);
+    // this.deleteItem = this.deleteItem.bind(this);
+    this.renderItems = this.renderItems.bind(this);
   }
 
   onDragOver(e) {
@@ -64,7 +65,7 @@ class Canvas extends Component {
     }
     return (
       <Modal
-        title='Add Field'
+        title='Add Item'
         onClose={this.closeModal}
         show={this.state.showModal}
       >
@@ -72,6 +73,12 @@ class Canvas extends Component {
       </Modal>
     );
   }
+
+  // deleteItem(itemKey) {
+  //   let items = Object.assign([], this.state.items);
+  //   delete items[itemKey];
+  //   this.setState({items});
+  // }
 
   renderItems() {
     return this.state.items.map((item, key) => {
@@ -93,6 +100,9 @@ class Canvas extends Component {
           key={key}
           style={itemStyle}
         >
+        <span style={{background: '#FCFCFC', float: 'right'}}>
+          <i className="fas fa-times-circle"></i>
+        </span>
         </div>
       );
     });
@@ -103,7 +113,7 @@ class Canvas extends Component {
       background: 'transparent',
       border: '1px solid #C3D5DB',
       order: 2,
-      flex: '3',
+      flex: '18',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'auto',
