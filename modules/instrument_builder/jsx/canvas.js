@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 // import PropTypes from 'prop-types';
 
+import swal from 'sweetalert2';
 import Modal from 'Modal';
 import AddListItemForm from './addListItemForm';
 
@@ -19,6 +20,7 @@ class Canvas extends Component {
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.renderModal = this.renderModal.bind(this);
+    this.saveItem = this.saveItem.bind(this);
     // this.deleteItem = this.deleteItem.bind(this);
     this.renderItems = this.renderItems.bind(this);
   }
@@ -29,12 +31,7 @@ class Canvas extends Component {
 
   onDrop(e) {
     let target = e.dataTransfer.getData('text');
-    let items = Object.assign([], this.state.items);
-    items.push(target);
-    this.setState({
-      items: items,
-      selectedFieldType: target,
-    });
+    this.setState({selectedFieldType: target});
     this.openModal();
     e.dataTransfer.clearData();
   }
@@ -57,10 +54,10 @@ class Canvas extends Component {
 
         break;
       case 'select':
-        addItemForm = <AddListItemForm uiType='select'/>;
+        addItemForm = <AddListItemForm uiType='select' onSave={this.saveItem}/>;
         break;
       case 'radio':
-        addItemForm = <AddListItemForm uiType='radio'/>;
+        addItemForm = <AddListItemForm uiType='radio' onSave={this.saveItem}/>;
         break;
     }
     return (
@@ -72,6 +69,17 @@ class Canvas extends Component {
         {addItemForm}
       </Modal>
     );
+  }
+
+  saveItem(formData) {
+    let items = Object.assign([], this.state.items);
+    items.push(formData);
+    this.setState({items});
+    swal('Success!', 'Item added.', 'success').then((result) => {
+      if (result.value) {
+        this.closeModal();
+      }
+    });
   }
 
   // deleteItem(itemKey) {
