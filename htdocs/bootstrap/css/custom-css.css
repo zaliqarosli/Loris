@@ -849,3 +849,13 @@ legend {
     font-size: 14px;
     color: #064785;
 }
+
+/* Styling for checkbox and radio element */
+.form-horizontal .radio,
+.form-horizontal .checkbox,
+.form-horizontal .radio-inline,
+.form-horizontal .checkbox-inline {
+    margin-top:0;
+    margin-bottom:15px;
+    padding-top:7px;
+}
