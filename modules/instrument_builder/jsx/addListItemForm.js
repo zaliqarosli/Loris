@@ -6,17 +6,27 @@ class AddListItemForm extends Component {
     super(props);
     this.state = {
       formData: {
+        itemID: '',
+        uiType: this.props.uiType,
+        question: '',
+        description: '',
+        selectedType: null,
         options: {
-          choices: [],
+          choices: [
+            {name: '', value: ''},
+          ],
           multipleChoice: false,
           requiredValue: false,
-          readOnly: false,
         },
-        rules: {},
+        rules: {
+          branching: '',
+          scoring: '',
+        },
       },
       dataType: {
         integer: 'Integer',
         string: 'String',
+        boolean: 'Boolean',
       },
       uiType: {
         select: 'Select',
@@ -24,24 +34,94 @@ class AddListItemForm extends Component {
       },
     };
 
-    this.addChoices = this.addChoices.bind(this);
+    this.setChoiceLabel = this.setChoiceLabel.bind(this);
+    this.setChoiceValue = this.setChoiceValue.bind(this);
+    this.setFormData = this.setFormData.bind(this);
     this.setCheckbox = this.setCheckbox.bind(this);
+    this.setRules = this.setRules.bind(this);
+    this.addOptions = this.addOptions.bind(this);
+    this.renderFieldOptions = this.renderFieldOptions.bind(this);
   }
 
-  addChoices(element, value) {
+  setChoiceLabel(elementName, value) {
     let formData = Object.assign({}, this.state.formData);
-    let newChoice= {
-      name: value,
-      value: value,
-    };
-    formData.options.choices[element] = newChoice;
+    const choiceKey = elementName;
+    formData.options.choices[choiceKey].name = value;
     this.setState({formData});
   }
 
-  setCheckbox(element, value) {
+  setChoiceValue(elementName, value) {
     let formData = Object.assign({}, this.state.formData);
-    formData.options.element = value;
+    const choiceKey = elementName;
+    formData.options.choices[choiceKey].value = value;
     this.setState({formData});
+  }
+
+  setFormData(elementName, value) {
+    let formData = Object.assign({}, this.state.formData);
+    formData[elementName] = value;
+    this.setState({formData});
+  }
+
+  setCheckbox(elementName, value) {
+    let formData = Object.assign({}, this.state.formData);
+    formData.options[elementName] = value;
+    this.setState({formData});
+  }
+
+  setRules(elementName, value) {
+    let formData = Object.assign({}, this.state.formData);
+    formData.rules[elementName] = value;
+    this.setState({formData});
+  }
+
+  addOptions(e) {
+    let formData = Object.assign({}, this.state.formData);
+    const newChoice = {name: '', value: ''};
+    formData.options.choices.push(newChoice);
+    this.setState({formData});
+  }
+
+  renderFieldOptions() {
+    let optionsBlock = this.state.formData.options.choices.map((choice, key) => {
+      return (
+        <div key={key} style={{display: 'flex', justifyContent: 'flex-end'}}>
+          <div style={{marginRight: '20px'}}>
+            <TextboxElement
+              name={key}
+              label='Label'
+              onUserInput={this.addChoiceLabel}
+              value={this.state.formData.options.choices[key].name}
+            />
+          </div>
+          <div style={{marginRight: '17px'}}>
+            <TextboxElement
+              name={key}
+              label='Value'
+              onUserInput={this.addChoiceValue}
+              value={this.state.formData.options.choices[key].value}
+            />
+          </div>
+          <ButtonElement
+            name='addOptions'
+            label={
+              <span><i className='fas fa-plus'></i></span>
+            }
+            onUserInput={this.addOptions}
+          />
+        </div>
+      );
+    });
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        marginRight: '15px',
+        float: 'right',
+      }}>
+        {optionsBlock}
+      </div>
+    );
   }
 
   render() {
@@ -51,52 +131,55 @@ class AddListItemForm extends Component {
         id='addListItem'
       >
         <TextboxElement
-          name='itemid'
+          name='itemID'
           label='Item ID'
+          value={this.state.formData.itemID}
+          onUserInput={this.setFormData}
         />
         <StaticElement
           label='UI type'
           text={this.state.uiType[this.props.uiType]}
         />
         <TextboxElement
+          name='question'
           label='Question text'
+          value={this.state.formData.question}
+          onUserInput={this.setFormData}
         />
         <TextboxElement
+          name='description'
           label='Description'
+          value={this.state.formData.description}
+          onUserInput={this.setFormData}
         />
         <SelectElement
+          name='selectedType'
           label='Data type'
           options={this.state.dataType}
+          value={this.state.formData.selectedType}
+          onUserInput={this.setFormData}
         />
-        <TextboxElement
-          name='option1'
-          label='Options 1'
-          onUserInput={this.addChoices}
-          value={(this.state.formData.options.choices['option1'] || {}).value}
+        <StaticElement
+          label='Field options:'
         />
-        <TextboxElement
-          name='option2'
-          label='Options 2'
-          onUserInput={this.addChoices}
-          value={(this.state.formData.options.choices['option2'] || {}).value}
-        />
-        <TextboxElement
-          name='option3'
-          label='Options 3'
-          onUserInput={this.addChoices}
-          value={(this.state.formData.options.choices['option3'] || {}).value}
-        />
-        <TextboxElement
-          name='option4'
-          label='Options 4'
-          onUserInput={this.addChoices}
-          value={(this.state.formData.options.choices['option4'] || {}).value}
-        />
+        {this.renderFieldOptions()}
         <CheckboxElement
           name='multipleChoice'
           label='Allow multiple values'
           value={this.state.formData.options.multipleChoice}
           onUserInput={this.setCheckbox}
+        />
+        <TextboxElement
+          name='branching'
+          label='Branching formula'
+          value={this.state.formData.rules.branching}
+          onUserInput={this.setRules}
+        />
+        <TextboxElement
+          name='scoring'
+          label='Scoring formula'
+          value={this.state.formData.rules.scoring}
+          onUserInput={this.setRules}
         />
         <CheckboxElement
           name='requiredValue'
