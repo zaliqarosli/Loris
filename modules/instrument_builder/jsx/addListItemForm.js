@@ -183,7 +183,7 @@ class AddListItemForm extends Component {
         />
         <CheckboxElement
           name='requiredValue'
-          label='Item is required'
+          label='Required item'
           value={this.state.formData.options.requiredValue}
           onUserInput={this.setCheckbox}
         />
