@@ -41,6 +41,7 @@ class AddListItemForm extends Component {
     this.setRules = this.setRules.bind(this);
     this.addOptions = this.addOptions.bind(this);
     this.renderFieldOptions = this.renderFieldOptions.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   setChoiceLabel(elementName, value) {
@@ -90,7 +91,7 @@ class AddListItemForm extends Component {
             <TextboxElement
               name={key}
               label='Label'
-              onUserInput={this.addChoiceLabel}
+              onUserInput={this.setChoiceLabel}
               value={this.state.formData.options.choices[key].name}
             />
           </div>
@@ -98,12 +99,13 @@ class AddListItemForm extends Component {
             <TextboxElement
               name={key}
               label='Value'
-              onUserInput={this.addChoiceValue}
+              onUserInput={this.setChoiceValue}
               value={this.state.formData.options.choices[key].value}
             />
           </div>
           <ButtonElement
             name='addOptions'
+            type='button'
             label={
               <span><i className='fas fa-plus'></i></span>
             }
@@ -124,17 +126,24 @@ class AddListItemForm extends Component {
     );
   }
 
+  handleSubmit(e) {
+    let formData = Object.assign({}, this.state.formData);
+    this.props.onSave(formData);
+  }
+
   render() {
     return (
       <FormElement
         name='addListItem'
         id='addListItem'
+        onSubmit={this.handleSubmit}
       >
         <TextboxElement
           name='itemID'
           label='Item ID'
           value={this.state.formData.itemID}
           onUserInput={this.setFormData}
+          required={true}
         />
         <StaticElement
           label='UI type'
@@ -145,6 +154,7 @@ class AddListItemForm extends Component {
           label='Question text'
           value={this.state.formData.question}
           onUserInput={this.setFormData}
+          required={true}
         />
         <TextboxElement
           name='description'
@@ -158,6 +168,7 @@ class AddListItemForm extends Component {
           options={this.state.dataType}
           value={this.state.formData.selectedType}
           onUserInput={this.setFormData}
+          required={true}
         />
         <StaticElement
           label='Field options:'
@@ -187,6 +198,11 @@ class AddListItemForm extends Component {
           value={this.state.formData.options.requiredValue}
           onUserInput={this.setCheckbox}
         />
+        <ButtonElement
+          name='submit'
+          type='submit'
+          label='Add item'
+        />
       </FormElement>
     );
   }
@@ -194,6 +210,7 @@ class AddListItemForm extends Component {
 
 AddListItemForm.propTypes = {
   uiType: PropTypes.string.isRequired,
+  onSave: PropTypes.func.isRequired,
 };
 
 export default AddListItemForm;
