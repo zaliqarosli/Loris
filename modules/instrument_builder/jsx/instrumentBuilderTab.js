@@ -5,6 +5,8 @@ import Toolbar from './toolbar';
 import Canvas from './canvas';
 import EditDrawer from './editdrawer';
 
+const jsonld = require('jsonld');
+
 class InstrumentBuilderTab extends Component {
   constructor(props) {
     super(props);
@@ -30,9 +32,10 @@ class InstrumentBuilderTab extends Component {
    * @return {object}
    */
   fetchData() {
-     return fetch(this.props.fetchURL, {credentials: 'same-origin'})
+    return fetch(this.props.fetchURL, {credentials: 'same-origin'})
     .then((resp) => resp.json())
     .then((data) => {
+      jsonld.expand(data.schemaJSON);
       this.setState({
         schemaJson: data.schemaJSON,
         schemaID: data.schemaID,
