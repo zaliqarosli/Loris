@@ -3,16 +3,14 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
 class AddListItemForm extends Component {
-
-  // Define constructor with super props, state, and methods 
+  // Define constructor with super props, state, and methods
   constructor(props) {
-
     // Pass props to parent constructor
     super(props);
 
     // Define component's states
     this.state = {
-      formData: {     // the object in which the form's data on user input is stored
+      formData: { // the object in which the form's data on user input is stored
         itemID: '',
         uiType: this.props.uiType,
         question: '',
@@ -30,12 +28,12 @@ class AddListItemForm extends Component {
           scoring: '',
         },
       },
-      dataType: {     // options for 'Data type' select element
+      dataType: { // options for 'Data type' select element
         integer: 'Integer',
         string: 'String',
         boolean: 'Boolean',
       },
-      uiType: {       // options for UI type given this.props.uiType
+      uiType: { // options for UI type given this.props.uiType
         select: 'Select',
         radio: 'Radio',
       },
@@ -144,7 +142,7 @@ class AddListItemForm extends Component {
   }
 
   // On clicking 'Add item', call the call-back method passed in this.props.onSave
-  // This call-back method can be anything you want it to be, what's important here is 
+  // This call-back method can be anything you want it to be, what's important here is
   // that handleSubmit calls `this.props.onSave`.
   // Passing `formData` to the prop function sends the formData up to the parent level
   handleSubmit(e) {
@@ -235,7 +233,7 @@ class AddListItemForm extends Component {
 // Define props to pass to the component when called
 AddListItemForm.propTypes = {
   uiType: PropTypes.string.isRequired, // i.e. whether it is "select" or "radio"
-  onSave: PropTypes.func.isRequired,   // a call-back function defined in parent class that will be triggered when called in this class 
+  onSave: PropTypes.func.isRequired, // a call-back function defined in parent class that will be triggered when called in this class
 };
 
 // Export component to be used in other classes
