@@ -15,7 +15,6 @@ class InstrumentBuilderApp extends Component {
       schemaURI: this.props.schemaURI,
       schemaJSON: {},
       expanded: {},
-      flattened: {},
       formData: {},
       error: false,
     };
@@ -33,11 +32,9 @@ class InstrumentBuilderApp extends Component {
       }
       const schemaJSON = await resp.json();
       const expanded = await jsonld.expand(this.state.schemaURI);
-      const flattened = await jsonld.flatten(schemaJSON);
       this.setState({
         schemaJSON,
         expanded,
-        flattened,
       });
       let formData = this.mapFormData(this.state.expanded);
       this.setState({formData});
