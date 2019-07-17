@@ -18,50 +18,27 @@ class InstrumentBuilderApp extends Component {
       formData: {},
       error: false,
     };
-    this.fetchData = this.fetchData.bind(this);
     this.updateFormData = this.updateFormData.bind(this);
     this.mapFormData = this.mapFormData.bind(this);
   }
 
   async componentDidMount() {
     try {
-      // this.fetchData();
       const resp = await fetch(this.state.schemaURI);
       if (!resp.ok) {
         console.error(resp.statusText);
       }
       const schemaJSON = await resp.json();
       const expanded = await jsonld.expand(this.state.schemaURI);
+      const formData = this.mapFormData(expanded);
       this.setState({
         schemaJSON,
         expanded,
+        formData,
       });
-      let formData = this.mapFormData(this.state.expanded);
-      this.setState({formData});
     } catch (error) {
       console.error(error);
     }
-  }
-
-  /**
-   * Retrieve data from the provided URL and save it in state
-   *
-   * @return {object}
-   */
-  fetchData() {
-    return fetch(this.props.fetchURL, {credentials: 'same-origin'})
-    .then((resp) => resp.json())
-    .then((data) => {
-      this.setState({
-        schemaURI: data.schemaURI,
-      });
-    })
-    .catch((error) => {
-      // if response is not json but instead html from display(),
-      // catch error. this should probably be updated to be more robust
-      // this.setState({error: true});
-      // console.error(error);
-    });
   }
 
   mapFormData(data) {
