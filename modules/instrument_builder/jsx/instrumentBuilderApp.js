@@ -7,23 +7,43 @@ import EditDrawer from './editdrawer';
 
 const jsonld = require('jsonld');
 
-class InstrumentBuilderTab extends Component {
+class InstrumentBuilderApp extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      schemaJson: {},
-      schemaID: null,
-      error: false,
+      schemaURI: this.props.schemaURI,
+      schemaJSON: {},
+      expanded: {},
+      flattened: {},
       formData: {},
+      error: false,
     };
     this.fetchData = this.fetchData.bind(this);
     this.updateFormData = this.updateFormData.bind(this);
     this.mapFormData = this.mapFormData.bind(this);
   }
 
-  componentDidMount() {
-    this.fetchData();
+  async componentDidMount() {
+    try {
+      // this.fetchData();
+      const resp = await fetch(this.state.schemaURI);
+      if (!resp.ok) {
+        console.error(resp.statusText);
+      }
+      const schemaJSON = await resp.json();
+      const expanded = await jsonld.expand(this.state.schemaURI);
+      const flattened = await jsonld.flatten(schemaJSON);
+      this.setState({
+        schemaJSON,
+        expanded,
+        flattened,
+      });
+      let formData = this.mapFormData(this.state.expanded);
+      this.setState({formData});
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   /**
@@ -35,13 +55,9 @@ class InstrumentBuilderTab extends Component {
     return fetch(this.props.fetchURL, {credentials: 'same-origin'})
     .then((resp) => resp.json())
     .then((data) => {
-      jsonld.expand(data.schemaJSON);
       this.setState({
-        schemaJson: data.schemaJSON,
-        schemaID: data.schemaID,
+        schemaURI: data.schemaURI,
       });
-      let formData = this.mapFormData(data.schemaJSON);
-      this.setState({formData});
     })
     .catch((error) => {
       // if response is not json but instead html from display(),
@@ -113,12 +129,12 @@ class InstrumentBuilderTab extends Component {
   }
 }
 
-InstrumentBuilderTab.propTypes = {
-  fetchURL: PropTypes.string.isRequired,
+InstrumentBuilderApp.propTypes = {
+  schemaURI: PropTypes.string.isRequired,
 };
 
-InstrumentBuilderTab.defaultProps = {
-  fetchURL: null,
+InstrumentBuilderApp.defaultProps = {
+  schemaURI: null,
 };
 
-export default InstrumentBuilderTab;
+export default InstrumentBuilderApp;

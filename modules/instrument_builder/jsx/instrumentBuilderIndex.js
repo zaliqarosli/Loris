@@ -7,7 +7,7 @@ import Loader from 'Loader';
 import {Tabs, TabPane} from 'Tabs';
 import FilterableDataTable from 'FilterableDataTable';
 
-import InstrumentBuilderTab from './instrumentBuilderTab';
+import InstrumentBuilderApp from './instrumentBuilderApp';
 
 class InstrumentBuilderIndex extends Component {
   constructor(props) {
@@ -120,9 +120,12 @@ class InstrumentBuilderIndex extends Component {
     let result = <td>{cell}</td>;
     switch (column) {
       case 'Instrument':
-        const url = loris.BaseURL + '/instrument_builder?schemaID=' +
-                      row.ID + '#buildInstruments';
+        const url = loris.BaseURL + '/instrument_builder?uri=' +
+                      row['Schema URI'] + '#buildInstruments';
         result = <td><a href={url}>{cell}</a></td>;
+        break;
+      case 'Schema URI':
+        result = <td><a href={cell}>Link</a></td>;
         break;
     }
     return result;
@@ -221,12 +224,13 @@ class InstrumentBuilderIndex extends Component {
       }},
       {label: 'Date Updated', show: true},
       {label: 'Updated By', show: true},
+      {label: 'Schema URI', show: true},
     ];
     const actions = [
       {name: 'loadInstrument', label: 'Load Instrument', action: this.openModal},
     ];
 
-    const schemaID = this.props.schemaID || '';
+    const schemaURI = this.props.schemaURI || '';
 
     return (
       <Tabs
@@ -248,8 +252,8 @@ class InstrumentBuilderIndex extends Component {
         <TabPane
           TabId={'buildInstruments'}
         >
-          <InstrumentBuilderTab
-            fetchURL={`${loris.BaseURL}/instrument_builder/fetchschema/?schemaID=` + schemaID}
+          <InstrumentBuilderApp
+            schemaURI={schemaURI}
           />
         </TabPane>
       </Tabs>
@@ -268,7 +272,7 @@ window.addEventListener('load', () => {
     <InstrumentBuilderIndex
       fetchURL={`${loris.BaseURL}/instrument_builder/?format=json`}
       loadURL={`${loris.BaseURL}/instrument_buider/`}
-      schemaID={param.schemaID}
+      schemaURI={param.uri}
     />,
     document.getElementById('lorisworkspace')
   );
