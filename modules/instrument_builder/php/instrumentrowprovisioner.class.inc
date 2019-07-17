@@ -42,7 +42,7 @@ class InstrumentRowProvisioner extends \LORIS\Data\Provisioners\DBRowProvisioner
                     tn.Full_name AS description,
                     i_s.DateUpdated AS dateUpdated,
                     u.Real_name AS updatedBy,
-                    i_s.SchemaJson AS schemaURI
+                    i_s.SchemaURI AS schemaURI
             FROM test_names tn
                 LEFT JOIN instrument_schema i_s USING
                     (InstrumentSchemaID)
