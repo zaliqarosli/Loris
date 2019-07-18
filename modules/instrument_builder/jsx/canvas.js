@@ -24,6 +24,7 @@ class Canvas extends Component {
       ],
       showModal: false,
       selectedFieldType: null,
+      selectedPage: null,
     };
     this.onDragOver = this.onDragOver.bind(this);
     this.onDrop = this.onDrop.bind(this);
@@ -43,8 +44,12 @@ class Canvas extends Component {
   }
 
   onDrop(e) {
-    let target = e.dataTransfer.getData('text');
-    this.setState({selectedFieldType: target});
+    const selectedPage = e.target.id;
+    const selectedFieldType = e.dataTransfer.getData('text');
+    this.setState({
+      selectedFieldType,
+      selectedPage,
+    });
     this.openModal();
     e.dataTransfer.clearData();
   }
@@ -86,6 +91,7 @@ class Canvas extends Component {
 
   saveItem(formData) {
     let items = Object.assign([], this.state.items);
+    formData.onPage = this.state.selectedPage;
     items.push(formData);
     this.setState({items});
     swal.fire('Success!', 'Item added.', 'success').then((result) => {
@@ -125,24 +131,24 @@ class Canvas extends Component {
   }
 
   deletePage(e) {
-  //  const itemKey = e.currentTarget.parentNode.id;
-  //  let items = Object.assign([], this.state.items);
-  //  swal.fire({
-  //    title: 'Are you sure?',
-  //    text: 'You will lose all item information.',
-  //    type: 'warning',
-  //    showCancelButton: true,
-  //    confirmButtonText: 'Yes, delete item!',
-  //  }).then((result) => {
-  //    if (result.value) {
-  //      delete items[itemKey];
-  //      this.setState({items});
-  //      swal.fire('Deleted!', 'Item has been deleted.', 'success');
-  //    }
-  //  });
+    const pageKey = e.currentTarget.parentNode.id;
+    let pages = Object.assign([], this.state.pages);
+    swal.fire({
+      title: 'Are you sure?',
+      text: 'You will lose all page information.',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete page!',
+    }).then((result) => {
+      if (result.value) {
+        delete pages[pageKey];
+        this.setState({pages});
+        swal.fire('Deleted!', 'Page has been deleted.', 'success');
+      }
+    });
   }
 
-  renderItems() {
+  renderItems(pageIndex) {
     return this.state.items.map((item, key) => {
       const itemStyle = {
         borderRadius: '2px',
@@ -161,25 +167,27 @@ class Canvas extends Component {
         background: 'transparent',
         border: 0,
       };
-      return (
-        <div
-          className="items"
-          key={key}
-          id={key}
-          style={itemStyle}
-        >
-          <button
-            name="deleteItem"
-            type="button"
-            style={deleteBtnStyle}
-            onClick={this.deleteItem}
+      if (item.onPage == pageIndex) {
+        return (
+          <div
+            className="items"
+            key={key}
+            id={key}
+            style={itemStyle}
           >
-            <span style={{background: '#FCFCFC', float: 'right'}}>
-              <i className="fas fa-times-circle"></i>
-            </span>
-          </button>
-        </div>
-      );
+            <button
+              name="deleteItem"
+              type="button"
+              style={deleteBtnStyle}
+              onClick={this.deleteItem}
+            >
+              <span style={{background: '#FCFCFC', float: 'right'}}>
+                <i className="fas fa-times-circle"></i>
+              </span>
+            </button>
+          </div>
+        );
+      }
     });
   }
 
@@ -221,7 +229,7 @@ class Canvas extends Component {
               <i className="fas fa-times-circle"></i>
             </span>
           </button>
-          {this.renderItems()}
+          {this.renderItems(key)}
         </div>
       );
     });
