@@ -60,9 +60,9 @@ class Toolbar extends Component {
           />
           <TextboxElement
             name='prefLabel'
-            label='Description'
+            label='Full Name'
             required={false}
-            value={this.props.profile.description}
+            value={this.props.profile.fullName}
             onUserInput={this.props.onUpdate}
             // errorMessage="Please enter instrument's description"
           />

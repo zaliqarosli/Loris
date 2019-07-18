@@ -4,6 +4,7 @@ import React, {Component} from 'react';
 import swal from 'sweetalert2';
 import Modal from 'Modal';
 import AddListItemForm from './addListItemForm';
+import AddPageForm from './addPageForm';
 
 class Canvas extends Component {
   constructor(props) {
@@ -45,19 +46,19 @@ class Canvas extends Component {
   }
 
   renderModal() {
-    let addItemForm = null;
+    let addForm = null;
     switch (this.state.selectedFieldType) {
       case 'pageBreak':
-
+        addForm = <AddPageForm onSave={this.saveItem}/>;
         break;
       case 'section':
 
         break;
       case 'select':
-        addItemForm = <AddListItemForm uiType='select' onSave={this.saveItem}/>;
+        addForm = <AddListItemForm uiType='select' onSave={this.saveItem}/>;
         break;
       case 'radio':
-        addItemForm = <AddListItemForm uiType='radio' onSave={this.saveItem}/>;
+        addForm = <AddListItemForm uiType='radio' onSave={this.saveItem}/>;
         break;
     }
     return (
@@ -66,7 +67,7 @@ class Canvas extends Component {
         onClose={this.closeModal}
         show={this.state.showModal}
       >
-        {addItemForm}
+        {addForm}
       </Modal>
     );
   }
@@ -75,7 +76,7 @@ class Canvas extends Component {
     let items = Object.assign([], this.state.items);
     items.push(formData);
     this.setState({items});
-    swal('Success!', 'Item added.', 'success').then((result) => {
+    swal.fire('Success!', 'Item added.', 'success').then((result) => {
       if (result.value) {
         this.closeModal();
       }

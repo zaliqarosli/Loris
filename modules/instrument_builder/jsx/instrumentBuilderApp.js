@@ -33,7 +33,7 @@ class InstrumentBuilderApp extends Component {
       const formData = this.mapFormData(expanded);
       this.setState({
         schemaJSON,
-        expanded,
+        expanded: expanded[0],
         formData,
       });
     } catch (error) {
@@ -42,20 +42,18 @@ class InstrumentBuilderApp extends Component {
   }
 
   mapFormData(data) {
-    const newKeys = {
-      '@context': 'context',
-      '@id': 'id',
-      '@type': 'type',
-      'schema:description': 'description',
-      'schema:schemaVersion': 'schemaVersion',
-      'schema:version': 'version',
-      'skos:altLabel': 'altLabel',
-      'skos:prefLabel': 'prefLabel',
-    };
-
-    const keyValues = Object.keys(data).map((key) => {
-      const newKey = newKeys[key] || key;
-      return {[newKey]: data[key]};
+    const keyValues = Object.keys(data[0]).map((key) => {
+      let newKey = '';
+      if (key.charAt(0) === '@') {
+        newKey = key.substring(1);
+      } else {
+        let lastPiece = key.substring(key.lastIndexOf('/') + 1);
+        if (lastPiece.lastIndexOf('#') > -1) {
+          lastPiece = key.substring(key.lastIndexOf('#') + 1);
+        }
+        newKey = lastPiece;
+      }
+      return {[newKey]: data[0][key]};
     });
 
     return Object.assign({}, ...keyValues);
@@ -78,11 +76,13 @@ class InstrumentBuilderApp extends Component {
       alignItems: 'stretch',
       background: '#FCFCFC',
     };
-
-    const profile = {
-      name: this.state.formData['altLabel'] || '',
-      description: this.state.formData['prefLabel'] || '',
-    };
+    let profile = {};
+    if (this.state.formData['altLabel'] && this.state.formData['prefLabel']) {
+      profile = {
+        name: this.state.formData['altLabel'][0]['@value'],
+        fullName: this.state.formData['prefLabel'][0]['@value'],
+      };
+    }
 
     return (
       <div style={divStyle}>
