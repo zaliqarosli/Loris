@@ -23,21 +23,23 @@ class InstrumentBuilderApp extends Component {
   }
 
   async componentDidMount() {
-    try {
-      const resp = await fetch(this.state.schemaURI);
-      if (!resp.ok) {
-        console.error(resp.statusText);
+    if (this.state.schemaURI !== '') {
+      try {
+        const resp = await fetch(this.state.schemaURI);
+        if (!resp.ok) {
+          console.error(resp.statusText);
+        }
+        const schemaJSON = await resp.json();
+        const expanded = await jsonld.expand(this.state.schemaURI);
+        const formData = this.mapFormData(expanded);
+        this.setState({
+          schemaJSON,
+          expanded: expanded[0],
+          formData,
+        });
+      } catch (error) {
+        console.error(error);
       }
-      const schemaJSON = await resp.json();
-      const expanded = await jsonld.expand(this.state.schemaURI);
-      const formData = this.mapFormData(expanded);
-      this.setState({
-        schemaJSON,
-        expanded: expanded[0],
-        formData,
-      });
-    } catch (error) {
-      console.error(error);
     }
   }
 
