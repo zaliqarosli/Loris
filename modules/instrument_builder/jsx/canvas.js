@@ -75,7 +75,7 @@ class Canvas extends Component {
     }
     return (
       <Modal
-        title='Add Item'
+        title='Add Field'
         onClose={this.closeModal}
         show={this.state.showModal}
       >
