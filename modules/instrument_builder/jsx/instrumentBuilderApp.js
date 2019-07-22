@@ -48,7 +48,7 @@ class InstrumentBuilderApp extends Component {
         } catch (error) {
           console.error(error);
         }
-        return this.mapJSON(expandedItem);
+        return expandedItem[0];
       });
       Promise.all(promises).then((result) => {
         this.setState({items: result});
