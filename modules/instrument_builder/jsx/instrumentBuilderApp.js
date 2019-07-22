@@ -5,7 +5,7 @@ import Toolbar from './toolbar';
 import Canvas from './canvas';
 import EditDrawer from './editdrawer';
 
-const jsonld = require('jsonld');
+import expandFull from './../../../htdocs/js/jsonldexpander';
 
 class InstrumentBuilderApp extends Component {
   constructor(props) {
@@ -17,6 +17,7 @@ class InstrumentBuilderApp extends Component {
       formData: {},
       items: [],
       error: false,
+      schemaObject: {},
     };
     this.updateFormData = this.updateFormData.bind(this);
     this.mapJSON = this.mapJSON.bind(this);
@@ -24,35 +25,38 @@ class InstrumentBuilderApp extends Component {
 
   async componentDidMount() {
     if (this.state.schemaURI !== '') {
-      let itemsURI = [];
+      // let itemsURI = [];
+      let schemaObject = {};
       try {
         const resp = await fetch(this.state.schemaURI);
         if (!resp.ok) {
           console.error(resp.statusText);
         }
-        const expanded = await jsonld.expand(this.state.schemaURI);
-        const formData = this.mapJSON(expanded);
-        itemsURI = formData.order[0]['@list'];
-        this.setState({
-          expanded,
-          formData,
-        });
+        schemaObject = expandFull(this.state.schemaURI);
+        // const expanded = await jsonld.expand(this.state.schemaURI);
+        // const formData = this.mapJSON(expanded);
+        // itemsURI = formData.order[0]['@list'];
+        // this.setState({
+        //   expanded,
+        //   formData,
+        // });
       } catch (error) {
         console.error(error);
       }
-      let promises = itemsURI.map(async (item, key) => {
-        const itemURI = item['@id'];
-        let expandedItem = {};
-        try {
-          expandedItem = await jsonld.expand(itemURI);
-        } catch (error) {
-          console.error(error);
-        }
-        return expandedItem[0];
-      });
-      Promise.all(promises).then((result) => {
-        this.setState({items: result});
-      });
+      // let promises = itemsURI.map(async (item, key) => {
+      //   const itemURI = item['@id'];
+      //   let expandedItem = {};
+      //   try {
+      //     expandedItem = await jsonld.expand(itemURI);
+      //   } catch (error) {
+      //     console.error(error);
+      //   }
+      //   return expandedItem[0];
+      // });
+      // Promise.all(promises).then((result) => {
+      //   this.setState({items: result});
+      // });
+      this.setState({schemaObject});
     }
   }
 
