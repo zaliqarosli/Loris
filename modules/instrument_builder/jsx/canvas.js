@@ -1,17 +1,20 @@
 import React, {Component} from 'react';
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 
 import swal from 'sweetalert2';
 import Modal from 'Modal';
 import AddListItemForm from './addListItemForm';
 import AddPageForm from './addPageForm';
 
+// const jsonld = require('jsonld');
+
 class Canvas extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
+      order: [],
       items: [],
+      subactivities: [],
       pages: [
         {
           pageID: '',
@@ -26,17 +29,75 @@ class Canvas extends Component {
       selectedFieldType: null,
       selectedPage: null,
     };
+
+    this.mapJSON = this.mapJSON.bind(this);
     this.onDragOver = this.onDragOver.bind(this);
     this.onDrop = this.onDrop.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.renderModal = this.renderModal.bind(this);
+    this.pushToItems = this.pushToItems.bind(this);
+    this.pushToSubactivities = this.pushToSubactivities.bind(this);
+    this.pushToPages = this.pushToPages.bind(this);
     this.saveItem = this.saveItem.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.deletePage = this.deletePage.bind(this);
     this.savePage = this.savePage.bind(this);
     this.renderItems = this.renderItems.bind(this);
     this.renderPages = this.renderPages.bind(this);
+  }
+
+  componentDidMount() {
+    this.setState({order: this.props.order});
+    // console.log(this.props.order);
+    // // const order = Array.from(this.props.order);
+    // console.log('componentDidMount');
+    // console.log(this.state.order);
+    // if (order.length > 0) {
+    //   const schemaArray = order.map(async (object, key) => {
+    //     const objectURI = object['@id'];
+    //     const schema = {};
+    //     try {
+    //       const expanded = await jsonld.expand(objectURI);
+    //       schema = this.mapJSON(expanded);
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    //     return schema;
+    //   });
+    //   console.log('schemaArray: ' + schemaArray);
+    //   schemaArray.map((schema, key) => {
+    //     let inputType = schema.inputType;
+    //     switch (inputType) {
+    //       case 'page':
+    //       case 'multipart':
+    //       case 'section':
+    //       case 'table':
+    //         pushToSubactivities(schema);
+    //         break;
+    //       default:
+    //         pushToItems(schema);
+    //     }
+    //   });
+    // }
+  }
+
+  mapJSON(data) {
+    const keyValues = Object.keys(data[0]).map((key) => {
+      let newKey = '';
+      if (key.charAt(0) === '@') {
+        newKey = key.substring(1);
+      } else {
+        let lastPiece = key.substring(key.lastIndexOf('/') + 1);
+        if (lastPiece.lastIndexOf('#') > -1) {
+          lastPiece = key.substring(key.lastIndexOf('#') + 1);
+        }
+        newKey = lastPiece;
+      }
+      return {[newKey]: data[0][key]};
+    });
+
+    return Object.assign({}, ...keyValues);
   }
 
   onDragOver(e) {
@@ -89,11 +150,27 @@ class Canvas extends Component {
     );
   }
 
-  saveItem(formData) {
+  pushToItems(item) {
     let items = Object.assign([], this.state.items);
-    formData.onPage = this.state.selectedPage;
-    items.push(formData);
+    items.push(item);
     this.setState({items});
+  }
+
+  pushToSubactivities(subAct) {
+    let subactivities = Object.assign([], this.state.subactivities);
+    subactivities.push(subAct);
+    this.setState({subactivities});
+  }
+
+  pushToPages(page) {
+    let pages = Object.assign([], this.state.pages);
+    pages.push(page);
+    this.setState({pages});
+  }
+
+  saveItem(formData) {
+    formData.onPage = this.state.selectedPage;
+    pushToItems(formData);
     swal.fire('Success!', 'Item added.', 'success').then((result) => {
       if (result.value) {
         this.closeModal();
@@ -102,9 +179,7 @@ class Canvas extends Component {
   }
 
   savePage(formData) {
-    let pages = Object.assign([], this.state.pages);
-    pages.push(formData);
-    this.setState({pages});
+    pushToPages(formData);
     swal.fire('Success!', 'Page added.', 'success').then((result) => {
       if (result.value) {
         this.closeModal();
@@ -256,6 +331,7 @@ class Canvas extends Component {
 }
 
 Canvas.propTypes = {
+  order: PropTypes.array,
 };
 
 export default Canvas;

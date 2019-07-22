@@ -31,10 +31,11 @@ class InstrumentBuilderApp extends Component {
         }
         const schemaJSON = await resp.json();
         const expanded = await jsonld.expand(this.state.schemaURI);
+        const flattened = await jsonld.flatten(schemaJSON);
         const formData = this.mapFormData(expanded);
         this.setState({
           schemaJSON,
-          expanded: expanded[0],
+          expanded: flattened[0],
           formData,
         });
       } catch (error) {
@@ -85,7 +86,7 @@ class InstrumentBuilderApp extends Component {
         fullName: this.state.formData['prefLabel'][0]['@value'],
       };
     }
-
+    let order = (this.state.formData.order) ? this.state.formData.order[0]['@list'] : [];
     return (
       <div style={divStyle}>
         <Toolbar
@@ -94,6 +95,7 @@ class InstrumentBuilderApp extends Component {
         >
         </Toolbar>
         <Canvas
+          order={order}
         >
         </Canvas>
         <EditDrawer
