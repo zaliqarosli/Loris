@@ -13,38 +13,50 @@ class InstrumentBuilderApp extends Component {
 
     this.state = {
       schemaURI: this.props.schemaURI,
-      schemaJSON: {},
       expanded: {},
       formData: {},
+      items: [],
       error: false,
     };
     this.updateFormData = this.updateFormData.bind(this);
-    this.mapFormData = this.mapFormData.bind(this);
+    this.mapJSON = this.mapJSON.bind(this);
   }
 
   async componentDidMount() {
     if (this.state.schemaURI !== '') {
+      let itemsURI = [];
       try {
         const resp = await fetch(this.state.schemaURI);
         if (!resp.ok) {
           console.error(resp.statusText);
         }
-        const schemaJSON = await resp.json();
         const expanded = await jsonld.expand(this.state.schemaURI);
-        const flattened = await jsonld.flatten(schemaJSON);
-        const formData = this.mapFormData(expanded);
+        const formData = this.mapJSON(expanded);
+        itemsURI = formData.order[0]['@list'];
         this.setState({
-          schemaJSON,
-          expanded: flattened[0],
+          expanded,
           formData,
         });
       } catch (error) {
         console.error(error);
       }
+      let promises = itemsURI.map(async (item, key) => {
+        const itemURI = item['@id'];
+        let expandedItem = {};
+        try {
+          expandedItem = await jsonld.expand(itemURI);
+        } catch (error) {
+          console.error(error);
+        }
+        return this.mapJSON(expandedItem);
+      });
+      Promise.all(promises).then((result) => {
+        this.setState({items: result});
+      });
     }
   }
 
-  mapFormData(data) {
+  mapJSON(data) {
     const keyValues = Object.keys(data[0]).map((key) => {
       let newKey = '';
       if (key.charAt(0) === '@') {
@@ -86,7 +98,6 @@ class InstrumentBuilderApp extends Component {
         fullName: this.state.formData['prefLabel'][0]['@value'],
       };
     }
-    let order = (this.state.formData.order) ? this.state.formData.order[0]['@list'] : [];
     return (
       <div style={divStyle}>
         <Toolbar
@@ -95,7 +106,7 @@ class InstrumentBuilderApp extends Component {
         >
         </Toolbar>
         <Canvas
-          order={order}
+          // order={order}
         >
         </Canvas>
         <EditDrawer
