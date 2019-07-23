@@ -13,11 +13,14 @@ class InstrumentBuilderApp extends Component {
 
     this.state = {
       schemaURI: this.props.schemaURI,
-      expanded: {},
+      schemaExpanded: {},
+      fields: [],
+      multiparts: [],
+      pages: [],
+      sections: [],
+      tables: [],
       formData: {},
-      items: [],
       error: false,
-      schemaObject: {},
     };
     this.updateFormData = this.updateFormData.bind(this);
     this.mapJSON = this.mapJSON.bind(this);
@@ -25,38 +28,20 @@ class InstrumentBuilderApp extends Component {
 
   async componentDidMount() {
     if (this.state.schemaURI !== '') {
-      // let itemsURI = [];
       let schemaObject = {};
       try {
-        const resp = await fetch(this.state.schemaURI);
-        if (!resp.ok) {
-          console.error(resp.statusText);
-        }
-        schemaObject = expandFull(this.state.schemaURI);
-        // const expanded = await jsonld.expand(this.state.schemaURI);
-        // const formData = this.mapJSON(expanded);
-        // itemsURI = formData.order[0]['@list'];
-        // this.setState({
-        //   expanded,
-        //   formData,
-        // });
+        schemaObject = await expandFull(this.state.schemaURI);
       } catch (error) {
         console.error(error);
       }
-      // let promises = itemsURI.map(async (item, key) => {
-      //   const itemURI = item['@id'];
-      //   let expandedItem = {};
-      //   try {
-      //     expandedItem = await jsonld.expand(itemURI);
-      //   } catch (error) {
-      //     console.error(error);
-      //   }
-      //   return expandedItem[0];
-      // });
-      // Promise.all(promises).then((result) => {
-      //   this.setState({items: result});
-      // });
-      this.setState({schemaObject});
+      this.setState({
+        schemaExpanded: schemaObject.schema,
+        fields: schemaObject.fields,
+        multiparts: schemaObject.multiparts,
+        pages: schemaObject.pages,
+        sections: schemaObject.sections,
+        tables: schemaObject.tables,
+      });
     }
   }
 
