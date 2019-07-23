@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import Toolbar from './toolbar';
 import Canvas from './canvas';
 import EditDrawer from './editdrawer';
+import AddListItemForm from './addListItemForm';
+import AddPageForm from './addPageForm';
 
 import expandFull from './../../../htdocs/js/jsonldexpander';
 
@@ -12,8 +14,7 @@ class InstrumentBuilderApp extends Component {
     super(props);
 
     this.state = {
-      schemaURI: this.props.schemaURI,
-      schemaData: {},
+      error: false,
       formData: {
         schema: {},
         fields: [],
@@ -22,10 +23,24 @@ class InstrumentBuilderApp extends Component {
         sections: [],
         tables: [],
       },
-      error: false,
+      schemaData: {},
+      schemaURI: this.props.schemaURI,
+      selectedFieldType: null,
+      selectedPage: null,
+      showModal: false,
     };
     this.updateFormData = this.updateFormData.bind(this);
     this.mapKeysToAlias = this.mapKeysToAlias.bind(this);
+    this.openModal = this.openModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+    this.renderModal = this.renderModal.bind(this);
+    this.onDrop = this.onDrop.bind(this);
+    this.deleteField = this.deleteField.bind(this);
+    this.deletePage = this.deletePage.bind(this);
+    this.saveField = this.saveField.bind(this);
+    this.savePage = this.savePage.bind(this);
+    this.pushToFields = this.pushToFields.bind(this);
+    this.pushToPages = this.pushToPages.bind(this);
   }
 
   async componentDidMount() {
@@ -75,6 +90,116 @@ class InstrumentBuilderApp extends Component {
     this.setState({formData});
   }
 
+  openModal() {
+    this.setState({showModal: true});
+  }
+
+  closeModal() {
+    this.setState({showModal: false});
+  }
+
+  renderModal() {
+    let addForm = null;
+    switch (this.state.selectedFieldType) {
+      case 'pageBreak':
+        addForm = <AddPageForm onSave={this.savePage}/>;
+        break;
+      case 'section':
+
+        break;
+      case 'select':
+        addForm = <AddListItemForm uiType='select' onSave={this.saveItem}/>;
+        break;
+      case 'radio':
+        addForm = <AddListItemForm uiType='radio' onSave={this.saveItem}/>;
+        break;
+    }
+    return (
+      <Modal
+        title='Add Field'
+        onClose={this.closeModal}
+        show={this.state.showModal}
+      >
+        {addForm}
+      </Modal>
+    );
+  }
+
+  onDrop(e) {
+    const selectedPage = e.target.id;
+    const selectedFieldType = e.dataTransfer.getData('text');
+    this.setState({selectedFieldType, selectedPage});
+    this.openModal();
+    e.dataTransfer.clearData();
+  }
+
+  deleteField(e) {
+    const fieldKey = e.currentTarget.parentNode.id;
+    let formData = Object.assign({}, this.state.formData);
+    swal.fire({
+      title: 'Are you sure?',
+      text: 'You will lose all item information.',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete item!',
+    }).then((result) => {
+      if (result.value) {
+        delete formData.fields[fieldKey];
+        this.setState({formData});
+        swal.fire('Deleted!', 'Item has been deleted.', 'success');
+      }
+    });
+  }
+
+  deletePage(e) {
+    const pageKey = e.currentTarget.parentNode.id;
+    let formData = Object.assign([], this.state.formData);
+    swal.fire({
+      title: 'Are you sure?',
+      text: 'You will lose all page information.',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete page!',
+    }).then((result) => {
+      if (result.value) {
+        delete formData.pages[pageKey];
+        this.setState({formData});
+        swal.fire('Deleted!', 'Page has been deleted.', 'success');
+      }
+    });
+  }
+
+  saveField(formData) {
+    formData.onPage = this.state.selectedPage;
+    pushToItems(formData);
+    swal.fire('Success!', 'Item added.', 'success').then((result) => {
+      if (result.value) {
+        this.closeModal();
+      }
+    });
+  }
+
+  savePage(formData) {
+    pushToPages(formData);
+    swal.fire('Success!', 'Page added.', 'success').then((result) => {
+      if (result.value) {
+        this.closeModal();
+      }
+    });
+  }
+
+  pushToFields(field) {
+    let formData = Object.assign([], this.state.formData);
+    formData.fields.push(field);
+    this.setState({formData});
+  }
+
+  pushToPages(page) {
+    let formData = Object.assign([], this.state.formData);
+    formData.pages.push(page);
+    this.setState({formData});
+  }
+
   render() {
     const divStyle = {
       border: '1px solid #C3D5DB',
@@ -94,24 +219,28 @@ class InstrumentBuilderApp extends Component {
       };
     }
     return (
-      <div style={divStyle}>
-        <Toolbar
-          profile={profile}
-          onUpdate={this.updateFormData}
-        >
-        </Toolbar>
-        <Canvas
-          fields={this.state.formData.fields}
-          multiparts={this.state.formData.multiparts}
-          pages={this.state.formData.pages}
-          sections={this.state.formData.sections}
-          tables={this.state.formData.tables}
-        >
-        </Canvas>
-        <EditDrawer
-        >
-        </EditDrawer>
+      <div>
+        {this.renderModal}
+        <div style={divStyle}>
+          <Toolbar
+            profile={profile}
+            onUpdate={this.updateFormData}
+          >
+          </Toolbar>
+          <Canvas
+            fields={this.state.formData.fields}
+            multiparts={this.state.formData.multiparts}
+            pages={this.state.formData.pages}
+            sections={this.state.formData.sections}
+            tables={this.state.formData.tables}
+            onDrop={this.onDrop}
+          >
+          </Canvas>
+          <EditDrawer
+          >
+          </EditDrawer>
 
+        </div>
       </div>
     );
   }
