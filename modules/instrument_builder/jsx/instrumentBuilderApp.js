@@ -13,40 +13,46 @@ class InstrumentBuilderApp extends Component {
 
     this.state = {
       schemaURI: this.props.schemaURI,
-      schemaExpanded: {},
-      fields: [],
-      multiparts: [],
-      pages: [],
-      sections: [],
-      tables: [],
-      formData: {},
+      schemaData: {},
+      formData: {
+        schema: {},
+        fields: [],
+        multiparts: [],
+        pages: [],
+        sections: [],
+        tables: [],
+      },
       error: false,
     };
     this.updateFormData = this.updateFormData.bind(this);
-    this.mapJSON = this.mapJSON.bind(this);
+    this.mapKeysToAlias = this.mapKeysToAlias.bind(this);
   }
 
   async componentDidMount() {
     if (this.state.schemaURI !== '') {
-      let schemaObject = {};
+      let formData = {};
+      let schemaData = {};
       try {
-        schemaObject = await expandFull(this.state.schemaURI);
+        formData = await expandFull(this.state.schemaURI);
+        // Have to do this twice because deep cloning doesn't seem to be working currently
+        schemaData = await expandFull(this.state.schemaURI);
       } catch (error) {
         console.error(error);
       }
-      this.setState({
-        schemaExpanded: schemaObject.schema,
-        fields: schemaObject.fields,
-        multiparts: schemaObject.multiparts,
-        pages: schemaObject.pages,
-        sections: schemaObject.sections,
-        tables: schemaObject.tables,
+      // Map formData keys to aliases
+      const items = ['fields', 'multiparts', 'pages', 'sections', 'tables'];
+      items.forEach((item) => {
+        formData[item] = [...formData[item].map((schema, index) => {
+          return this.mapKeysToAlias(schema);
+        })];
       });
+      formData.schema = this.mapKeysToAlias(formData.schema);
+      this.setState({formData, schemaData});
     }
   }
 
-  mapJSON(data) {
-    const keyValues = Object.keys(data[0]).map((key) => {
+  mapKeysToAlias(data) {
+    const keyValues = Object.keys(data).map((key) => {
       let newKey = '';
       if (key.charAt(0) === '@') {
         newKey = key.substring(1);
@@ -57,7 +63,7 @@ class InstrumentBuilderApp extends Component {
         }
         newKey = lastPiece;
       }
-      return {[newKey]: data[0][key]};
+      return {[newKey]: data[key]};
     });
 
     return Object.assign({}, ...keyValues);
@@ -95,7 +101,11 @@ class InstrumentBuilderApp extends Component {
         >
         </Toolbar>
         <Canvas
-          // order={order}
+          fields={this.state.formData.fields}
+          multiparts={this.state.formData.multiparts}
+          pages={this.state.formData.pages}
+          sections={this.state.formData.sections}
+          tables={this.state.formData.tables}
         >
         </Canvas>
         <EditDrawer
