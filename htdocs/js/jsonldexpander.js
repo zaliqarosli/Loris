@@ -4,64 +4,61 @@ export default async function expandFull(schemaURI) {
   const expanded = await jsonld.expand(schemaURI);
   const schema = expanded[0];
   // By item, we mean any subactivity or field
-  let itemList = await getItems(schema);
-
-  // Work through each subactivity/field in item list
+  const itemList = await getItems(schema);
   let pages = [];
   let sections = [];
   let multiparts = [];
   let tables = [];
   let fields = [];
 
-  // sortItems(itemList, pages, sections, multiparts, tables, fields);
+  sortItems(itemList, pages, sections, multiparts, tables, fields);
 
   return {schema, pages, sections, multiparts, tables, fields};
 }
 
-// function sortItems(itemList, pages, sections, multiparts, tables, fields) {
-//   itemList.forEach((schema) => {
-//     switch (schema['https://schema.repronim.org/inputType'][0]['@value']) {
-//       case 'page':
-//         pages.push(schema);
-//         break;
-//       case 'section':
-//         sections.push(schema);
-//         break;
-//       case 'multipart':
-//         multiparts.push(schema);
-//         break;
-//       case 'table':
-//         tables.push(schema);
-//         break;
-//       default:
-//         // For leftover case i.e. fields
-//         if (schema['@type'][0] === 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field.jsonld') {
-//           fields.push(schema);
-//         }
-//     }
-//     if (hasItems(schema)) {
-//       newItemList = getItems(schema);
-//       sortItems(newItemList, pages, sections, multiparts, tables, fields);
-//     }
-//   });
-// }
+function sortItems(itemList, pages, sections, multiparts, tables, fields) {
+  itemList.forEach(async (schema) => {
+    switch (schema['https://schema.repronim.org/inputType'][0]['@value']) {
+      case 'page':
+        pages.push(schema);
+        break;
+      case 'section':
+        sections.push(schema);
+        break;
+      case 'multipart':
+        multiparts.push(schema);
+        break;
+      case 'table':
+        tables.push(schema);
+        break;
+      default:
+        // For leftover case i.e. fields
+        if (schema['@type'][0] === 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field.jsonld') {
+          fields.push(schema);
+        }
+    }
+    if (hasItems(schema)) {
+      const newItemList = await getItems(schema);
+      sortItems(newItemList, pages, sections, multiparts, tables, fields);
+    }
+  });
+}
 
-// function hasItems(schema) {
-//   if (schema['https://schema.repronim.org/order']) {
-//     return true;
-//   }
-//   return false;
-// }
+function hasItems(schema) {
+  if (schema['https://schema.repronim.org/order']) {
+    return true;
+  }
+  return false;
+}
 
 async function getItems(schema) {
   const orderList = schema['https://schema.repronim.org/order'][0]['@list'];
   let schemaList = [];
-  let promises = orderList.map((uriObject, key) => {
-    let uri = uriObject['@id'];
+  const promises = orderList.map((uriObject, key) => {
+    const uri = uriObject['@id'];
     return getSchemaByUri(uri);
   });
   schemaList = await Promise.all(promises).then((result) => {
-    console.log('schemalistresult: ' + result);
     return result;
   });
   return schemaList;
@@ -72,6 +69,7 @@ async function getSchemaByUri(uri) {
   try {
     expanded = await jsonld.expand(uri);
   } catch (error) {
+    console.error('Expanding URI ' + uri + ' failed.');
     console.error(error);
   }
   return expanded[0];
