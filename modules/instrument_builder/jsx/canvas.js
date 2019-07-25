@@ -19,7 +19,9 @@ class Canvas extends Component {
   }
 
   renderField(fieldIndex) {
-    let question = this.props.fields[fieldIndex].question[0]['@value'];
+    const name = this.props.fields[fieldIndex].altLabel[0]['@value'];
+    const question = this.props.fields[fieldIndex].question[0]['@value'];
+    const inputType = this.props.fields[fieldIndex].inputType[0]['@value'];
     const itemStyle = {
       borderRadius: '2px',
       background: 'transparent',
@@ -31,12 +33,61 @@ class Canvas extends Component {
       order: {fieldIndex} + 1,
       minWidth: '90%',
       minHeight: '20%',
+      display: 'flex',
+      flexDirection: 'column',
     };
     const deleteBtnStyle = {
       float: 'right',
       background: 'transparent',
       border: 0,
+      paddingRight: 0,
     };
+    let input = null;
+    switch (inputType) {
+      case 'radio':
+      case 'select':
+        input = <SelectElement
+                  name={name}
+                  label={question}
+                />;
+        break;
+      case 'multiselect':
+        input = <SelectElement
+                  name={name}
+                  label={question}
+                  multiple={true}
+                />;
+        break;
+      case 'text':
+        input = <TextboxElement
+                  name={name}
+                  label={question}
+                />;
+        break;
+      case 'textarea':
+        input = <TextareaElement
+                  name={name}
+                  label={question}
+                />;
+        break;
+      case 'date':
+        input = <DateElement
+                  name={name}
+                  label={question}
+                />;
+        break;
+      case 'checkbox':
+        input = <CheckboxElement
+                  name={name}
+                  label={question}
+                />;
+        break;
+      case 'static':
+        input = <StaticElement
+                  label={question}
+                />;
+        break;
+    }
     return (
       <div
         className="fields"
@@ -54,9 +105,9 @@ class Canvas extends Component {
             <i className="fas fa-times-circle"></i>
           </span>
         </button>
-        <label>
-          {question}
-        </label>
+        <div style={{marginTop: '10px'}}>
+          {input}
+        </div>
       </div>
     );
   }
@@ -111,7 +162,6 @@ class Canvas extends Component {
     // ItemsID array of items in this section
     (this.props.sections[sectionIndex].order[0]['@list']).map((item, index) => {
       let id = item['@id'];
-      console.log('sectionIndex: ' + sectionIndex);
       // find itemID and return item
       itemTypes.forEach((type) => {
         this.props[type].forEach((searchItemSchema, searchIndex) => {
@@ -119,7 +169,6 @@ class Canvas extends Component {
           // Need to add .jsonld back in to searchItemSchema.id
           let correctedURI = searchItemSchema.id.concat('.jsonld');
           if (id === correctedURI) {
-            console.log(id);
             items[searchIndex] = searchItemSchema;
           }
         });
@@ -199,6 +248,7 @@ class Canvas extends Component {
         alignSelf: 'center',
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'visible',
       };
       const deleteBtnStyle = {
         float: 'right',
