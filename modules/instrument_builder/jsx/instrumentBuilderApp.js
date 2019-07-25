@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
+import swal from 'sweetalert2';
+import Modal from 'Modal';
+
 import Toolbar from './toolbar';
 import Canvas from './canvas';
 import EditDrawer from './editdrawer';
@@ -138,15 +141,15 @@ class InstrumentBuilderApp extends Component {
     let formData = Object.assign({}, this.state.formData);
     swal.fire({
       title: 'Are you sure?',
-      text: 'You will lose all item information.',
+      text: 'You will lose all field information.',
       type: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Yes, delete item!',
+      confirmButtonText: 'Yes, delete field!',
     }).then((result) => {
       if (result.value) {
         delete formData.fields[fieldKey];
         this.setState({formData});
-        swal.fire('Deleted!', 'Item has been deleted.', 'success');
+        swal.fire('Deleted!', 'Field has been deleted.', 'success');
       }
     });
   }
@@ -212,15 +215,32 @@ class InstrumentBuilderApp extends Component {
       background: '#FCFCFC',
     };
     let profile = {};
-    if (this.state.formData['altLabel'] && this.state.formData['prefLabel']) {
+    if (this.state.formData.schema['altLabel'] && this.state.formData.schema['prefLabel']) {
       profile = {
-        name: this.state.formData['altLabel'][0]['@value'],
-        fullName: this.state.formData['prefLabel'][0]['@value'],
+        name: this.state.formData.schema['altLabel'][0]['@value'],
+        fullName: this.state.formData.schema['prefLabel'][0]['@value'],
       };
+    }
+    let pages = [];
+    if (this.state.formData.pages.length == 0) {
+      pages.push({
+        altLabel: '',
+        description: '',
+        id: '',
+        preamble: '',
+        prefLabel: '',
+        order: [
+          {
+            '@list': [],
+          },
+        ],
+      });
+    } else {
+      pages = [...this.state.formData.pages];
     }
     return (
       <div>
-        {this.renderModal}
+        {this.renderModal()}
         <div style={divStyle}>
           <Toolbar
             profile={profile}
@@ -230,10 +250,12 @@ class InstrumentBuilderApp extends Component {
           <Canvas
             fields={this.state.formData.fields}
             multiparts={this.state.formData.multiparts}
-            pages={this.state.formData.pages}
+            pages={pages}
             sections={this.state.formData.sections}
             tables={this.state.formData.tables}
             onDrop={this.onDrop}
+            deletePage={this.deletePage}
+            deleteField={this.deleteField}
           >
           </Canvas>
           <EditDrawer

@@ -18,9 +18,9 @@
     display: block;
 }
 
-.items {
+.fields {
     border: 1px dashed #C3D5DB;
 }
-.items:hover {
+.fields:hover {
     border: 1px dashed #246EB6;
 }

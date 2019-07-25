@@ -51,6 +51,7 @@ function hasItems(schema) {
   return false;
 }
 
+// Given a jsonld schema, this function returns the schema of all items in the order list
 async function getItems(schema) {
   const orderList = schema['https://schema.repronim.org/order'][0]['@list'];
   let schemaList = [];

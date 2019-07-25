@@ -1,19 +1,15 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
-import swal from 'sweetalert2';
-import Modal from 'Modal';
-import AddListItemForm from './addListItemForm';
-import AddPageForm from './addPageForm';
-
 class Canvas extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-
-    };
 
     this.onDragOver = this.onDragOver.bind(this);
+    this.renderField = this.renderField.bind(this);
+    this.renderMultipart = this.renderMultipart.bind(this);
+    this.renderSection = this.renderSection.bind(this);
+    this.renderTable = this.renderTable.bind(this);
     this.renderItems = this.renderItems.bind(this);
     this.renderPages = this.renderPages.bind(this);
   }
@@ -22,55 +18,181 @@ class Canvas extends Component {
     e.preventDefault();
   }
 
+  renderField(fieldIndex) {
+    let question = this.props.fields[fieldIndex].question[0]['@value'];
+    const itemStyle = {
+      borderRadius: '2px',
+      background: 'transparent',
+      padding: '10px',
+      margin: '15px',
+      color: '#333',
+      textAlign: 'left',
+      alignSelf: 'center',
+      order: {fieldIndex} + 1,
+      minWidth: '90%',
+      minHeight: '20%',
+    };
+    const deleteBtnStyle = {
+      float: 'right',
+      background: 'transparent',
+      border: 0,
+    };
+    return (
+      <div
+        className="fields"
+        key={fieldIndex}
+        id={fieldIndex}
+        style={itemStyle}
+      >
+        <button
+          name="deleteField"
+          type="button"
+          style={deleteBtnStyle}
+          onClick={this.props.deleteField}
+        >
+          <span style={{background: '#FCFCFC', float: 'right'}}>
+            <i className="fas fa-times-circle"></i>
+          </span>
+        </button>
+        <label>
+          {question}
+        </label>
+      </div>
+    );
+  }
+
+  renderMultipart(multipartIndex) {
+    // what we essentially want is an array of items in this multipart
+    // then map for each item in the array, call this.render[ItemType].
+    let itemTypes = ['fields', 'sections', 'tables'];
+    let items = [];
+    // ItemsID array of items in this section
+    (this.props.multiparts[multipartIndex].order[0]['@list']).map((item, index) => {
+      let id = item['@id'];
+      // find itemID and return item
+      itemTypes.forEach((type) => {
+        this.props[type].forEach((searchItemSchema, searchIndex) => {
+          // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
+          // Need to add .jsonld back in to searchItemSchema.id
+          let correctedURI = searchItemSchema.id.concat('.jsonld');
+          if (id === correctedURI) {
+            items[searchIndex] = searchItemSchema;
+          }
+        });
+      });
+    });
+    let rendered = items.map((itemSchema, itemIndex) => {
+      let inputType = itemSchema.inputType[0]['@value'];
+      switch (inputType) {
+        case 'section':
+          return this.renderSection(itemIndex);
+          break;
+        case 'table':
+          return this.renderTable(itemIndex);
+          break;
+        default:
+          return this.renderField(itemIndex);
+      }
+    });
+    return (
+      <div key={'multipart'+multipartIndex}>
+        <h3>Multipart</h3>
+        {rendered}
+      </div>
+    );
+  }
+
+  renderSection(sectionIndex) {
+    let title = this.props.sections[sectionIndex].preamble[0]['@value'];
+    // what we essentially want is an array of items in this section
+    // then map for each item in the array, call this.render[ItemType].
+    let itemTypes = ['fields', 'tables'];
+    let items = [];
+    // ItemsID array of items in this section
+    (this.props.sections[sectionIndex].order[0]['@list']).map((item, index) => {
+      let id = item['@id'];
+      console.log('sectionIndex: ' + sectionIndex);
+      // find itemID and return item
+      itemTypes.forEach((type) => {
+        this.props[type].forEach((searchItemSchema, searchIndex) => {
+          // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
+          // Need to add .jsonld back in to searchItemSchema.id
+          let correctedURI = searchItemSchema.id.concat('.jsonld');
+          if (id === correctedURI) {
+            console.log(id);
+            items[searchIndex] = searchItemSchema;
+          }
+        });
+      });
+    });
+    let rendered = items.map((itemSchema, itemIndex) => {
+      let inputType = itemSchema.inputType[0]['@value'];
+      switch (inputType) {
+        case 'table':
+          return this.renderTable(itemIndex);
+          break;
+        default:
+          return this.renderField(itemIndex);
+      }
+    });
+    return (
+      <div key={'section'+sectionIndex}>
+        <h2 style={{margin: '15px'}}>{title}</h2>
+        {rendered}
+      </div>
+    );
+  }
+
+  renderTable(tableIndex) {
+
+  }
+
   renderItems(pageIndex) {
-    return this.props.fields.map((item, key) => {
-      const itemStyle = {
-        borderRadius: '2px',
-        background: 'transparent',
-        padding: '10px',
-        margin: '15px',
-        color: '#333',
-        textAlign: 'center',
-        alignSelf: 'center',
-        order: {key} + 1,
-        minWidth: '90%',
-        minHeight: '20%',
-      };
-      const deleteBtnStyle = {
-        float: 'right',
-        background: 'transparent',
-        border: 0,
-      };
-      if (item.onPage == pageIndex) {
-        return (
-          <div
-            className="items"
-            key={key}
-            id={key}
-            style={itemStyle}
-          >
-            <button
-              name="deleteItem"
-              type="button"
-              style={deleteBtnStyle}
-              onClick={this.deleteItem}
-            >
-              <span style={{background: '#FCFCFC', float: 'right'}}>
-                <i className="fas fa-times-circle"></i>
-              </span>
-            </button>
-          </div>
-        );
+    // what we essentially want is an array of items on this page
+    // then map for each item in the array, call this.render[ItemType].
+
+    let itemTypes = ['fields', 'multiparts', 'sections', 'tables'];
+    let items = [];
+    // ItemsID array of items on this page
+    (this.props.pages[pageIndex].order[0]['@list']).map((item, index) => {
+      let id = item['@id'];
+      // find itemID and return item
+      itemTypes.forEach((type) => {
+        this.props[type].forEach((searchItemSchema, searchIndex) => {
+          // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
+          // Need to add .jsonld back in to searchItemSchema.id
+          let correctedURI = searchItemSchema.id.concat('.jsonld');
+          if (id == correctedURI) {
+            items[searchIndex] = searchItemSchema;
+          }
+        });
+      });
+    });
+    return items.map((itemSchema, itemIndex) => {
+      let inputType = itemSchema.inputType[0]['@value'];
+      switch (inputType) {
+        case 'multipart':
+          return this.renderMultipart(itemIndex);
+          break;
+        case 'section':
+          return this.renderSection(itemIndex);
+          break;
+        case 'table':
+          return this.renderTable(itemIndex);
+          break;
+        default:
+          return this.renderField(itemIndex);
       }
     });
   }
 
   renderPages() {
-    return this.props.pages.map((item, key) => {
+    return this.props.pages.map((page, index) => {
       const pageStyle = {
         background: 'white',
         boxShadow: '0px -1px 4px 2px rgba(0,0,0,0.175)',
         margin: '20px 30px 0 30px',
+        padding: '20px',
         flex: '1',
         minHeight: '792px',
         width: '612px',
@@ -87,8 +209,8 @@ class Canvas extends Component {
       return (
         <div
           className="pages"
-          key={key}
-          id={key}
+          key={index}
+          id={index}
           style={pageStyle}
           onDragOver={this.onDragOver}
           onDrop={this.props.onDrop}
@@ -97,13 +219,13 @@ class Canvas extends Component {
             name="deleteItem"
             type="button"
             style={deleteBtnStyle}
-            onClick={this.deletePage}
+            onClick={this.props.deletePage}
           >
             <span style={{background: '#FCFCFC', float: 'right'}}>
               <i className="fas fa-times-circle"></i>
             </span>
           </button>
-          {this.renderItems(key)}
+          {this.renderItems(index)}
         </div>
       );
     });
@@ -135,6 +257,8 @@ Canvas.propTypes = {
   sections: PropTypes.array,
   tables: PropTypes.array,
   onDrop: PropTypes.func.isRequired,
+  deletePage: PropTypes.func.isRequired,
+  deleteField: PropTypes.func.isRequired,
 };
 
 export default Canvas;
