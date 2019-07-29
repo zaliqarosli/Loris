@@ -43,7 +43,7 @@ function sortItems(itemList, pages, sections, multiparts, tables, fields) {
     }
     if (hasValueConstraints(schema)) {
       let valueSchema = await getValueConstraints(schema);
-      if (typeof valueSchema !== undefined) {
+      if (typeof valueSchema != undefined) {
         schema['https://schema.repronim.org/valueconstraints'] = valueSchema;
       }
     }

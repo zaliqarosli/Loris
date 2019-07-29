@@ -20,9 +20,22 @@ class Canvas extends Component {
   }
 
   renderField(fieldIndex) {
-    const name = this.props.fields[fieldIndex].altLabel[0]['@value'];
-    const question = this.props.fields[fieldIndex].question[0]['@value'];
-    const inputType = this.props.fields[fieldIndex].inputType[0]['@value'];
+    const field = this.props.fields[fieldIndex];
+    const name = field.altLabel[0]['@value'];
+    const question = field.question[0]['@value'];
+    const inputType = field.inputType[0]['@value'];
+    let mapped = [];
+    if (field.valueconstraints[0]['http://schema.org/itemListElement']) {
+      const valueconstraints = field.valueconstraints[0]['http://schema.org/itemListElement'][0]['@list'];
+      mapped = valueconstraints.map((option, index) => {
+        const key = option['http://schema.org/value'][0]['@value'];
+        return {[key]: option['http://schema.org/name'][0]['@value']};
+      });
+    }
+    let options = {};
+    mapped.forEach((option, index) => {
+      options[Object.keys(option)] = option[Object.keys(option)];
+    });
     const itemStyle = {
       borderRadius: '2px',
       background: 'transparent',
@@ -50,6 +63,7 @@ class Canvas extends Component {
         input = <SelectElement
                   name={name}
                   label={question}
+                  options={options}
                 />;
         break;
       case 'multiselect':
@@ -57,6 +71,7 @@ class Canvas extends Component {
                   name={name}
                   label={question}
                   multiple={true}
+                  options={options}
                 />;
         break;
       case 'text':
@@ -301,6 +316,7 @@ class Canvas extends Component {
       display: 'flex',
       flexDirection: 'column',
       overflow: 'auto',
+      overflowX: 'scroll',
       margin: '-1px 0px 0 -1px',
     };
     return (
