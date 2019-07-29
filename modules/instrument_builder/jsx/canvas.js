@@ -6,6 +6,7 @@ class Canvas extends Component {
     super(props);
 
     this.onDragOver = this.onDragOver.bind(this);
+    this.onDragStart = this.onDragStart.bind(this);
     this.renderField = this.renderField.bind(this);
     this.renderMultipart = this.renderMultipart.bind(this);
     this.renderSection = this.renderSection.bind(this);
@@ -94,6 +95,10 @@ class Canvas extends Component {
         key={fieldIndex}
         id={fieldIndex}
         style={itemStyle}
+        draggable={true}
+        onDragStart={this.onDragStart}
+        onDragEnter={this.props.reIndexField}
+        onDragOver={this.onDragOver}
       >
         <button
           name="deleteField"
@@ -110,6 +115,12 @@ class Canvas extends Component {
         </div>
       </div>
     );
+  }
+
+  onDragStart(e) {
+    e.dataTransfer.effectAllowed = 'move';
+    // Firefox requires dataTransfer data to be set
+    e.dataTransfer.setData('text/plain', e.target.id);
   }
 
   renderMultipart(multipartIndex) {
@@ -263,7 +274,7 @@ class Canvas extends Component {
           id={index}
           style={pageStyle}
           onDragOver={this.onDragOver}
-          onDrop={this.props.onDrop}
+          onDrop={this.props.onDropFieldType}
         >
           <button
             name="deleteItem"
@@ -306,7 +317,8 @@ Canvas.propTypes = {
   pages: PropTypes.array,
   sections: PropTypes.array,
   tables: PropTypes.array,
-  onDrop: PropTypes.func.isRequired,
+  onDropFieldType: PropTypes.func.isRequired,
+  reIndexField: PropTypes.func.isRequired,
   deletePage: PropTypes.func.isRequired,
   deleteField: PropTypes.func.isRequired,
 };

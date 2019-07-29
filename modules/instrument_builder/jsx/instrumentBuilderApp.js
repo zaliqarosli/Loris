@@ -37,7 +37,8 @@ class InstrumentBuilderApp extends Component {
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.renderModal = this.renderModal.bind(this);
-    this.onDrop = this.onDrop.bind(this);
+    this.onDropFieldType = this.onDropFieldType.bind(this);
+    this.reIndexField - this.reIndexField.bind(this);
     this.deleteField = this.deleteField.bind(this);
     this.deletePage = this.deletePage.bind(this);
     this.saveField = this.saveField.bind(this);
@@ -128,11 +129,22 @@ class InstrumentBuilderApp extends Component {
     );
   }
 
-  onDrop(e) {
+  onDropFieldType(e) {
     const selectedPage = e.target.id;
     const selectedFieldType = e.dataTransfer.getData('text');
     this.setState({selectedFieldType, selectedPage});
     this.openModal();
+    e.dataTransfer.clearData();
+  }
+
+  reIndexField(e) {
+    const targetField = e.target.id;
+    const selectedField = e.dataTransfer.getData('text');
+    let formData = Object.assign({}, this.state.formData);
+    let temp = formData.fields[selectedField];
+    formData.fields[selectedField] = formData.fields[targetField];
+    formData.fields[targetField] = temp;
+    this.setState({formData});
     e.dataTransfer.clearData();
   }
 
@@ -147,7 +159,7 @@ class InstrumentBuilderApp extends Component {
       confirmButtonText: 'Yes, delete field!',
     }).then((result) => {
       if (result.value) {
-        delete formData.fields[fieldKey];
+        formData.fields.splice(fieldKey, 1);
         this.setState({formData});
         swal.fire('Deleted!', 'Field has been deleted.', 'success');
       }
@@ -165,7 +177,7 @@ class InstrumentBuilderApp extends Component {
       confirmButtonText: 'Yes, delete page!',
     }).then((result) => {
       if (result.value) {
-        delete formData.pages[pageKey];
+        formData.pages.splice(pageKey, 2);
         this.setState({formData});
         swal.fire('Deleted!', 'Page has been deleted.', 'success');
       }
@@ -253,7 +265,8 @@ class InstrumentBuilderApp extends Component {
             pages={pages}
             sections={this.state.formData.sections}
             tables={this.state.formData.tables}
-            onDrop={this.onDrop}
+            onDropFieldType={this.onDropFieldType}
+            reIndexField={this.reIndexField}
             deletePage={this.deletePage}
             deleteField={this.deleteField}
           >

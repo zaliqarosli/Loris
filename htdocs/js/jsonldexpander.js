@@ -41,11 +41,21 @@ function sortItems(itemList, pages, sections, multiparts, tables, fields) {
       const newItemList = await getItems(schema);
       sortItems(newItemList, pages, sections, multiparts, tables, fields);
     }
+    if (hasValueConstraints(schema)) {
+      await getValueConstraints(schema);
+    }
   });
 }
 
 function hasItems(schema) {
   if (schema['https://schema.repronim.org/order']) {
+    return true;
+  }
+  return false;
+}
+
+function hasValueConstraints(schema) {
+  if (schema['https://schema.repronim.org/valueconstraints']) {
     return true;
   }
   return false;
@@ -63,6 +73,15 @@ async function getItems(schema) {
     return result;
   });
   return schemaList;
+}
+
+async function getValueConstraints(schema) {
+  schema['https://schema.repronim.org/valueconstraints'].map(async (uriObject, key) => {
+    const uri = uriObject['@id'];
+    return await Promise.all(getSchemaByUri(uri)).then((result) => {
+      return result;
+    });
+  });
 }
 
 async function getSchemaByUri(uri) {
