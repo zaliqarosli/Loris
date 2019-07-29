@@ -146,6 +146,7 @@ class Canvas extends Component {
     // then map for each item in the array, call this.render[ItemType].
     let itemTypes = ['fields', 'sections', 'tables'];
     let items = [];
+    let seenIDs = [];
     // ItemsID array of items in this section
     (this.props.multiparts[multipartIndex].order[0]['@list']).map((item, index) => {
       let id = item['@id'];
@@ -155,8 +156,9 @@ class Canvas extends Component {
           // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
           // Need to add .jsonld back in to searchItemSchema.id
           let correctedURI = searchItemSchema.id.concat('.jsonld');
-          if (id === correctedURI) {
+          if (id === correctedURI && !seenIDs.includes(correctedURI)) {
             items[searchIndex] = searchItemSchema;
+            seenIDs.push(id);
           }
         });
       });
@@ -188,6 +190,7 @@ class Canvas extends Component {
     // then map for each item in the array, call this.render[ItemType].
     let itemTypes = ['fields', 'tables'];
     let items = [];
+    let seenIDs = [];
     // ItemsID array of items in this section
     (this.props.sections[sectionIndex].order[0]['@list']).map((item, index) => {
       let id = item['@id'];
@@ -197,8 +200,9 @@ class Canvas extends Component {
           // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
           // Need to add .jsonld back in to searchItemSchema.id
           let correctedURI = searchItemSchema.id.concat('.jsonld');
-          if (id === correctedURI) {
+          if (id === correctedURI && !seenIDs.includes(correctedURI)) {
             items[searchIndex] = searchItemSchema;
+            seenIDs.push(id);
           }
         });
       });
