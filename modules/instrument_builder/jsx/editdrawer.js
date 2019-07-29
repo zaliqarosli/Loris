@@ -7,27 +7,18 @@ class EditDrawer extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      open: true,
-    };
-    this.closeDrawer = this.closeDrawer.bind(this);
     this.renderDrawerContent = this.renderDrawerContent.bind(this);
   }
 
-  closeDrawer(e) {
-    let open = !this.state.open;
-    this.setState({open});
-  }
-
   renderDrawerContent() {
-    let hidden = !this.state.open;
+    let hidden = (!this.props.open || Object.keys(this.props.selectedField).length == 0);
     let contentDiv = {
       order: 2,
       flex: 10,
-      padding: '10px',
+      padding: '20px',
       overflow: 'scroll',
     };
-    if (!this.state.open) {
+    if (!this.props.open) {
       contentDiv = {
         order: 2,
         flex: 1,
@@ -65,12 +56,12 @@ class EditDrawer extends Component {
       background: 'white',
       border: '1px solid #C3D5DB',
       order: 3,
-      flex: 7,
+      flex: 10,
       margin: '-1px -1px 0 -1px',
       display: 'flex',
       justifyContent: 'space-between',
     };
-    if (!this.state.open) {
+    if (!this.props.open) {
       icon = 'fas fa-chevron-left';
       outerDiv = {
         background: 'white',
@@ -87,7 +78,7 @@ class EditDrawer extends Component {
       <div style={outerDiv}>
         <div
           style={{order: 1, flex: 1, display: 'flex', justifyContent: 'center'}}
-          onClick={this.closeDrawer}
+          onClick={this.props.closeDrawer}
         >
           <span style={{alignSelf: 'center'}}><i className={icon}></i></span>
         </div>
@@ -98,6 +89,8 @@ class EditDrawer extends Component {
 }
 
 EditDrawer.propTypes = {
+  open: PropTypes.bool.isRequired,
+  closeDrawer: PropTypes.func.isRequired,
   selectedField: PropTypes.object,
 };
 

@@ -32,11 +32,13 @@ class InstrumentBuilderApp extends Component {
       selectedFieldType: null,
       selectedPage: null,
       showModal: false,
+      openDrawer: false,
     };
     this.updateFormData = this.updateFormData.bind(this);
     this.mapKeysToAlias = this.mapKeysToAlias.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.closeDrawer = this.closeDrawer.bind(this);
     this.renderModal = this.renderModal.bind(this);
     this.onDropFieldType = this.onDropFieldType.bind(this);
     this.reIndexField - this.reIndexField.bind(this);
@@ -102,6 +104,11 @@ class InstrumentBuilderApp extends Component {
 
   closeModal() {
     this.setState({showModal: false});
+  }
+
+  closeDrawer(e) {
+    let openDrawer = !this.state.openDrawer;
+    this.setState({openDrawer});
   }
 
   renderModal() {
@@ -219,7 +226,10 @@ class InstrumentBuilderApp extends Component {
 
   selectField(e) {
     let fieldIndex = e.currentTarget.id;
-    this.setState({selectedField: fieldIndex});
+    this.setState({
+      selectedField: fieldIndex,
+      openDrawer: true,
+    });
   }
 
   render() {
@@ -280,6 +290,8 @@ class InstrumentBuilderApp extends Component {
           >
           </Canvas>
           <EditDrawer
+            open={this.state.openDrawer}
+            closeDrawer={this.closeDrawer}
             selectedField={this.state.formData.fields[this.state.selectedField] || {}}
           >
           </EditDrawer>
