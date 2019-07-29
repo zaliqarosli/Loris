@@ -326,7 +326,8 @@ class Canvas extends Component {
       overflow: 'auto',
       overflowX: 'scroll',
       margin: '-1px 0px 0 -1px',
-    };
+      paddingBottom: '20px',
+   };
     return (
       <div style={dragNDropField}>
         {this.renderPages()}
