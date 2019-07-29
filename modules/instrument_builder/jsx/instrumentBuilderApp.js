@@ -28,6 +28,7 @@ class InstrumentBuilderApp extends Component {
       },
       schemaData: {},
       schemaURI: this.props.schemaURI,
+      selectedField: null,
       selectedFieldType: null,
       selectedPage: null,
       showModal: false,
@@ -45,6 +46,7 @@ class InstrumentBuilderApp extends Component {
     this.savePage = this.savePage.bind(this);
     this.pushToFields = this.pushToFields.bind(this);
     this.pushToPages = this.pushToPages.bind(this);
+    this.selectField = this.selectField.bind(this);
   }
 
   async componentDidMount() {
@@ -215,6 +217,11 @@ class InstrumentBuilderApp extends Component {
     this.setState({formData});
   }
 
+  selectField(e) {
+    let fieldIndex = e.currentTarget.id;
+    this.setState({selectedField: fieldIndex});
+  }
+
   render() {
     const divStyle = {
       border: '1px solid #C3D5DB',
@@ -269,9 +276,11 @@ class InstrumentBuilderApp extends Component {
             reIndexField={this.reIndexField}
             deletePage={this.deletePage}
             deleteField={this.deleteField}
+            selectField={this.selectField}
           >
           </Canvas>
           <EditDrawer
+            selectedField={this.state.formData.fields[this.state.selectedField] || {}}
           >
           </EditDrawer>
 

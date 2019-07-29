@@ -11,10 +11,10 @@ class AddListItemForm extends Component {
     // Define component's states
     this.state = {
       formData: { // the object in which the form's data on user input is stored
-        itemID: '',
+        itemID: this.props.formData.id || '',
         uiType: this.props.uiType,
-        question: '',
-        description: '',
+        question: this.props.formData.question[0]['@value'] || '',
+        description: this.props.formData.description[0]['@value'] || '',
         selectedType: null,
         options: {
           choices: [
@@ -233,6 +233,7 @@ class AddListItemForm extends Component {
 // Define props to pass to the component when called
 AddListItemForm.propTypes = {
   uiType: PropTypes.string.isRequired, // i.e. whether it is "select" or "radio"
+  formData: PropTypes.object,
   onSave: PropTypes.func.isRequired, // a call-back function defined in parent class that will be triggered when called in this class
 };
 

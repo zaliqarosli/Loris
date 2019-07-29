@@ -114,17 +114,20 @@ class Canvas extends Component {
         onDragStart={this.onDragStart}
         onDragEnter={this.props.reIndexField}
         onDragOver={this.onDragOver}
+        onClick={this.props.selectField}
       >
-        <button
-          name="deleteField"
-          type="button"
-          style={deleteBtnStyle}
-          onClick={this.props.deleteField}
-        >
-          <span style={{background: '#FCFCFC', float: 'right'}}>
-            <i className="fas fa-times-circle"></i>
-          </span>
-        </button>
+        <span>
+          <button
+            name="deleteField"
+            type="button"
+            style={deleteBtnStyle}
+            onClick={this.props.deleteField}
+          >
+            <span style={{background: '#FCFCFC', float: 'right'}}>
+              <i className="fas fa-times-circle"></i>
+            </span>
+          </button>
+        </span>
         <div style={{marginTop: '10px'}}>
           {input}
         </div>
@@ -291,16 +294,18 @@ class Canvas extends Component {
           onDragOver={this.onDragOver}
           onDrop={this.props.onDropFieldType}
         >
-          <button
-            name="deleteItem"
-            type="button"
-            style={deleteBtnStyle}
-            onClick={this.props.deletePage}
-          >
-            <span style={{background: '#FCFCFC', float: 'right'}}>
-              <i className="fas fa-times-circle"></i>
-            </span>
-          </button>
+          <span>
+            <button
+              name="deleteItem"
+              type="button"
+              style={deleteBtnStyle}
+              onClick={this.props.deletePage}
+            >
+              <span style={{background: '#FCFCFC', float: 'right'}}>
+                <i className="fas fa-times-circle"></i>
+              </span>
+            </button>
+          </span>
           {this.renderItems(index)}
         </div>
       );
@@ -337,6 +342,7 @@ Canvas.propTypes = {
   reIndexField: PropTypes.func.isRequired,
   deletePage: PropTypes.func.isRequired,
   deleteField: PropTypes.func.isRequired,
+  selectField: PropTypes.func.isRequired,
 };
 
 export default Canvas;
