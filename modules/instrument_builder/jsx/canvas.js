@@ -25,7 +25,7 @@ class Canvas extends Component {
     const question = field.question[0]['@value'];
     const inputType = field.inputType[0]['@value'];
     let mapped = [];
-    if (field.valueconstraints[0]['http://schema.org/itemListElement']) {
+    if (field.valueconstraints && field.valueconstraints[0]['http://schema.org/itemListElement']) {
       const valueconstraints = field.valueconstraints[0]['http://schema.org/itemListElement'][0]['@list'];
       mapped = valueconstraints.map((option, index) => {
         const key = option['http://schema.org/value'][0]['@value'];
