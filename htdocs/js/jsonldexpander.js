@@ -42,7 +42,10 @@ function sortItems(itemList, pages, sections, multiparts, tables, fields) {
       sortItems(newItemList, pages, sections, multiparts, tables, fields);
     }
     if (hasValueConstraints(schema)) {
-      await getValueConstraints(schema);
+      let valueSchema = await getValueConstraints(schema);
+      if (typeof valueSchema !== undefined) {
+        schema['https://schema.repronim.org/valueconstraints'] = valueSchema;
+      }
     }
   });
 }
@@ -65,9 +68,9 @@ function hasValueConstraints(schema) {
 async function getItems(schema) {
   const orderList = schema['https://schema.repronim.org/order'][0]['@list'];
   let schemaList = [];
-  const promises = orderList.map((uriObject, key) => {
+  const promises = orderList.map(async (uriObject, key) => {
     const uri = uriObject['@id'];
-    return getSchemaByUri(uri);
+    return await getSchemaByUri(uri);
   });
   schemaList = await Promise.all(promises).then((result) => {
     return result;
@@ -75,13 +78,16 @@ async function getItems(schema) {
   return schemaList;
 }
 
+// Returns schema of valueconstraint uri in given schema
 async function getValueConstraints(schema) {
-  schema['https://schema.repronim.org/valueconstraints'].map(async (uriObject, key) => {
+  const promises = schema['https://schema.repronim.org/valueconstraints'].map(async (uriObject, key) => {
     const uri = uriObject['@id'];
-    return await Promise.all(getSchemaByUri(uri)).then((result) => {
-      return result;
-    });
+    return await getSchemaByUri(uri);
   });
+  const valueSchema = await Promise.all(promises).then((result) => {
+      return result;
+  });
+  return valueSchema;
 }
 
 async function getSchemaByUri(uri) {
