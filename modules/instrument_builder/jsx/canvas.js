@@ -25,7 +25,7 @@ class Canvas extends Component {
     const question = field['http://schema.org/question'][0]['@value'];
     const inputType = field['https://schema.repronim.org/inputType'][0]['@value'];
     let mapped = [];
-    if (field['https://schema.repronim.org/valueconstraints'] && field['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement']) {
+    if ((field['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
       const valueconstraints = field['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'];
       mapped = valueconstraints.map((option, index) => {
         const key = option['http://schema.org/value'][0]['@value'];
@@ -155,7 +155,7 @@ class Canvas extends Component {
         this.props[type].forEach((searchItemSchema, searchIndex) => {
           // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
           // Need to add .jsonld back in to searchItemSchema.id
-          let correctedURI = searchItemSchema.id.concat('.jsonld');
+          let correctedURI = searchItemSchema['@id'].concat('.jsonld');
           if (id === correctedURI && !seenIDs.includes(correctedURI)) {
             items[searchIndex] = searchItemSchema;
             seenIDs.push(id);
@@ -232,18 +232,17 @@ class Canvas extends Component {
   renderItems(pageIndex) {
     // what we essentially want is an array of items on this page
     // then map for each item in the array, call this.render[ItemType].
-
-    let itemTypes = ['fields', 'multiparts', 'sections', 'tables'];
+    const itemTypes = ['fields', 'multiparts', 'sections', 'tables'];
     let items = [];
     // ItemsID array of items on this page
     (this.props.pages[pageIndex]['https://schema.repronim.org/order'][0]['@list']).map((item, index) => {
-      let id = item['@id'];
+      const id = item['@id'];
       // find itemID and return item
       itemTypes.forEach((type) => {
         this.props[type].forEach((searchItemSchema, searchIndex) => {
           // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
           // Need to add .jsonld back in to searchItemSchema.id
-          let correctedURI = searchItemSchema['@id'].concat('.jsonld');
+          const correctedURI = searchItemSchema['@id'].concat('.jsonld');
           if (id == correctedURI) {
             items[searchIndex] = searchItemSchema;
           }
@@ -277,6 +276,7 @@ class Canvas extends Component {
         padding: '20px',
         flex: '1',
         width: '612px',
+        minHeight: '792px',
         alignSelf: 'center',
         display: 'flex',
         flexDirection: 'column',

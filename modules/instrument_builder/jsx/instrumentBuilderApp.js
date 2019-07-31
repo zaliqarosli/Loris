@@ -56,7 +56,7 @@ class InstrumentBuilderApp extends Component {
       try {
         // Have to do this twice because deep cloning doesn't seem to be working currently
         const formData = await expandFull(this.state.schemaURI);
-        const schemaData = await expandFull(this.state.schemaURI);
+        const schemaData = Object.assign({}, formData);
         this.setState({formData, schemaData});
       } catch (error) {
         console.error(error);
@@ -285,7 +285,6 @@ class InstrumentBuilderApp extends Component {
             selectedField={this.state.formData.fields[this.state.selectedField] || {}}
           >
           </EditDrawer>
-
         </div>
       </div>
     );

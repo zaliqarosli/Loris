@@ -40,15 +40,16 @@ function sortItems(itemList, pages, sections, multiparts, tables, fields, valuec
       default:
         // For leftover case i.e. fields
         if (schema['@type'][0] === 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field.jsonld') {
+          if (hasValueConstraints(schema)) {
+            const valueSchema = await getValueConstraints(schema);
+            schema['https://schema.repronim.org/valueconstraints'] = [...valueSchema];
+          }
           fields.push(schema);
         }
     }
     if (hasItems(schema)) {
       const newItemList = await getItems(schema);
       sortItems(newItemList, pages, sections, multiparts, tables, fields, valueconstraints);
-    }
-    if (hasValueConstraints(schema)) {
-      await getValueConstraints(schema);
     }
   });
 }
@@ -61,7 +62,7 @@ function hasItems(schema) {
 }
 
 function hasValueConstraints(schema) {
-  if (schema['https://schema.repronim.org/valueconstraints']) {
+  if ((schema['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('@id')) {
     return true;
   }
   return false;
@@ -91,7 +92,7 @@ async function getValueConstraints(schema) {
       const uri = uriObject['@id'];
       return getSchemaByUri(uri);
     });
-    schema['https://schema.repronim.org/valueconstraints'] = await Promise.all(promises).then((result) => {
+    return await Promise.all(promises).then((result) => {
         return result;
     });
   } catch (error) {
@@ -109,30 +110,3 @@ async function getSchemaByUri(uri) {
     console.error(error);
   }
 }
-
-// function mapKeysToAlias(data) {
-//   const keyValues = Object.keys(data).map((key) => {
-//     let newKey = '';
-//     if (key.charAt(0) === '@') {
-//       newKey = key.substring(1);
-//     } else {
-//       let lastPiece = key.substring(key.lastIndexOf('/') + 1);
-//       if (lastPiece.lastIndexOf('#') > -1) {
-//         lastPiece = key.substring(key.lastIndexOf('#') + 1);
-//       }
-//       newKey = lastPiece;
-//     }
-//     return {[newKey]: data[key]};
-//   });
-//
-//   return Object.assign({}, ...keyValues);
-// }
-
-
-// function map_json_to_alias() {
-//
-// }
-//
-// function expand_fully_alias() {
-//
-// }

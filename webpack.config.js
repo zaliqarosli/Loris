@@ -110,8 +110,10 @@ const config = [{
   devtool: 'source-map',
   plugins: [],
   optimization: {
+    minimize: true,
     minimizer: [
       new TerserPlugin({
+        include: './modules/instrument_builder/js/instrumentBuilderIndex.js',
         cache: true,
         parallel: true,
         terserOptions: {
