@@ -84,7 +84,8 @@ class InstrumentBuilderApp extends Component {
 
   updateFormData(element, value) {
     let formData = Object.assign({}, this.state.formData);
-    formData[element] = value;
+    const fullKeyName = 'http://www.w3.org/2004/02/skos/core#' + element;
+    formData.schema[fullKeyName][0]['@value'] = value;
     this.setState({formData});
   }
 

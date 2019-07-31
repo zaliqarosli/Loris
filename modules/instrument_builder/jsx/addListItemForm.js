@@ -28,11 +28,6 @@ class AddListItemForm extends Component {
           scoring: '',
         },
       },
-      dataType: { // options for 'Data type' select element
-        integer: 'Integer',
-        string: 'String',
-        boolean: 'Boolean',
-      },
       uiType: { // options for UI type given this.props.uiType
         select: 'Select',
         radio: 'Radio',
@@ -85,7 +80,18 @@ class AddListItemForm extends Component {
   // Sets this.state.formData on user input for the other remaining elements
   setFormData(elementName, value) {
     let formData = Object.assign({}, this.state.formData);
-    formData[elementName] = value;
+    switch(elementName) {
+      case 'itemID':
+        formData['@id'] = value;
+        break;
+      case 'question':
+        formData['http://schema.org/question'][0]['@value'] = value;
+        break;
+      case 'description':
+        formData['http://schema.org/description'][0]['@value'] = value;
+        break;
+    }
+    formData[fullKeyName] = value;
     this.setState({formData});
   }
 
@@ -183,14 +189,6 @@ class AddListItemForm extends Component {
           label='Description'
           value={this.state.formData.description}
           onUserInput={this.setFormData}
-        />
-        <SelectElement
-          name='selectedType'
-          label='Data type'
-          options={this.state.dataType}
-          value={this.state.formData.selectedType}
-          onUserInput={this.setFormData}
-          required={true}
         />
         <StaticElement
           label='Field options:'
