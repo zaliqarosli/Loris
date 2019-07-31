@@ -22,20 +22,17 @@ class Canvas extends Component {
   renderField(fieldIndex) {
     const field = this.props.fields[fieldIndex];
     const name = field['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
-    console.log(name);
     const question = field['http://schema.org/question'][0]['@value'];
     const inputType = field['https://schema.repronim.org/inputType'][0]['@value'];
     let mapped = [];
     if (field['https://schema.repronim.org/valueconstraints'] && field['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement']) {
       const valueconstraints = field['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'];
-      console.log(valueconstraints);
       mapped = valueconstraints.map((option, index) => {
         const key = option['http://schema.org/value'][0]['@value'];
         return {[key]: option['http://schema.org/name'][0]['@value']};
       });
     }
     let options = {};
-    console.log(mapped);
     mapped.forEach((option, index) => {
       options[Object.keys(option)] = option[Object.keys(option)];
     });
