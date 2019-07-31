@@ -11,10 +11,10 @@ class AddListItemForm extends Component {
     // Define component's states
     this.state = {
       formData: { // the object in which the form's data on user input is stored
-        itemID: this.props.formData.id || '',
-        uiType: this.props.uiType,
-        question: this.props.formData.question[0]['@value'] || '',
-        description: this.props.formData.description[0]['@value'] || '',
+        itemID: this.props.formData['@id'] || '',
+        uiType: this.props['https://schema.repronim.org/inputType'],
+        question: this.props.formData['http://schema.org/question'][0]['@value'] || '',
+        description: this.props.formData['http://schema.org/description'][0]['@value'] || '',
         selectedType: null,
         options: {
           choices: [

@@ -27,7 +27,7 @@ class EditDrawer extends Component {
     let editForm = null;
     let inputType = null;
     if (Object.keys(this.props.selectedField).length != 0) {
-      inputType = this.props.selectedField.inputType[0]['@value'];
+      inputType = this.props.selectedField['https://schema.repronim.org/inputType'][0]['@value'];
     }
     switch (inputType) {
       case 'select':
@@ -78,7 +78,7 @@ class EditDrawer extends Component {
       <div style={outerDiv}>
         <div
           style={{order: 1, flex: 1, display: 'flex', justifyContent: 'center'}}
-          onClick={this.props.closeDrawer}
+          onClick={this.props.showDrawer}
         >
           <span style={{alignSelf: 'center'}}><i className={icon}></i></span>
         </div>
@@ -90,7 +90,7 @@ class EditDrawer extends Component {
 
 EditDrawer.propTypes = {
   open: PropTypes.bool.isRequired,
-  closeDrawer: PropTypes.func.isRequired,
+  showDrawer: PropTypes.func.isRequired,
   selectedField: PropTypes.object,
 };
 

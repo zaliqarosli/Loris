@@ -38,7 +38,7 @@ class InstrumentBuilderApp extends Component {
     this.mapKeysToAlias = this.mapKeysToAlias.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
-    this.closeDrawer = this.closeDrawer.bind(this);
+    this.showDrawer = this.showDrawer.bind(this);
     this.renderModal = this.renderModal.bind(this);
     this.onDropFieldType = this.onDropFieldType.bind(this);
     this.reIndexField = this.reIndexField.bind(this);
@@ -96,7 +96,7 @@ class InstrumentBuilderApp extends Component {
     this.setState({showModal: false});
   }
 
-  closeDrawer(e) {
+  showDrawer(e) {
     let openDrawer = !this.state.openDrawer;
     this.setState({openDrawer});
   }
@@ -281,7 +281,7 @@ class InstrumentBuilderApp extends Component {
           </Canvas>
           <EditDrawer
             open={this.state.openDrawer}
-            closeDrawer={this.closeDrawer}
+            showDrawer={this.showDrawer}
             selectedField={this.state.formData.fields[this.state.selectedField] || {}}
           >
           </EditDrawer>
