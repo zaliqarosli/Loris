@@ -48,10 +48,7 @@ function sortItems(itemList, pages, sections, multiparts, tables, fields, valuec
       sortItems(newItemList, pages, sections, multiparts, tables, fields, valueconstraints);
     }
     if (hasValueConstraints(schema)) {
-      let valueSchema = await getValueConstraints(schema);
-      if (valueSchema != undefined) {
-        valueconstraints.push(valueSchema);
-      }
+      await getValueConstraints(schema);
     }
   });
 }
@@ -89,14 +86,18 @@ async function getItems(schema) {
 
 // Returns schema of valueconstraint uri in given schema
 async function getValueConstraints(schema) {
-  const promises = schema['https://schema.repronim.org/valueconstraints'].map((uriObject, key) => {
-    const uri = uriObject['@id'];
-    return getSchemaByUri(uri);
-  });
-  const valueSchema = await Promise.all(promises).then((result) => {
-      return result;
-  });
-  return valueSchema;
+  try {
+    const promises = schema['https://schema.repronim.org/valueconstraints'].map((uriObject, key) => {
+      const uri = uriObject['@id'];
+      return getSchemaByUri(uri);
+    });
+    schema['https://schema.repronim.org/valueconstraints'] = await Promise.all(promises).then((result) => {
+        return result;
+    });
+  } catch (error) {
+    console.error('Error getting value constraints.');
+    console.error(error);
+  }
 }
 
 async function getSchemaByUri(uri) {
@@ -108,6 +109,25 @@ async function getSchemaByUri(uri) {
     console.error(error);
   }
 }
+
+// function mapKeysToAlias(data) {
+//   const keyValues = Object.keys(data).map((key) => {
+//     let newKey = '';
+//     if (key.charAt(0) === '@') {
+//       newKey = key.substring(1);
+//     } else {
+//       let lastPiece = key.substring(key.lastIndexOf('/') + 1);
+//       if (lastPiece.lastIndexOf('#') > -1) {
+//         lastPiece = key.substring(key.lastIndexOf('#') + 1);
+//       }
+//       newKey = lastPiece;
+//     }
+//     return {[newKey]: data[key]};
+//   });
+//
+//   return Object.assign({}, ...keyValues);
+// }
+
 
 // function map_json_to_alias() {
 //

@@ -41,7 +41,7 @@ class InstrumentBuilderApp extends Component {
     this.closeDrawer = this.closeDrawer.bind(this);
     this.renderModal = this.renderModal.bind(this);
     this.onDropFieldType = this.onDropFieldType.bind(this);
-    this.reIndexField - this.reIndexField.bind(this);
+    this.reIndexField = this.reIndexField.bind(this);
     this.deleteField = this.deleteField.bind(this);
     this.deletePage = this.deletePage.bind(this);
     this.saveField = this.saveField.bind(this);
@@ -53,24 +53,14 @@ class InstrumentBuilderApp extends Component {
 
   async componentDidMount() {
     if (this.state.schemaURI !== '') {
-      let formData = {};
-      let schemaData = {};
       try {
-        formData = await expandFull(this.state.schemaURI);
         // Have to do this twice because deep cloning doesn't seem to be working currently
-        schemaData = await expandFull(this.state.schemaURI);
+        const formData = await expandFull(this.state.schemaURI);
+        const schemaData = await expandFull(this.state.schemaURI);
+        this.setState({formData, schemaData});
       } catch (error) {
         console.error(error);
       }
-      // Map formData keys to aliases
-      const items = ['fields', 'multiparts', 'pages', 'sections', 'tables'];
-      items.forEach((item) => {
-        formData[item] = [...formData[item].map((schema, index) => {
-          return this.mapKeysToAlias(schema);
-        })];
-      });
-      formData.schema = this.mapKeysToAlias(formData.schema);
-      this.setState({formData, schemaData});
     }
   }
 
@@ -244,21 +234,21 @@ class InstrumentBuilderApp extends Component {
       background: '#FCFCFC',
     };
     let profile = {};
-    if (this.state.formData.schema['altLabel'] && this.state.formData.schema['prefLabel']) {
+    if (this.state.formData.schema['http://www.w3.org/2004/02/skos/core#altLabel'] && this.state.formData.schema['http://www.w3.org/2004/02/skos/core#prefLabel']) {
       profile = {
-        name: this.state.formData.schema['altLabel'][0]['@value'],
-        fullName: this.state.formData.schema['prefLabel'][0]['@value'],
+        name: this.state.formData.schema['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'],
+        fullName: this.state.formData.schema['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'],
       };
     }
     let pages = [];
-    if (this.state.formData.pages.length == 0) {
+    if ((this.state.formData['pages']).length == 0) {
       pages.push({
-        altLabel: '',
-        description: '',
-        id: '',
-        preamble: '',
-        prefLabel: '',
-        order: [
+        'http://www.w3.org/2004/02/skos/core#altLabel': '',
+        'http://schema.org/description': '',
+        '@id': '',
+        'http://schema.repronim.org/preamble': '',
+        'http://www.w3.org/2004/02/skos/core#prefLabel': '',
+        'https://schema.repronim.org/order': [
           {
             '@list': [],
           },

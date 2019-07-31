@@ -21,18 +21,21 @@ class Canvas extends Component {
 
   renderField(fieldIndex) {
     const field = this.props.fields[fieldIndex];
-    const name = field.altLabel[0]['@value'];
-    const question = field.question[0]['@value'];
-    const inputType = field.inputType[0]['@value'];
+    const name = field['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
+    console.log(name);
+    const question = field['http://schema.org/question'][0]['@value'];
+    const inputType = field['https://schema.repronim.org/inputType'][0]['@value'];
     let mapped = [];
-    if (field.valueconstraints && field.valueconstraints[0]['http://schema.org/itemListElement']) {
-      const valueconstraints = field.valueconstraints[0]['http://schema.org/itemListElement'][0]['@list'];
+    if (field['https://schema.repronim.org/valueconstraints'] && field['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement']) {
+      const valueconstraints = field['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'];
+      console.log(valueconstraints);
       mapped = valueconstraints.map((option, index) => {
         const key = option['http://schema.org/value'][0]['@value'];
         return {[key]: option['http://schema.org/name'][0]['@value']};
       });
     }
     let options = {};
+    console.log(mapped);
     mapped.forEach((option, index) => {
       options[Object.keys(option)] = option[Object.keys(option)];
     });
@@ -148,7 +151,7 @@ class Canvas extends Component {
     let items = [];
     let seenIDs = [];
     // ItemsID array of items in this section
-    (this.props.multiparts[multipartIndex].order[0]['@list']).map((item, index) => {
+    (this.props.multiparts[multipartIndex]['https://schema.repronim.org/order'][0]['@list']).map((item, index) => {
       let id = item['@id'];
       // find itemID and return item
       itemTypes.forEach((type) => {
@@ -164,7 +167,7 @@ class Canvas extends Component {
       });
     });
     let rendered = items.map((itemSchema, itemIndex) => {
-      let inputType = itemSchema.inputType[0]['@value'];
+      let inputType = itemSchema['https://schema.repronim.org/inputType'][0]['@value'];
       switch (inputType) {
         case 'section':
           return this.renderSection(itemIndex);
@@ -185,21 +188,21 @@ class Canvas extends Component {
   }
 
   renderSection(sectionIndex) {
-    let title = this.props.sections[sectionIndex].preamble[0]['@value'];
+    let title = this.props.sections[sectionIndex]['http://schema.repronim.org/preamble'][0]['@value'];
     // what we essentially want is an array of items in this section
     // then map for each item in the array, call this.render[ItemType].
     let itemTypes = ['fields', 'tables'];
     let items = [];
     let seenIDs = [];
     // ItemsID array of items in this section
-    (this.props.sections[sectionIndex].order[0]['@list']).map((item, index) => {
+    (this.props.sections[sectionIndex]['https://schema.repronim.org/order'][0]['@list']).map((item, index) => {
       let id = item['@id'];
       // find itemID and return item
       itemTypes.forEach((type) => {
         this.props[type].forEach((searchItemSchema, searchIndex) => {
           // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
           // Need to add .jsonld back in to searchItemSchema.id
-          let correctedURI = searchItemSchema.id.concat('.jsonld');
+          let correctedURI = searchItemSchema['@id'].concat('.jsonld');
           if (id === correctedURI && !seenIDs.includes(correctedURI)) {
             items[searchIndex] = searchItemSchema;
             seenIDs.push(id);
@@ -208,7 +211,7 @@ class Canvas extends Component {
       });
     });
     let rendered = items.map((itemSchema, itemIndex) => {
-      let inputType = itemSchema.inputType[0]['@value'];
+      let inputType = itemSchema['https://schema.repronim.org/inputType'][0]['@value'];
       switch (inputType) {
         case 'table':
           return this.renderTable(itemIndex);
@@ -236,14 +239,14 @@ class Canvas extends Component {
     let itemTypes = ['fields', 'multiparts', 'sections', 'tables'];
     let items = [];
     // ItemsID array of items on this page
-    (this.props.pages[pageIndex].order[0]['@list']).map((item, index) => {
+    (this.props.pages[pageIndex]['https://schema.repronim.org/order'][0]['@list']).map((item, index) => {
       let id = item['@id'];
       // find itemID and return item
       itemTypes.forEach((type) => {
         this.props[type].forEach((searchItemSchema, searchIndex) => {
           // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
           // Need to add .jsonld back in to searchItemSchema.id
-          let correctedURI = searchItemSchema.id.concat('.jsonld');
+          let correctedURI = searchItemSchema['@id'].concat('.jsonld');
           if (id == correctedURI) {
             items[searchIndex] = searchItemSchema;
           }
@@ -251,7 +254,7 @@ class Canvas extends Component {
       });
     });
     return items.map((itemSchema, itemIndex) => {
-      let inputType = itemSchema.inputType[0]['@value'];
+      let inputType = itemSchema['https://schema.repronim.org/inputType'][0]['@value'];
       switch (inputType) {
         case 'multipart':
           return this.renderMultipart(itemIndex);
