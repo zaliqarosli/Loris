@@ -1,6 +1,6 @@
 const jsonld = require('jsonld');
 
-export default async function expandFull(schemaURI) {
+const expandFull = async (schemaURI) => {
   try {
     const expanded = await jsonld.expand(schemaURI);
     const schema = expanded[0];
@@ -20,9 +20,9 @@ export default async function expandFull(schemaURI) {
     console.error('Error full expanding.');
     console.error(error);
   }
-}
+};
 
-function sortItems(itemList, pages, sections, multiparts, tables, fields, valueconstraints) {
+const sortItems = async (itemList, pages, sections, multiparts, tables, fields, valueconstraints) => {
   itemList.forEach(async (schema) => {
     switch (schema['https://schema.repronim.org/inputType'][0]['@value']) {
       case 'page':
@@ -52,24 +52,24 @@ function sortItems(itemList, pages, sections, multiparts, tables, fields, valuec
       sortItems(newItemList, pages, sections, multiparts, tables, fields, valueconstraints);
     }
   });
-}
+};
 
-function hasItems(schema) {
+const hasItems = (schema) => {
   if (schema['https://schema.repronim.org/order']) {
     return true;
   }
   return false;
-}
+};
 
-function hasValueConstraints(schema) {
+const hasValueConstraints = (schema) => {
   if ((schema['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('@id')) {
     return true;
   }
   return false;
-}
+};
 
 // Given a jsonld schema, this function returns the schema of all items in the order list
-async function getItems(schema) {
+const getItems = async (schema) => {
   try {
     const orderList = schema['https://schema.repronim.org/order'][0]['@list'];
     const promises = orderList.map((uriObject, key) => {
@@ -83,10 +83,10 @@ async function getItems(schema) {
     console.error('Error getting items.');
     console.error(error);
   }
-}
+};
 
 // Returns schema of valueconstraint uri in given schema
-async function getValueConstraints(schema) {
+const getValueConstraints = async (schema) => {
   try {
     const promises = schema['https://schema.repronim.org/valueconstraints'].map((uriObject, key) => {
       const uri = uriObject['@id'];
@@ -99,9 +99,9 @@ async function getValueConstraints(schema) {
     console.error('Error getting value constraints.');
     console.error(error);
   }
-}
+};
 
-async function getSchemaByUri(uri) {
+const getSchemaByUri = async (uri) => {
   try {
     const expanded = await jsonld.expand(uri);
     return expanded[0];
@@ -109,4 +109,10 @@ async function getSchemaByUri(uri) {
     console.error('Expanding URI ' + uri + ' failed.');
     console.error(error);
   }
-}
+};
+
+const JsonLDExpander = {
+  expandFull: expandFull,
+};
+
+export default JsonLDExpander;

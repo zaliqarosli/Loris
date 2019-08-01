@@ -10,7 +10,7 @@ import EditDrawer from './editdrawer';
 import AddListItemForm from './addListItemForm';
 import AddPageForm from './addPageForm';
 
-import expandFull from './../../../htdocs/js/jsonldexpander';
+import JsonLDExpander from './../../../htdocs/js/JsonLDExpander';
 
 class InstrumentBuilderApp extends Component {
   constructor(props) {
@@ -55,7 +55,7 @@ class InstrumentBuilderApp extends Component {
     if (this.state.schemaURI !== '') {
       try {
         // Have to do this twice because deep cloning doesn't seem to be working currently
-        const formData = await expandFull(this.state.schemaURI);
+        const formData = await JsonLDExpander.expandFull(this.state.schemaURI);
         const schemaData = Object.assign({}, formData);
         this.setState({formData, schemaData});
       } catch (error) {

@@ -58,6 +58,7 @@ const config = [{
   output: {
     path: __dirname + '/',
     filename: '[name]',
+    chunkFilename: '[name]',
   },
   module: {
     rules: [

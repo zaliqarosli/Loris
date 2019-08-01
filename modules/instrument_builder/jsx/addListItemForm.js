@@ -80,7 +80,7 @@ class AddListItemForm extends Component {
   // Sets this.state.formData on user input for the other remaining elements
   setFormData(elementName, value) {
     let formData = Object.assign({}, this.state.formData);
-    switch(elementName) {
+    switch (elementName) {
       case 'itemID':
         formData['@id'] = value;
         break;
