@@ -37,16 +37,20 @@ class EditDrawer extends Component {
         editForm = <AddListItemForm
                      uiType='select'
                      formData={this.props.selectedField}
-                     onSave={this.submitEdit}
+                     onEditField={this.props.onEditField}
                      choices={choices}
+                     mode='edit'
+                     addChoices={this.props.addChoices}
                    />;
         break;
       case 'radio':
         editForm = <AddListItemForm
                      uiType='radio'
                      formData={this.props.selectedField}
-                     onSave={this.submitEdit}
+                     onEditField={this.props.onEditField}
                      choices={choices}
+                     mode='edit'
+                     addChoices={this.props.addChoices}
                    />;
         break;
     }
@@ -121,6 +125,8 @@ EditDrawer.propTypes = {
   open: PropTypes.bool.isRequired,
   showDrawer: PropTypes.func.isRequired,
   selectedField: PropTypes.object,
+  onEditField: PropTypes.func.isRequired,
+  addChoices: PropTypes.func,
 };
 
 export default EditDrawer;

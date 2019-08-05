@@ -50,6 +50,7 @@ class InstrumentBuilderApp extends Component {
     this.pushToPages = this.pushToPages.bind(this);
     this.selectField = this.selectField.bind(this);
     this.editFormData = this.editFormData.bind(this);
+    this.addValueConstraints = this.addValueConstraints.bind(this);
   }
 
   async componentDidMount() {
@@ -251,6 +252,23 @@ class InstrumentBuilderApp extends Component {
     this.setState({formData});
   }
 
+  addValueConstraints(e) {
+    const currentField = this.state.selectedField;
+    let formData = Object.assign({}, this.state.formData);
+    const newValueConstraint = {
+      'http://schema.org/name': [{
+        '@language': 'en',
+        '@value': '',
+      }],
+      'http://schema.org/value': [{
+        '@language': 'en',
+        '@value': '',
+      }],
+    };
+    (formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list']).push(newValueConstraint);
+    this.setState({formData});
+  }
+
   render() {
     const divStyle = {
       border: '1px solid #C3D5DB',
@@ -312,6 +330,8 @@ class InstrumentBuilderApp extends Component {
             open={this.state.openDrawer}
             showDrawer={this.showDrawer}
             selectedField={this.state.formData.fields[this.state.selectedField] || {}}
+            onEditField={this.editFormData}
+            addChoices={this.addValueConstraints}
           >
           </EditDrawer>
         </div>
