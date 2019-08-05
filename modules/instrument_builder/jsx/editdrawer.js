@@ -8,6 +8,7 @@ class EditDrawer extends Component {
     super(props);
 
     this.renderDrawerContent = this.renderDrawerContent.bind(this);
+    this.getChoicesFromValueConstraints = this.getChoicesFromValueConstraints.bind(this);
   }
 
   renderDrawerContent() {
@@ -29,13 +30,24 @@ class EditDrawer extends Component {
     if (Object.keys(this.props.selectedField).length != 0) {
       inputType = this.props.selectedField['https://schema.repronim.org/inputType'][0]['@value'];
     }
+    const choices = this.getChoicesFromValueConstraints();
     switch (inputType) {
       case 'select':
       case 'multiselect':
-        editForm = <AddListItemForm uiType='select' formData={this.props.selectedField} onSave={this.submitEdit}/>;
+        editForm = <AddListItemForm
+                     uiType='select'
+                     formData={this.props.selectedField}
+                     onSave={this.submitEdit}
+                     choices={choices}
+                   />;
         break;
       case 'radio':
-        editForm = <AddListItemForm uiType='radio' formData={this.props.selectedField} onSave={this.submitEdit}/>;
+        editForm = <AddListItemForm
+                     uiType='radio'
+                     formData={this.props.selectedField}
+                     onSave={this.submitEdit}
+                     choices={choices}
+                   />;
         break;
     }
     return (
@@ -48,6 +60,23 @@ class EditDrawer extends Component {
         </FieldsetElement>
       </div>
     );
+  }
+
+  getChoicesFromValueConstraints() {
+    if (this.props.selectedField.hasOwnProperty('https://schema.repronim.org/valueconstraints')) {
+      if ((this.props.selectedField['https://schema.repronim.org/valueconstraints']).hasOwnProperty(0)) {
+        if ((this.props.selectedField['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
+          const valueConstraints = this.props.selectedField['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'];
+          return valueConstraints.map((valueConstraint, index) => {
+            return ({
+              name: valueConstraint['http://schema.org/name'][0]['@value'],
+              value: valueConstraint['http://schema.org/value'][0]['@value'],
+            });
+          });
+        }
+      }
+    }
+    return null;
   }
 
   render() {

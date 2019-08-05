@@ -11,15 +11,13 @@ class AddListItemForm extends Component {
     // Define component's states
     this.state = {
       formData: { // the object in which the form's data on user input is stored
-        itemID: this.props.formData['@id'] || '',
+        itemID: this.props.formData['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'] || '',
         uiType: this.props['https://schema.repronim.org/inputType'],
         question: this.props.formData['http://schema.org/question'][0]['@value'] || '',
         description: this.props.formData['http://schema.org/description'][0]['@value'] || '',
         selectedType: null,
         options: {
-          choices: [
-            {name: '', value: ''},
-          ],
+          choices: this.props.choices || [{name: '', value: ''}],
           multipleChoice: false,
           requiredValue: false,
         },
@@ -110,7 +108,7 @@ class AddListItemForm extends Component {
         <div key={key} style={{display: 'flex', justifyContent: 'flex-end'}}>
           <div style={{marginRight: '20px'}}>
             <TextboxElement
-              name={key}
+              name={'name_'+key}
               label='Label'
               onUserInput={this.setChoiceLabel}
               value={this.state.formData.options.choices[key].name}
@@ -118,7 +116,7 @@ class AddListItemForm extends Component {
           </div>
           <div style={{marginRight: '17px'}}>
             <TextboxElement
-              name={key}
+              name={'value_'+key}
               label='Value'
               onUserInput={this.setChoiceValue}
               value={this.state.formData.options.choices[key].value}
@@ -232,7 +230,8 @@ class AddListItemForm extends Component {
 AddListItemForm.propTypes = {
   uiType: PropTypes.string.isRequired, // i.e. whether it is "select" or "radio"
   formData: PropTypes.object,
-  onSave: PropTypes.func.isRequired, // a call-back function defined in parent class that will be triggered when called in this class
+  onSave: PropTypes.func.isRequired, // a call-back function defined in parent class that will be triggered when called in this class,
+  choices: PropTypes.array,
 };
 
 // Export component to be used in other classes

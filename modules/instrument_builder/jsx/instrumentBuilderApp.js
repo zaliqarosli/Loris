@@ -34,7 +34,7 @@ class InstrumentBuilderApp extends Component {
       showModal: false,
       openDrawer: false,
     };
-    this.updateFormData = this.updateFormData.bind(this);
+    this.updateProfile = this.updateProfile.bind(this);
     this.mapKeysToAlias = this.mapKeysToAlias.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -44,11 +44,12 @@ class InstrumentBuilderApp extends Component {
     this.reIndexField = this.reIndexField.bind(this);
     this.deleteField = this.deleteField.bind(this);
     this.deletePage = this.deletePage.bind(this);
-    this.saveField = this.saveField.bind(this);
-    this.savePage = this.savePage.bind(this);
+    this.addField = this.addField.bind(this);
+    this.addPage = this.addPage.bind(this);
     this.pushToFields = this.pushToFields.bind(this);
     this.pushToPages = this.pushToPages.bind(this);
     this.selectField = this.selectField.bind(this);
+    this.editFormData = this.editFormData.bind(this);
   }
 
   async componentDidMount() {
@@ -82,7 +83,7 @@ class InstrumentBuilderApp extends Component {
     return Object.assign({}, ...keyValues);
   }
 
-  updateFormData(element, value) {
+  updateProfile(element, value) {
     let formData = Object.assign({}, this.state.formData);
     const fullKeyName = 'http://www.w3.org/2004/02/skos/core#' + element;
     formData.schema[fullKeyName][0]['@value'] = value;
@@ -106,16 +107,16 @@ class InstrumentBuilderApp extends Component {
     let addForm = null;
     switch (this.state.selectedFieldType) {
       case 'pageBreak':
-        addForm = <AddPageForm onSave={this.savePage}/>;
+        addForm = <AddPageForm onSave={this.addPage}/>;
         break;
       case 'section':
 
         break;
       case 'select':
-        addForm = <AddListItemForm uiType='select' onSave={this.saveItem}/>;
+        addForm = <AddListItemForm uiType='select' onSave={this.addItem}/>;
         break;
       case 'radio':
-        addForm = <AddListItemForm uiType='radio' onSave={this.saveItem}/>;
+        addForm = <AddListItemForm uiType='radio' onSave={this.addItem}/>;
         break;
     }
     return (
@@ -184,7 +185,7 @@ class InstrumentBuilderApp extends Component {
     });
   }
 
-  saveField(formData) {
+  addField(formData) {
     formData.onPage = this.state.selectedPage;
     pushToItems(formData);
     swal.fire('Success!', 'Item added.', 'success').then((result) => {
@@ -194,7 +195,7 @@ class InstrumentBuilderApp extends Component {
     });
   }
 
-  savePage(formData) {
+  addPage(formData) {
     pushToPages(formData);
     swal.fire('Success!', 'Page added.', 'success').then((result) => {
       if (result.value) {
@@ -221,6 +222,33 @@ class InstrumentBuilderApp extends Component {
       selectedField: fieldIndex,
       openDrawer: true,
     });
+  }
+
+
+  editFormData(elementName, value) {
+    const currentField = this.state.selectedField;
+    let formData = Object.assign({}, this.state.formData);
+    switch (elementName) {
+      case 'itemID':
+        formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'] = value;
+        break;
+      case 'description':
+        formData.fields[currentField]['http://schema.org/description'][0]['@value'] = value;
+        formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'] = value;
+        break;
+      case 'question':
+        formData.fields[currentField]['http://schema.org/question'][0]['@value'] = value;
+        break;
+      default:
+        if (elementName.includes('name')) {
+          const index = elementName.substring(elementName.indexOf('_')+1);
+         formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'][index]['http://schema.org/name'][0]['@value'] = value;
+        } else if (elementName.includes('value')) {
+          const index = elementName.substring(elementName.indexOf('_')+1);
+         formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'][index]['http://schema.org/value'][0]['@value'] = value;
+        }
+    }
+    this.setState({formData});
   }
 
   render() {
@@ -264,7 +292,7 @@ class InstrumentBuilderApp extends Component {
         <div style={divStyle}>
           <Toolbar
             profile={profile}
-            onUpdate={this.updateFormData}
+            onUpdate={this.updateProfile}
           >
           </Toolbar>
           <Canvas
