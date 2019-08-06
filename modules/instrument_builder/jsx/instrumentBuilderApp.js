@@ -26,7 +26,7 @@ class InstrumentBuilderApp extends Component {
         sections: [],
         tables: [],
       },
-      schemaData: {},
+      // schemaData: {},
       schemaURI: this.props.schemaURI,
       selectedField: null,
       selectedFieldType: null,
@@ -34,8 +34,10 @@ class InstrumentBuilderApp extends Component {
       showModal: false,
       openDrawer: false,
     };
-    this.updateProfile = this.updateProfile.bind(this);
     this.mapKeysToAlias = this.mapKeysToAlias.bind(this);
+    this.updateProfile = this.updateProfile.bind(this);
+    this.editFormData = this.editFormData.bind(this);
+    this.addValueConstraints = this.addValueConstraints.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.showDrawer = this.showDrawer.bind(this);
@@ -49,8 +51,6 @@ class InstrumentBuilderApp extends Component {
     this.pushToFields = this.pushToFields.bind(this);
     this.pushToPages = this.pushToPages.bind(this);
     this.selectField = this.selectField.bind(this);
-    this.editFormData = this.editFormData.bind(this);
-    this.addValueConstraints = this.addValueConstraints.bind(this);
   }
 
   async componentDidMount() {
@@ -58,8 +58,8 @@ class InstrumentBuilderApp extends Component {
       try {
         // Have to do this twice because deep cloning doesn't seem to be working currently
         const formData = await JsonLDExpander.expandFull(this.state.schemaURI);
-        const schemaData = Object.assign({}, formData);
-        this.setState({formData, schemaData});
+        // const schemaData = Object.assign({}, formData);
+        this.setState({formData});
       } catch (error) {
         console.error(error);
       }
@@ -88,6 +88,49 @@ class InstrumentBuilderApp extends Component {
     let formData = Object.assign({}, this.state.formData);
     const fullKeyName = 'http://www.w3.org/2004/02/skos/core#' + element;
     formData.schema[fullKeyName][0]['@value'] = value;
+    this.setState({formData});
+  }
+
+  editFormData(elementName, value) {
+    const currentField = this.state.selectedField;
+    let formData = Object.assign({}, this.state.formData);
+    switch (elementName) {
+      case 'itemID':
+        formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'] = value;
+        break;
+      case 'description':
+        formData.fields[currentField]['http://schema.org/description'][0]['@value'] = value;
+        formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'] = value;
+        break;
+      case 'question':
+        formData.fields[currentField]['http://schema.org/question'][0]['@value'] = value;
+        break;
+      default:
+        if (elementName.includes('name')) {
+          const index = elementName.substring(elementName.indexOf('_')+1);
+         formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'][index]['http://schema.org/name'][0]['@value'] = value;
+        } else if (elementName.includes('value')) {
+          const index = elementName.substring(elementName.indexOf('_')+1);
+         formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'][index]['http://schema.org/value'][0]['@value'] = value;
+        }
+    }
+    this.setState({formData});
+  }
+
+  addValueConstraints(e) {
+    const currentField = this.state.selectedField;
+    let formData = Object.assign({}, this.state.formData);
+    const newValueConstraint = {
+      'http://schema.org/name': [{
+        '@language': 'en',
+        '@value': '',
+      }],
+      'http://schema.org/value': [{
+        '@language': 'en',
+        '@value': '',
+      }],
+    };
+    (formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list']).push(newValueConstraint);
     this.setState({formData});
   }
 
@@ -225,50 +268,6 @@ class InstrumentBuilderApp extends Component {
     });
   }
 
-
-  editFormData(elementName, value) {
-    const currentField = this.state.selectedField;
-    let formData = Object.assign({}, this.state.formData);
-    switch (elementName) {
-      case 'itemID':
-        formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'] = value;
-        break;
-      case 'description':
-        formData.fields[currentField]['http://schema.org/description'][0]['@value'] = value;
-        formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'] = value;
-        break;
-      case 'question':
-        formData.fields[currentField]['http://schema.org/question'][0]['@value'] = value;
-        break;
-      default:
-        if (elementName.includes('name')) {
-          const index = elementName.substring(elementName.indexOf('_')+1);
-         formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'][index]['http://schema.org/name'][0]['@value'] = value;
-        } else if (elementName.includes('value')) {
-          const index = elementName.substring(elementName.indexOf('_')+1);
-         formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'][index]['http://schema.org/value'][0]['@value'] = value;
-        }
-    }
-    this.setState({formData});
-  }
-
-  addValueConstraints(e) {
-    const currentField = this.state.selectedField;
-    let formData = Object.assign({}, this.state.formData);
-    const newValueConstraint = {
-      'http://schema.org/name': [{
-        '@language': 'en',
-        '@value': '',
-      }],
-      'http://schema.org/value': [{
-        '@language': 'en',
-        '@value': '',
-      }],
-    };
-    (formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list']).push(newValueConstraint);
-    this.setState({formData});
-  }
-
   render() {
     const divStyle = {
       border: '1px solid #C3D5DB',
@@ -304,6 +303,26 @@ class InstrumentBuilderApp extends Component {
     } else {
       pages = [...this.state.formData.pages];
     }
+    let field = {};
+    if (this.state.selectedField != null) {
+      const currentField = this.state.selectedField;
+      let choices = [];
+      if ((this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
+        choices = this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'].map((valueConstraint, index) => {
+          return ({
+            name: valueConstraint['http://schema.org/name'][0]['@value'],
+            value: valueConstraint['http://schema.org/value'][0]['@value'],
+          });
+        });
+      }
+      field = {
+        itemID: this.state.formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'],
+        inputType: this.state.formData.fields[currentField]['https://schema.repronim.org/inputType'][0]['@value'],
+        description: this.state.formData.fields[currentField]['http://schema.org/description'][0]['@value'],
+        question: this.state.formData.fields[currentField]['http://schema.org/question'][0]['@value'],
+        choices: choices,
+      };
+    }
     return (
       <div>
         {this.renderModal()}
@@ -329,7 +348,7 @@ class InstrumentBuilderApp extends Component {
           <EditDrawer
             open={this.state.openDrawer}
             showDrawer={this.showDrawer}
-            selectedField={this.state.formData.fields[this.state.selectedField] || {}}
+            field={field}
             onEditField={this.editFormData}
             addChoices={this.addValueConstraints}
           >

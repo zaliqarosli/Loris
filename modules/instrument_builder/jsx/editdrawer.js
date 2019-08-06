@@ -8,11 +8,11 @@ class EditDrawer extends Component {
     super(props);
 
     this.renderDrawerContent = this.renderDrawerContent.bind(this);
-    this.getChoicesFromValueConstraints = this.getChoicesFromValueConstraints.bind(this);
+    // this.getChoicesFromValueConstraints = this.getChoicesFromValueConstraints.bind(this);
   }
 
   renderDrawerContent() {
-    let hidden = (!this.props.open || Object.keys(this.props.selectedField).length == 0);
+    let hidden = (!this.props.open || Object.keys(this.props.field).length == 0);
     let contentDiv = {
       order: 2,
       flex: 10,
@@ -27,18 +27,17 @@ class EditDrawer extends Component {
     }
     let editForm = null;
     let inputType = null;
-    if (Object.keys(this.props.selectedField).length != 0) {
-      inputType = this.props.selectedField['https://schema.repronim.org/inputType'][0]['@value'];
+    if (Object.keys(this.props.field).length != 0) {
+      inputType = this.props.field.inputType;
     }
-    const choices = this.getChoicesFromValueConstraints();
+    // const choices = this.getChoicesFromValueConstraints();
     switch (inputType) {
       case 'select':
       case 'multiselect':
         editForm = <AddListItemForm
                      uiType='select'
-                     formData={this.props.selectedField}
+                     formData={this.props.field}
                      onEditField={this.props.onEditField}
-                     choices={choices}
                      mode='edit'
                      addChoices={this.props.addChoices}
                    />;
@@ -46,9 +45,8 @@ class EditDrawer extends Component {
       case 'radio':
         editForm = <AddListItemForm
                      uiType='radio'
-                     formData={this.props.selectedField}
+                     formData={this.props.field}
                      onEditField={this.props.onEditField}
-                     choices={choices}
                      mode='edit'
                      addChoices={this.props.addChoices}
                    />;
@@ -66,22 +64,22 @@ class EditDrawer extends Component {
     );
   }
 
-  getChoicesFromValueConstraints() {
-    if (this.props.selectedField.hasOwnProperty('https://schema.repronim.org/valueconstraints')) {
-      if ((this.props.selectedField['https://schema.repronim.org/valueconstraints']).hasOwnProperty(0)) {
-        if ((this.props.selectedField['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
-          const valueConstraints = this.props.selectedField['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'];
-          return valueConstraints.map((valueConstraint, index) => {
-            return ({
-              name: valueConstraint['http://schema.org/name'][0]['@value'],
-              value: valueConstraint['http://schema.org/value'][0]['@value'],
-            });
-          });
-        }
-      }
-    }
-    return null;
-  }
+  // getChoicesFromValueConstraints() {
+  //   if (this.props.selectedField.hasOwnProperty('https://schema.repronim.org/valueconstraints')) {
+  //     if ((this.props.selectedField['https://schema.repronim.org/valueconstraints']).hasOwnProperty(0)) {
+  //       if ((this.props.selectedField['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
+  //         const valueConstraints = this.props.selectedField['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'];
+  //         return valueConstraints.map((valueConstraint, index) => {
+  //           return ({
+  //             name: valueConstraint['http://schema.org/name'][0]['@value'],
+  //             value: valueConstraint['http://schema.org/value'][0]['@value'],
+  //           });
+  //         });
+  //       }
+  //     }
+  //   }
+  //   return null;
+  // }
 
   render() {
     let icon = 'fas fa-chevron-right';
@@ -124,7 +122,7 @@ class EditDrawer extends Component {
 EditDrawer.propTypes = {
   open: PropTypes.bool.isRequired,
   showDrawer: PropTypes.func.isRequired,
-  selectedField: PropTypes.object,
+  field: PropTypes.object,
   onEditField: PropTypes.func.isRequired,
   addChoices: PropTypes.func,
 };

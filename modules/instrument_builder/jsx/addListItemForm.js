@@ -10,22 +10,22 @@ class AddListItemForm extends Component {
 
     // Define component's states
     this.state = {
-      formData: { // the object in which the form's data on user input is stored
-        itemID: this.props.formData['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'] || '',
-        uiType: this.props['https://schema.repronim.org/inputType'],
-        question: this.props.formData['http://schema.org/question'][0]['@value'] || '',
-        description: this.props.formData['http://schema.org/description'][0]['@value'] || '',
-        selectedType: null,
-        options: {
-          choices: this.props.choices || [{name: '', value: ''}],
-          multipleChoice: false,
-          requiredValue: false,
-        },
-        rules: {
-          branching: '',
-          scoring: '',
-        },
-      },
+      // formData: { // the object in which the form's data on user input is stored
+      //   itemID: this.props.formData.itemID || '',
+      //   uiType: this.props.formData.inputType,
+      //   question: this.props.formData.question || '',
+      //   description: this.props.formData.description || '',
+      //   selectedType: null,
+      //   options: {
+      //     choices: this.props.formData.choices || [{name: '', value: ''}],
+      //     multipleChoice: false,
+      //     requiredValue: false,
+      //   },
+      //   rules: {
+      //     branching: '',
+      //     scoring: '',
+      //   },
+      // },
       uiType: { // options for UI type given this.props.uiType
         select: 'Select',
         radio: 'Radio',
@@ -33,8 +33,8 @@ class AddListItemForm extends Component {
     };
 
     // Bind all methods to `this` (except for render method)
-    this.setCheckbox = this.setCheckbox.bind(this);
-    this.setRules = this.setRules.bind(this);
+    // this.setCheckbox = this.setCheckbox.bind(this);
+    // this.setRules = this.setRules.bind(this);
     this.renderFieldOptions = this.renderFieldOptions.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -42,22 +42,22 @@ class AddListItemForm extends Component {
   // Create custom methods ..
 
   // Sets this.state.formData on user input for checkbox elements
-  setCheckbox(elementName, value) {
-    let formData = Object.assign({}, this.state.formData);
-    formData.options[elementName] = value;
-    this.setState({formData});
-  }
+  // setCheckbox(elementName, value) {
+  //   let formData = Object.assign({}, this.state.formData);
+  //   formData.options[elementName] = value;
+  //   this.setState({formData});
+  // }
 
   // Sets this.state.formData on user input for branching/scoring formula text element
-  setRules(elementName, value) {
-    let formData = Object.assign({}, this.state.formData);
-    formData.rules[elementName] = value;
-    this.setState({formData});
-  }
+  // setRules(elementName, value) {
+  //   let formData = Object.assign({}, this.state.formData);
+  //   formData.rules[elementName] = value;
+  //   this.setState({formData});
+  // }
 
   // Render 'Label' and 'Value' text elements and '+' button element for each object in the choices array
   renderFieldOptions() {
-    let optionsBlock = this.state.formData.options.choices.map((choice, key) => {
+    let optionsBlock = this.props.formData.choices.map((choice, key) => {
       return (
         <div key={key} style={{display: 'flex', justifyContent: 'flex-end'}}>
           <div style={{marginRight: '20px'}}>
@@ -65,7 +65,7 @@ class AddListItemForm extends Component {
               name={'name_'+key}
               label='Label'
               onUserInput={this.props.onEditField}
-              value={this.state.formData.options.choices[key].name}
+              value={this.props.formData.choices[key].name}
             />
           </div>
           <div style={{marginRight: '17px'}}>
@@ -73,7 +73,7 @@ class AddListItemForm extends Component {
               name={'value_'+key}
               label='Value'
               onUserInput={this.props.onEditField}
-              value={this.state.formData.options.choices[key].value}
+              value={this.props.formData.choices[key].value}
             />
           </div>
           <ButtonElement
@@ -128,25 +128,25 @@ class AddListItemForm extends Component {
         <TextboxElement
           name='itemID'
           label='Item ID'
-          value={this.state.formData.itemID}
+          value={this.props.formData.itemID}
           onUserInput={this.props.onEditField}
           required={true}
         />
         <StaticElement
           label='UI type'
-          text={this.state.uiType[this.props.uiType]}
+          text={this.state.uiType[this.props.formData.uiType]}
         />
         <TextboxElement
           name='question'
           label='Question text'
-          value={this.state.formData.question}
+          value={this.props.formData.question}
           onUserInput={this.props.onEditField}
           required={true}
         />
         <TextboxElement
           name='description'
           label='Description'
-          value={this.state.formData.description}
+          value={this.props.formData.description}
           onUserInput={this.props.onEditField}
         />
         <StaticElement
@@ -156,26 +156,26 @@ class AddListItemForm extends Component {
         <CheckboxElement
           name='multipleChoice'
           label='Allow multiple values'
-          value={this.state.formData.options.multipleChoice}
-          onUserInput={this.setCheckbox}
+          value={''}
+          // onUserInput={}
         />
         <TextboxElement
           name='branching'
           label='Branching formula'
-          value={this.state.formData.rules.branching}
-          onUserInput={this.setRules}
+          value={''}
+          // onUserInput={}
         />
         <TextboxElement
           name='scoring'
           label='Scoring formula'
-          value={this.state.formData.rules.scoring}
-          onUserInput={this.setRules}
+          value={''}
+          // onUserInput={}
         />
         <CheckboxElement
           name='requiredValue'
           label='Required item'
-          value={this.state.formData.options.requiredValue}
-          onUserInput={this.setCheckbox}
+          value={false}
+          // onUserInput={}
         />
         {addButton}
       </FormElement>
@@ -188,7 +188,6 @@ AddListItemForm.propTypes = {
   uiType: PropTypes.string.isRequired, // i.e. whether it is "select" or "radio"
   formData: PropTypes.object,
   onSave: PropTypes.func, // a call-back function defined in parent class that will be triggered when called in this class,
-  choices: PropTypes.array,
   mode: PropTypes.string,
   onEditField: PropTypes.func,
   addChoices: PropTypes.func,
