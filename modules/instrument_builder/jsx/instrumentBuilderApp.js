@@ -105,6 +105,9 @@ class InstrumentBuilderApp extends Component {
       case 'question':
         formData.fields[currentField]['http://schema.org/question'][0]['@value'] = value;
         break;
+      case 'multipleChoice':
+         formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/multipleChoice'][0]['@value'] = value;
+        break;
       default:
         if (elementName.includes('name')) {
           const index = elementName.substring(elementName.indexOf('_')+1);
@@ -279,6 +282,8 @@ class InstrumentBuilderApp extends Component {
       alignItems: 'stretch',
       background: '#FCFCFC',
     };
+
+    // Setup variables for toolbar component
     let profile = {};
     if (this.state.formData.schema['http://www.w3.org/2004/02/skos/core#altLabel'] && this.state.formData.schema['http://www.w3.org/2004/02/skos/core#prefLabel']) {
       profile = {
@@ -286,6 +291,8 @@ class InstrumentBuilderApp extends Component {
         fullName: this.state.formData.schema['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'],
       };
     }
+
+    // Setup variables for canvas component
     let pages = [];
     if ((this.state.formData['pages']).length == 0) {
       pages.push({
@@ -303,9 +310,12 @@ class InstrumentBuilderApp extends Component {
     } else {
       pages = [...this.state.formData.pages];
     }
+
+    // Setup variables for drawer component
     let field = {};
     if (this.state.selectedField != null) {
       const currentField = this.state.selectedField;
+      // Define choices
       let choices = [];
       if ((this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
         choices = this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'].map((valueConstraint, index) => {
@@ -315,12 +325,22 @@ class InstrumentBuilderApp extends Component {
           });
         });
       }
+      // Define multiplechoice boolean
+      let multipleChoice = null;
+      if ((this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.repronim.org/multipleChoice')) {
+        multipleChoice = this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/multipleChoice'][0]['@value'];
+      }
+      // Define branching logic string
+      // Find visibility array index where '@index' = currentField's altLabel
+      // Create field object to pass as prop to edit drawer component
       field = {
         itemID: this.state.formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'],
         inputType: this.state.formData.fields[currentField]['https://schema.repronim.org/inputType'][0]['@value'],
         description: this.state.formData.fields[currentField]['http://schema.org/description'][0]['@value'],
         question: this.state.formData.fields[currentField]['http://schema.org/question'][0]['@value'],
         choices: choices,
+        multipleChoice: multipleChoice,
+        branching: this.state.formData.schema['https://schema.repronim.org/visibility']
       };
     }
     return (

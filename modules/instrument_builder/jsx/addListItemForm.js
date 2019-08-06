@@ -10,22 +10,6 @@ class AddListItemForm extends Component {
 
     // Define component's states
     this.state = {
-      // formData: { // the object in which the form's data on user input is stored
-      //   itemID: this.props.formData.itemID || '',
-      //   uiType: this.props.formData.inputType,
-      //   question: this.props.formData.question || '',
-      //   description: this.props.formData.description || '',
-      //   selectedType: null,
-      //   options: {
-      //     choices: this.props.formData.choices || [{name: '', value: ''}],
-      //     multipleChoice: false,
-      //     requiredValue: false,
-      //   },
-      //   rules: {
-      //     branching: '',
-      //     scoring: '',
-      //   },
-      // },
       uiType: { // options for UI type given this.props.uiType
         select: 'Select',
         radio: 'Radio',
@@ -33,20 +17,12 @@ class AddListItemForm extends Component {
     };
 
     // Bind all methods to `this` (except for render method)
-    // this.setCheckbox = this.setCheckbox.bind(this);
     // this.setRules = this.setRules.bind(this);
     this.renderFieldOptions = this.renderFieldOptions.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   // Create custom methods ..
-
-  // Sets this.state.formData on user input for checkbox elements
-  // setCheckbox(elementName, value) {
-  //   let formData = Object.assign({}, this.state.formData);
-  //   formData.options[elementName] = value;
-  //   this.setState({formData});
-  // }
 
   // Sets this.state.formData on user input for branching/scoring formula text element
   // setRules(elementName, value) {
@@ -134,7 +110,7 @@ class AddListItemForm extends Component {
         />
         <StaticElement
           label='UI type'
-          text={this.state.uiType[this.props.formData.uiType]}
+          text={this.state.uiType[this.props.formData.inputType]}
         />
         <TextboxElement
           name='question'
@@ -156,8 +132,8 @@ class AddListItemForm extends Component {
         <CheckboxElement
           name='multipleChoice'
           label='Allow multiple values'
-          value={''}
-          // onUserInput={}
+          value={this.props.formData.multipleChoice}
+          onUserInput={this.props.onEditField}
         />
         <TextboxElement
           name='branching'
