@@ -32,7 +32,6 @@ class Toolbar extends Component {
     this.updateFilter = this.updateFilter.bind(this);
     this.isFiltered = this.isFiltered.bind(this);
     this.onDragStart = this.onDragStart.bind(this);
-    this.onDragEnd = this.onDragEnd.bind(this);
   }
 
   componentDidMount() {
@@ -137,11 +136,8 @@ class Toolbar extends Component {
   onDragStart(e) {
     e.dataTransfer.effectAllowed = 'move';
     // Firefox requires dataTransfer data to be set
+    console.log(e.target.id);
     e.dataTransfer.setData('text/plain', e.target.id);
-  }
-
-  onDragEnd(e) {
-    // show form modal for attributes
   }
 
   render() {

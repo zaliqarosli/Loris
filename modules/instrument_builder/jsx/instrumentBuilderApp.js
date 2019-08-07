@@ -30,7 +30,7 @@ class InstrumentBuilderApp extends Component {
       schemaURI: this.props.schemaURI,
       selectedField: null,
       selectedFieldType: null,
-      selectedPage: null,
+      selectedDropLocation: null,
       showModal: false,
       openDrawer: false,
     };
@@ -43,7 +43,7 @@ class InstrumentBuilderApp extends Component {
     this.showDrawer = this.showDrawer.bind(this);
     this.renderModal = this.renderModal.bind(this);
     this.onDropFieldType = this.onDropFieldType.bind(this);
-    this.reIndexField = this.reIndexField.bind(this);
+    // this.reIndexField = this.reIndexField.bind(this);
     this.deleteField = this.deleteField.bind(this);
     this.deletePage = this.deletePage.bind(this);
     this.addField = this.addField.bind(this);
@@ -152,6 +152,16 @@ class InstrumentBuilderApp extends Component {
 
   renderModal() {
     let addForm = null;
+    const field = {
+        itemID: '',
+        description: '',
+        question: '',
+        choices: [{name: '', value: ''}],
+        multipleChoice: false,
+        branching: '',
+        scoring: '',
+        requiredValue: false,
+    };
     switch (this.state.selectedFieldType) {
       case 'pageBreak':
         addForm = <AddPageForm onSave={this.addPage}/>;
@@ -160,10 +170,17 @@ class InstrumentBuilderApp extends Component {
 
         break;
       case 'select':
-        addForm = <AddListItemForm uiType='select' onSave={this.addItem}/>;
+        addForm = <AddListItemForm
+                    uiType='select'
+                    formData={field}
+                    onSave={this.addItem}
+                    mode='add'
+                    // onEditField={}
+                    // addChoices={this.addValueConstraints}
+                  />;
         break;
       case 'radio':
-        addForm = <AddListItemForm uiType='radio' onSave={this.addItem}/>;
+        addForm = <AddListItemForm uiType='radio' onSave={this.addItem} mode='add' />;
         break;
     }
     return (
@@ -178,23 +195,42 @@ class InstrumentBuilderApp extends Component {
   }
 
   onDropFieldType(e) {
-    const selectedPage = e.target.id;
     const selectedFieldType = e.dataTransfer.getData('text');
-    this.setState({selectedFieldType, selectedPage});
+    const selectedDropLocation = e.target.id;
+    console.log('ondrop target: ' + targetId);
+
+    // This doesn't need to be called here just yet
+    // It needs to be called once add item form is submitted
+    // const dropItemType = selectedDropLocation.substring(0, selectedDropLocation.indexOf('_'));
+    // const dropItemIndex = selectedDropLocation.substring(selectedDropLocation.indexOf('_')+1);
+    // addNewFieldTo(dropItemType, dropItemIndex);
+
+    this.setState({selectedFieldType, selectedDropLocation});
     this.openModal();
     e.dataTransfer.clearData();
   }
 
-  reIndexField(e) {
-    const targetField = e.target.id;
-    const selectedField = e.dataTransfer.getData('text');
-    let formData = Object.assign({}, this.state.formData);
-    let temp = formData.fields[selectedField];
-    formData.fields[selectedField] = formData.fields[targetField];
-    formData.fields[targetField] = temp;
-    this.setState({formData});
-    e.dataTransfer.clearData();
-  }
+  // addNewFieldTo(itemType, itemIndex) {
+  //   const formDataKey = itemType.concat('s');
+  // we want to add a new field to the order list of this.state.formData[formDataKey][itemIndex];
+  // we need to push to fields array first
+  // this function actually only needs to be called after data on add item form has been submitted
+  // }
+
+
+  // reIndexField(e) {
+  // // should actually be reindexing the order array in each parent div i.e. section/ pages.
+  // // splice(e.target.id??, 0, tempfield) insert temp field element into current index of fields array
+  //   const targetField = e.target.id;
+  //   const selectedField = e.dataTransfer.getData('text');
+  //   let formData = Object.assign({}, this.state.formData);
+  //   formData.fields.splice();
+  //   let temp = formData.fields[selectedField];
+  //   formData.fields[selectedField] = formData.fields[targetField];
+  //   formData.fields[targetField] = temp;
+  //   this.setState({formData});
+  //   e.dataTransfer.clearData();
+  // }
 
   deleteField(e) {
     const fieldKey = e.currentTarget.parentNode.id;
@@ -233,7 +269,6 @@ class InstrumentBuilderApp extends Component {
   }
 
   addField(formData) {
-    formData.onPage = this.state.selectedPage;
     pushToItems(formData);
     swal.fire('Success!', 'Item added.', 'success').then((result) => {
       if (result.value) {
@@ -264,7 +299,7 @@ class InstrumentBuilderApp extends Component {
   }
 
   selectField(e) {
-    let fieldIndex = e.currentTarget.id;
+    let fieldIndex = (e.currentTarget.id).substring((e.currentTarget.id).indexOf('_')+1);
     this.setState({
       selectedField: fieldIndex,
       openDrawer: true,
@@ -335,12 +370,11 @@ class InstrumentBuilderApp extends Component {
       // Create field object to pass as prop to edit drawer component
       field = {
         itemID: this.state.formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'],
-        inputType: this.state.formData.fields[currentField]['https://schema.repronim.org/inputType'][0]['@value'],
         description: this.state.formData.fields[currentField]['http://schema.org/description'][0]['@value'],
         question: this.state.formData.fields[currentField]['http://schema.org/question'][0]['@value'],
         choices: choices,
         multipleChoice: multipleChoice,
-        branching: this.state.formData.schema['https://schema.repronim.org/visibility']
+        branching: this.state.formData.schema['https://schema.repronim.org/visibility'],
       };
     }
     return (
@@ -359,7 +393,7 @@ class InstrumentBuilderApp extends Component {
             sections={this.state.formData.sections}
             tables={this.state.formData.tables}
             onDropFieldType={this.onDropFieldType}
-            reIndexField={this.reIndexField}
+            // reIndexField={this.reIndexField}
             deletePage={this.deletePage}
             deleteField={this.deleteField}
             selectField={this.selectField}

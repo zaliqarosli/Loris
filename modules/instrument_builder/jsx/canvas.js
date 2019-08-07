@@ -5,8 +5,9 @@ class Canvas extends Component {
   constructor(props) {
     super(props);
 
+    this.getPlaceholder = this.getPlaceholder.bind(this);
     this.onDragOver = this.onDragOver.bind(this);
-    this.onDragStart = this.onDragStart.bind(this);
+    // this.onDragStart = this.onDragStart.bind(this);
     this.renderField = this.renderField.bind(this);
     this.renderMultipart = this.renderMultipart.bind(this);
     this.renderSection = this.renderSection.bind(this);
@@ -15,8 +16,33 @@ class Canvas extends Component {
     this.renderPages = this.renderPages.bind(this);
   }
 
+  getPlaceholder() {
+    if (!this.placeholder) {
+      let placeholder = document.createElement('div');
+      placeholder.className = 'placeholder';
+      this.placeholder = placeholder;
+    }
+    return this.placeholder;
+  }
+
   onDragOver(e) {
     e.preventDefault();
+    let dropLocation = e.target;
+    if (dropLocation.className === 'placeholder') {
+      return;
+    }
+    this.over = dropLocation;
+    let relY = e.pageY - $(this.over).offset().top;
+    let height = this.over.offsetHeight / 2;
+    let parent = dropLocation.parentNode;
+
+    if (relY >= height) {
+      this.nodePlacement = 'after';
+      parent.insertBefore(this.getPlaceholder(), dropLocation.nextElementSibling);
+    } else {
+      this.nodePlace = 'before';
+      parent.insertBefore(this.getPlaceholder(), dropLocation);
+    }
   }
 
   renderField(fieldIndex) {
@@ -106,14 +132,14 @@ class Canvas extends Component {
     }
     return (
       <div
-        className="fields"
+        className="items"
         key={fieldIndex}
-        id={fieldIndex}
+        id={'field_'+fieldIndex}
         style={itemStyle}
-        draggable={true}
-        onDragStart={this.onDragStart}
-        onDragEnter={this.props.reIndexField}
-        onDragOver={this.onDragOver}
+        // draggable={true}
+        // onDragStart={this.onDragStart}
+        // onDragEnter={this.props.reIndexField}
+        // onDragOver={this.onDragOverField}
         onClick={this.props.selectField}
       >
         <span>
@@ -135,11 +161,11 @@ class Canvas extends Component {
     );
   }
 
-  onDragStart(e) {
-    e.dataTransfer.effectAllowed = 'move';
-    // Firefox requires dataTransfer data to be set
-    e.dataTransfer.setData('text/plain', e.target.id);
-  }
+  // onDragStart(e) {
+  //   e.dataTransfer.effectAllowed = 'move';
+  //   // Firefox requires dataTransfer data to be set
+  //   e.dataTransfer.setData('text/plain', e.target.id);
+  // }
 
   renderMultipart(multipartIndex) {
     // what we essentially want is an array of items in this multipart
@@ -177,7 +203,14 @@ class Canvas extends Component {
       }
     });
     return (
-      <div key={'multipart'+multipartIndex}>
+      <div
+        key={multipartIndex}
+        id={'multipart_'+multipartIndex}
+        className="items"
+        onDragOver={this.onDragOver}
+        onDragEnter={this.onDragEnter}
+        onDragLeave={this.onDragLeave}
+      >
         <h3>Multipart</h3>
         {rendered}
       </div>
@@ -218,7 +251,15 @@ class Canvas extends Component {
       }
     });
     return (
-      <div key={'section'+sectionIndex}>
+      <div
+        key={sectionIndex}
+        id={'section_'+sectionIndex}
+        className="items"
+        style={{margin: '10px 0px'}}
+        onDragOver={this.onDragOver}
+        onDragEnter={this.onDragEnter}
+        onDragLeave={this.onDragLeave}
+      >
         <h2 style={{margin: '15px'}}>{title}</h2>
         {rendered}
       </div>
@@ -242,9 +283,11 @@ class Canvas extends Component {
         this.props[type].forEach((searchItemSchema, searchIndex) => {
           // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
           // Need to add .jsonld back in to searchItemSchema.id
-          const correctedURI = searchItemSchema['@id'].concat('.jsonld');
-          if (id == correctedURI) {
-            items[searchIndex] = searchItemSchema;
+          if (searchItemSchema.hasOwnProperty('@id')) {
+            const correctedURI = searchItemSchema['@id'].concat('.jsonld');
+            if (id == correctedURI) {
+              items[searchIndex] = searchItemSchema;
+            }
           }
         });
       });
@@ -268,20 +311,20 @@ class Canvas extends Component {
   }
 
   renderPages() {
+    const pageStyle = {
+      background: 'white',
+      boxShadow: '0px -1px 4px 2px rgba(0,0,0,0.175)',
+      margin: '20px 30px 0 30px',
+      padding: '20px',
+      flex: '1',
+      width: '612px',
+      minHeight: '792px',
+      alignSelf: 'center',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'visible',
+    };
     return this.props.pages.map((page, index) => {
-      const pageStyle = {
-        background: 'white',
-        boxShadow: '0px -1px 4px 2px rgba(0,0,0,0.175)',
-        margin: '20px 30px 0 30px',
-        padding: '20px',
-        flex: '1',
-        width: '612px',
-        minHeight: '792px',
-        alignSelf: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'visible',
-      };
       const deleteBtnStyle = {
         float: 'right',
         background: 'transparent',
@@ -292,10 +335,12 @@ class Canvas extends Component {
         <div
           className="pages"
           key={index}
-          id={index}
+          id={'page_'+index}
           style={pageStyle}
           onDragOver={this.onDragOver}
           onDrop={this.props.onDropFieldType}
+          onDragEnter={this.onDragEnter}
+          onDragLeave={this.onDragLeave}
         >
           <span>
             <button
@@ -343,7 +388,7 @@ Canvas.propTypes = {
   sections: PropTypes.array,
   tables: PropTypes.array,
   onDropFieldType: PropTypes.func.isRequired,
-  reIndexField: PropTypes.func.isRequired,
+  // reIndexField: PropTypes.func.isRequired,
   deletePage: PropTypes.func.isRequired,
   deleteField: PropTypes.func.isRequired,
   selectField: PropTypes.func.isRequired,

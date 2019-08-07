@@ -18,9 +18,18 @@
     display: block;
 }
 
-.fields {
+.items {
     border: 1px dashed #C3D5DB;
 }
-.fields:hover {
+.items:hover {
     border: 1px dashed #246EB6;
+}
+
+.placeholder {
+    border-radius: 2px;
+    border: 1px dashed #C3D5DB;
+    background: transparent;
+    padding: 10px;
+    margin: 15px;
+    color: #333;
 }

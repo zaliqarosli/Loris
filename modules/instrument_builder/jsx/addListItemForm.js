@@ -110,7 +110,7 @@ class AddListItemForm extends Component {
         />
         <StaticElement
           label='UI type'
-          text={this.state.uiType[this.props.formData.inputType]}
+          text={this.state.uiType[this.props.uiType]}
         />
         <TextboxElement
           name='question'
