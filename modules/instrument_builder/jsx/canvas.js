@@ -8,6 +8,7 @@ class Canvas extends Component {
     this.getPlaceholder = this.getPlaceholder.bind(this);
     this.onDragOver = this.onDragOver.bind(this);
     // this.onDragStart = this.onDragStart.bind(this);
+    // this.onDragEnd = this.onDragEnd.bind(this);
     this.renderField = this.renderField.bind(this);
     this.renderMultipart = this.renderMultipart.bind(this);
     this.renderSection = this.renderSection.bind(this);
@@ -148,9 +149,10 @@ class Canvas extends Component {
         key={fieldIndex}
         id={'field_'+fieldIndex}
         style={itemStyle}
-        // draggable={true}
+        draggable={true}
         // onDragStart={this.onDragStart}
-        // onDragOver={this.onDragOverField}
+        // onDrag
+        onDragOver={this.onDragOver}
         onClick={this.props.selectField}
       >
         <span>
@@ -176,6 +178,10 @@ class Canvas extends Component {
   //   e.dataTransfer.effectAllowed = 'move';
   //   // Firefox requires dataTransfer data to be set
   //   e.dataTransfer.setData('text/plain', e.target.id);
+  // }
+
+  // onDragEnd(e) {
+
   // }
 
   renderMultipart(multipartIndex) {
