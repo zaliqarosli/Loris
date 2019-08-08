@@ -32,6 +32,7 @@ class Toolbar extends Component {
     this.updateFilter = this.updateFilter.bind(this);
     this.isFiltered = this.isFiltered.bind(this);
     this.onDragStart = this.onDragStart.bind(this);
+    this.onDragEnd = this.onDragEnd.bind(this);
   }
 
   componentDidMount() {
@@ -109,7 +110,6 @@ class Toolbar extends Component {
     const chipStyle = {
       border: '1px solid #CCC',
       borderRadius: '20px',
-      background: '#F3F3F3',
       padding: '5px',
       margin: '2px',
       color: '#064785',
@@ -125,6 +125,7 @@ class Toolbar extends Component {
             style={chipStyle}
             draggable={true}
             onDragStart={this.onDragStart}
+            onDragEnd={this.onDragEnd}
           >
             <label>{fieldType.label}</label>
           </div>
@@ -138,6 +139,13 @@ class Toolbar extends Component {
     // Firefox requires dataTransfer data to be set
     console.log(e.target.id);
     e.dataTransfer.setData('text/plain', e.target.id);
+  }
+
+  onDragEnd(e) {
+    let placeholder = document.getElementById('placeholder');
+    if (placeholder != null) {
+      placeholder.remove();
+    }
   }
 
   render() {

@@ -180,7 +180,12 @@ class InstrumentBuilderApp extends Component {
                   />;
         break;
       case 'radio':
-        addForm = <AddListItemForm uiType='radio' onSave={this.addItem} mode='add' />;
+        addForm = <AddListItemForm
+                    uiType='radio'
+                    formData={field}
+                    onSave={this.addItem}
+                    mode='add'
+                  />;
         break;
     }
     return (
@@ -197,7 +202,7 @@ class InstrumentBuilderApp extends Component {
   onDropFieldType(e) {
     const selectedFieldType = e.dataTransfer.getData('text');
     const selectedDropLocation = e.target.id;
-    console.log('ondrop target: ' + targetId);
+    console.log('ondrop target: ' + selectedDropLocation);
 
     // This doesn't need to be called here just yet
     // It needs to be called once add item form is submitted

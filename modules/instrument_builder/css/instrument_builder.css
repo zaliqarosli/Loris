@@ -25,11 +25,23 @@
     border: 1px dashed #246EB6;
 }
 
-.placeholder {
+.placeholder-field {
     border-radius: 2px;
     border: 1px dashed #C3D5DB;
     background: transparent;
     padding: 10px;
     margin: 15px;
     color: #333;
+    min-height: 20%;
 }
+
+.placeholder-section {
+    border-radius: 2px;
+    border: 1px dashed #C3D5DB;
+    background: transparent;
+    padding: 10px 0px;
+    margin: 15px;
+    color: #333;
+    min-height: 20%;
+}
+

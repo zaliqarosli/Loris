@@ -19,7 +19,14 @@ class Canvas extends Component {
   getPlaceholder() {
     if (!this.placeholder) {
       let placeholder = document.createElement('div');
-      placeholder.className = 'placeholder';
+      placeholder.className = 'placeholder-field';
+      placeholder.id = 'placeholder';
+      placeholder.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+      placeholder.addEventListener('drop', (e) => {
+        this.props.onDropFieldType(e);
+      });
       this.placeholder = placeholder;
     }
     return this.placeholder;
@@ -28,20 +35,25 @@ class Canvas extends Component {
   onDragOver(e) {
     e.preventDefault();
     let dropLocation = e.target;
-    if (dropLocation.className === 'placeholder') {
-      return;
-    }
-    this.over = dropLocation;
-    let relY = e.pageY - $(this.over).offset().top;
-    let height = this.over.offsetHeight / 2;
-    let parent = dropLocation.parentNode;
+    if (dropLocation.id != '') {
+      console.log('target: ' + e.target.id);
+      if (dropLocation.className === 'placeholder') {
+        return;
+      }
+      this.over = dropLocation;
+      let relY = e.pageY - $(this.over).offset().top;
+      let height = this.over.offsetHeight / 2;
+      let parent = dropLocation.parentNode;
 
-    if (relY >= height) {
-      this.nodePlacement = 'after';
-      parent.insertBefore(this.getPlaceholder(), dropLocation.nextElementSibling);
+      if (relY >= height) {
+        this.nodePlacement = 'after';
+        parent.insertBefore(this.getPlaceholder(), dropLocation.nextElementSibling);
+      } else {
+        this.nodePlace = 'before';
+        parent.insertBefore(this.getPlaceholder(), dropLocation);
+      }
     } else {
-      this.nodePlace = 'before';
-      parent.insertBefore(this.getPlaceholder(), dropLocation);
+      return;
     }
   }
 
@@ -138,7 +150,6 @@ class Canvas extends Component {
         style={itemStyle}
         // draggable={true}
         // onDragStart={this.onDragStart}
-        // onDragEnter={this.props.reIndexField}
         // onDragOver={this.onDragOverField}
         onClick={this.props.selectField}
       >
@@ -208,8 +219,6 @@ class Canvas extends Component {
         id={'multipart_'+multipartIndex}
         className="items"
         onDragOver={this.onDragOver}
-        onDragEnter={this.onDragEnter}
-        onDragLeave={this.onDragLeave}
       >
         <h3>Multipart</h3>
         {rendered}
@@ -257,8 +266,6 @@ class Canvas extends Component {
         className="items"
         style={{margin: '10px 0px'}}
         onDragOver={this.onDragOver}
-        onDragEnter={this.onDragEnter}
-        onDragLeave={this.onDragLeave}
       >
         <h2 style={{margin: '15px'}}>{title}</h2>
         {rendered}
@@ -337,10 +344,6 @@ class Canvas extends Component {
           key={index}
           id={'page_'+index}
           style={pageStyle}
-          onDragOver={this.onDragOver}
-          onDrop={this.props.onDropFieldType}
-          onDragEnter={this.onDragEnter}
-          onDragLeave={this.onDragLeave}
         >
           <span>
             <button
