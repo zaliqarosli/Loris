@@ -7,8 +7,8 @@ class Canvas extends Component {
 
     this.getPlaceholder = this.getPlaceholder.bind(this);
     this.onDragOver = this.onDragOver.bind(this);
-    // this.onDragStart = this.onDragStart.bind(this);
-    // this.onDragEnd = this.onDragEnd.bind(this);
+    this.onDragStart = this.onDragStart.bind(this);
+    this.onDragEnd = this.onDragEnd.bind(this);
     this.renderField = this.renderField.bind(this);
     this.renderMultipart = this.renderMultipart.bind(this);
     this.renderSection = this.renderSection.bind(this);
@@ -37,7 +37,6 @@ class Canvas extends Component {
     e.preventDefault();
     let dropLocation = e.target;
     if (dropLocation.id != '') {
-      console.log('target: ' + e.target.id);
       if (dropLocation.className === 'placeholder') {
         return;
       }
@@ -150,8 +149,8 @@ class Canvas extends Component {
         id={'field_'+fieldIndex}
         style={itemStyle}
         draggable={true}
-        // onDragStart={this.onDragStart}
-        // onDrag
+        onDragStart={this.onDragStart}
+        onDragEnd={this.onDragEnd}
         onDragOver={this.onDragOver}
         onClick={this.props.selectField}
       >
@@ -174,15 +173,17 @@ class Canvas extends Component {
     );
   }
 
-  // onDragStart(e) {
-  //   e.dataTransfer.effectAllowed = 'move';
-  //   // Firefox requires dataTransfer data to be set
-  //   e.dataTransfer.setData('text/plain', e.target.id);
-  // }
+  onDragStart(e) {
+    e.dataTransfer.effectAllowed = 'move';
+    // Firefox requires dataTransfer data to be set
+    e.dataTransfer.setData('text/plain', e.target.id);
+  }
 
-  // onDragEnd(e) {
-
-  // }
+  onDragEnd(e) {
+  // remove placeholder node
+  // update data
+  // do the whole splice thing
+  }
 
   renderMultipart(multipartIndex) {
     // what we essentially want is an array of items in this multipart

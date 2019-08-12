@@ -26,13 +26,23 @@ class InstrumentBuilderApp extends Component {
         sections: [],
         tables: [],
       },
-      // schemaData: {},
       schemaURI: this.props.schemaURI,
       selectedField: null,
       selectedFieldType: null,
-      selectedDropLocation: null,
+      prevItem: null,
+      nextItem: null,
       showModal: false,
       openDrawer: false,
+      newField: {
+        itemID: '',
+        description: '',
+        question: '',
+        choices: [{name: '', value: ''}],
+        multipleChoice: false,
+        branching: '',
+        scoring: '',
+        requiredValue: false,
+      },
     };
     this.mapKeysToAlias = this.mapKeysToAlias.bind(this);
     this.updateProfile = this.updateProfile.bind(this);
@@ -44,9 +54,9 @@ class InstrumentBuilderApp extends Component {
     this.renderModal = this.renderModal.bind(this);
     this.onDropFieldType = this.onDropFieldType.bind(this);
     // this.reIndexField = this.reIndexField.bind(this);
-    this.deleteField = this.deleteField.bind(this);
+    this.deleteItem = this.deleteItem.bind(this);
     this.deletePage = this.deletePage.bind(this);
-    this.addField = this.addField.bind(this);
+    this.addItem = this.addItem.bind(this);
     this.addPage = this.addPage.bind(this);
     this.pushToFields = this.pushToFields.bind(this);
     this.pushToPages = this.pushToPages.bind(this);
@@ -142,7 +152,17 @@ class InstrumentBuilderApp extends Component {
   }
 
   closeModal() {
-    this.setState({showModal: false});
+    const newField = {
+      itemID: '',
+      description: '',
+      question: '',
+      choices: [{name: '', value: ''}],
+      multipleChoice: false,
+      branching: '',
+      scoring: '',
+      requiredValue: false,
+    };
+    this.setState({showModal: false, newField});
   }
 
   showDrawer(e) {
@@ -150,17 +170,25 @@ class InstrumentBuilderApp extends Component {
     this.setState({openDrawer});
   }
 
+
   renderModal() {
     let addForm = null;
-    const field = {
-        itemID: '',
-        description: '',
-        question: '',
-        choices: [{name: '', value: ''}],
-        multipleChoice: false,
-        branching: '',
-        scoring: '',
-        requiredValue: false,
+    const addValueConstraint = () => {
+      let newField = Object.assign({}, this.state.newField);
+      const newValueConstraint = {name: '', value: ''};
+      newField.choices.push(newValueConstraint);
+      this.setState({newField});
+    };
+    const editField = (elementName, value) => {
+      let newField = Object.assign({}, this.state.newField);
+      if (elementName.includes('name') || elementName.includes('value')) {
+        const index = elementName.substring(elementName.indexOf('_')+1);
+        const name = elementName.substring(0, elementName.indexOf('_'));
+        newField.choices[index][name] = value;
+      } else {
+        newField[elementName] = value;
+      }
+      this.setState({newField});
     };
     switch (this.state.selectedFieldType) {
       case 'pageBreak':
@@ -171,20 +199,22 @@ class InstrumentBuilderApp extends Component {
         break;
       case 'select':
         addForm = <AddListItemForm
-                    uiType='select'
-                    formData={field}
-                    onSave={this.addItem}
                     mode='add'
-                    // onEditField={}
-                    // addChoices={this.addValueConstraints}
+                    uiType='select'
+                    formData={this.state.newField}
+                    onSave={this.addItem}
+                    onEditField={editField}
+                    addChoices={addValueConstraint}
                   />;
         break;
       case 'radio':
         addForm = <AddListItemForm
-                    uiType='radio'
-                    formData={field}
-                    onSave={this.addItem}
                     mode='add'
+                    uiType='radio'
+                    formData={this.state.newField}
+                    onSave={this.addItem}
+                    onEditField={editField}
+                    addChoices={addValueConstraint}
                   />;
         break;
     }
@@ -193,6 +223,7 @@ class InstrumentBuilderApp extends Component {
         title='Add Field'
         onClose={this.closeModal}
         show={this.state.showModal}
+        throwWarning={true}
       >
         {addForm}
       </Modal>
@@ -201,16 +232,18 @@ class InstrumentBuilderApp extends Component {
 
   onDropFieldType(e) {
     const selectedFieldType = e.dataTransfer.getData('text');
-    const selectedDropLocation = e.target.id;
-    console.log('ondrop target: ' + selectedDropLocation);
-
-    // This doesn't need to be called here just yet
-    // It needs to be called once add item form is submitted
-    // const dropItemType = selectedDropLocation.substring(0, selectedDropLocation.indexOf('_'));
-    // const dropItemIndex = selectedDropLocation.substring(selectedDropLocation.indexOf('_')+1);
-    // addNewFieldTo(dropItemType, dropItemIndex);
-
-    this.setState({selectedFieldType, selectedDropLocation});
+    const placeholder = e.target;
+    const prevSibling = placeholder.previousElementSibling;
+    const nextSibling = placeholder.nextElementSibling;
+    let prevItem = null;
+    let nextItem = null;
+    if (prevSibling != null) {
+      prevItem = prevSibling.id;
+    }
+    if (nextSibling != null) {
+      nextItem = nextSibling.id;
+    }
+    this.setState({selectedFieldType, prevItem, nextItem});
     this.openModal();
     e.dataTransfer.clearData();
   }
@@ -237,7 +270,7 @@ class InstrumentBuilderApp extends Component {
   //   e.dataTransfer.clearData();
   // }
 
-  deleteField(e) {
+  deleteItem(e) {
     const fieldKey = e.currentTarget.parentNode.id;
     let formData = Object.assign({}, this.state.formData);
     swal.fire({
@@ -273,12 +306,92 @@ class InstrumentBuilderApp extends Component {
     });
   }
 
-  addField(formData) {
-    pushToItems(formData);
-    swal.fire('Success!', 'Item added.', 'success').then((result) => {
-      if (result.value) {
-        this.closeModal();
+  addItem(e) {
+    let formData = Object.assign({}, this.state.formData);
+    const valueConstraints = this.state.newField.choices.map((choice, index) => {
+      return {
+        'http://schema.org/name': [{
+          '@language': 'en',
+          '@value': choice.name,
+        }],
+        'http://schema.org/value': [{
+          '@language': 'en',
+          '@value': choice.value,
+        }],
+      };
+    });
+    let field = {
+      '@id': this.state.newField.itemID,
+      '@type': [],
+      'http://schema.org/description': [{
+        '@language': 'en',
+        '@value': this.state.newField.description,
+      }],
+      'http://schema.org/question': [{
+        '@language': 'en',
+        '@value': this.state.newField.question,
+      }],
+      'http://www.w3.org/2004/02/skos/core#altLabel': [{
+        '@language': 'en',
+        '@value': this.state.newField.itemID,
+      }],
+      'http://www.w3.org/2004/02/skos/core#prefLabel': [{
+        '@language': 'en',
+        '@value': this.state.newField.description,
+      }],
+      'https://schema.repronim.org/inputType': [{
+        '@type': 'http://www.w3.org/2001/XMLSchema#string',
+        '@value': this.state.selectedFieldType,
+      }],
+      'https://schema.repronim.org/valueconstraints': [{
+        'http://schema.org/itemListElement': [{
+          '@list': valueConstraints,
+        }],
+      }],
+      'http://schema.repronim.org/multipleChoice': [{
+        '@type': 'http://schema.org/Boolean',
+        '@value': this.state.newField.multipleChoice,
+      }],
+    };
+    formData.fields.push(field);
+
+    // Add new item to parent's order list
+    const parentContainer = (document.getElementById(this.state.prevItem)).parentNode || (document.getElementById(this.state.nextItem)).parentNode;
+    const parentItem = (parentContainer.id).split('_');
+    const siblings = [this.state.prevItem, this.state.nextItem];
+    const siblingsID = siblings.map((sibling, key) => {
+      const split = sibling.split('_');
+      const type = split[0].concat('s');
+      const index = split[1];
+      return (formData[type][index]['@id']).concat('.jsonld');
+    });
+
+    // for each '@id' of this.state.prevItem/nextItem
+    // return location in parent of ids
+    const parentType = parentItem[0].concat('s');
+    const parentIndex = parentItem[1];
+    const order = (formData[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).map((item, index) => {
+      if (siblingsID.includes(item['@id'])) {
+        return index;
       }
+    });
+    if ((order[0]+1 == order[1]) || order[0] == undefined) {
+      (formData[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(order[1], 0, {
+        '@id': (this.state.newField.itemID).concat('.jsonld'),
+      });
+    } else if (order[1] == undefined) {
+      (formData[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).push({
+        '@id': (this.state.newField.itemID).concat('.jsonld'),
+      });
+    } else {
+      swal.fire('Error.', 'Error indexing and adding new item.', 'error');
+    }
+    this.setState({formData}, () => {
+      swal.fire('Success!', 'Item added.', 'success').then((result) => {
+        if (result.value) {
+          this.closeModal();
+        }
+      });
     });
   }
 
@@ -353,6 +466,7 @@ class InstrumentBuilderApp extends Component {
 
     // Setup variables for drawer component
     let field = {};
+    let inputType = null;
     if (this.state.selectedField != null) {
       const currentField = this.state.selectedField;
       // Define choices
@@ -381,6 +495,7 @@ class InstrumentBuilderApp extends Component {
         multipleChoice: multipleChoice,
         branching: this.state.formData.schema['https://schema.repronim.org/visibility'],
       };
+      inputType = this.state.formData.fields[currentField]['https://schema.repronim.org/inputType'][0]['@value'];
     }
     return (
       <div>
@@ -400,13 +515,14 @@ class InstrumentBuilderApp extends Component {
             onDropFieldType={this.onDropFieldType}
             // reIndexField={this.reIndexField}
             deletePage={this.deletePage}
-            deleteField={this.deleteField}
+            deleteField={this.deleteItem}
             selectField={this.selectField}
           >
           </Canvas>
           <EditDrawer
             open={this.state.openDrawer}
             showDrawer={this.showDrawer}
+            inputType={inputType}
             field={field}
             onEditField={this.editFormData}
             addChoices={this.addValueConstraints}

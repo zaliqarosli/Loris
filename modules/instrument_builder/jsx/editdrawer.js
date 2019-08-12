@@ -28,7 +28,7 @@ class EditDrawer extends Component {
     let editForm = null;
     let inputType = null;
     if (Object.keys(this.props.field).length != 0) {
-      inputType = this.props.field.inputType;
+      inputType = this.props.inputType;
     }
     // const choices = this.getChoicesFromValueConstraints();
     switch (inputType) {
