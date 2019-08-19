@@ -360,10 +360,14 @@ class InstrumentBuilderApp extends Component {
     const parentItem = (parentContainer.id).split('_');
     const siblings = [this.state.prevItem, this.state.nextItem];
     const siblingsID = siblings.map((sibling, key) => {
-      const split = sibling.split('_');
-      const type = split[0].concat('s');
-      const index = split[1];
-      return (formData[type][index]['@id']).concat('.jsonld');
+      if (sibling != null) {
+        const split = sibling.split('_');
+        const type = split[0].concat('s');
+        const index = split[1];
+        return (formData[type][index]['@id']).concat('.jsonld');
+      } else {
+        return null;
+      }
     });
 
     // for each '@id' of this.state.prevItem/nextItem
