@@ -40,7 +40,6 @@ class InstrumentBuilderApp extends Component {
         choices: [{name: '', value: ''}],
         multipleChoice: false,
         branching: '',
-        scoring: '',
         requiredValue: false,
       },
     };
@@ -118,6 +117,9 @@ class InstrumentBuilderApp extends Component {
       case 'multipleChoice':
          formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/multipleChoice'][0]['@value'] = value;
         break;
+      case 'branching':
+        formData.schema['https://schema.repronim.org/visibility'][currentField]['@value'] = value;
+        break;
       default:
         if (elementName.includes('name')) {
           const index = elementName.substring(elementName.indexOf('_')+1);
@@ -159,7 +161,6 @@ class InstrumentBuilderApp extends Component {
       choices: [{name: '', value: ''}],
       multipleChoice: false,
       branching: '',
-      scoring: '',
       requiredValue: false,
     };
     this.setState({showModal: false, newField});
@@ -490,14 +491,21 @@ class InstrumentBuilderApp extends Component {
       }
       // Define branching logic string
       // Find visibility array index where '@index' = currentField's altLabel
+      const itemID = this.state.formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
+      let branching = '';
+      (this.state.formData.schema['https://schema.repronim.org/visibility']).forEach((object, index) => {
+        if (object['@index'] == itemID) {
+          branching = object['@value'];
+        }
+      });
       // Create field object to pass as prop to edit drawer component
       field = {
-        itemID: this.state.formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'],
+        itemID: itemID,
         description: this.state.formData.fields[currentField]['http://schema.org/description'][0]['@value'],
         question: this.state.formData.fields[currentField]['http://schema.org/question'][0]['@value'],
         choices: choices,
         multipleChoice: multipleChoice,
-        branching: this.state.formData.schema['https://schema.repronim.org/visibility'],
+        branching: branching,
       };
       inputType = this.state.formData.fields[currentField]['https://schema.repronim.org/inputType'][0]['@value'];
     }

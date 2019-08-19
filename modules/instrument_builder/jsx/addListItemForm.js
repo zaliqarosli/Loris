@@ -138,14 +138,8 @@ class AddListItemForm extends Component {
         <TextboxElement
           name='branching'
           label='Branching formula'
-          value={''}
-          // onUserInput={}
-        />
-        <TextboxElement
-          name='scoring'
-          label='Scoring formula'
-          value={''}
-          // onUserInput={}
+          value={this.props.formData.branching}
+          onUserInput={this.props.onEditField}
         />
         <CheckboxElement
           name='requiredValue'
