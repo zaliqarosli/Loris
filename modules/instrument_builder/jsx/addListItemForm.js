@@ -72,7 +72,7 @@ class AddListItemForm extends Component {
   // that handleSubmit calls `this.props.onSave`.
   // Passing `formData` to the prop function sends the formData up to the parent level
   handleSubmit(e) {
-    let formData = Object.assign({}, this.state.formData);
+    let formData = Object.assign({}, this.props.formData);
     this.props.onSave(formData);
   }
 
