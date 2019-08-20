@@ -102,13 +102,13 @@ class InstrumentBuilderApp extends Component {
 
   editFormData(elementName, value) {
     const currentField = this.state.selectedField;
+    let formData = Object.assign({}, this.state.formData);
     const itemID = formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
     const requiredValueIndex = (formData.schema['https://schema.repronim.org/required']).forEach((object, index) => {
       if (object['@index'] == itemID) {
         return index;
       }
     });
-    let formData = Object.assign({}, this.state.formData);
     switch (elementName) {
       case 'itemID':
         formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'] = value;
