@@ -517,7 +517,7 @@ class InstrumentBuilderApp extends Component {
           requiredValue = object['@value'];
         }
       });
-      
+
       // Create field object to pass as prop to edit drawer component
       field = {
         itemID: itemID,
