@@ -8,31 +8,11 @@ class AddCheckboxItemForm extends Component {
     // Pass props to parent constructor
     super(props);
 
-    // Define component's states
-    this.state = {
-      formData: {     // the object in which the form's data on user input is stored
-
-      },
-      dataType: {     // options for 'Data type' select element
-        integer: 'Integer',
-        string: 'String',
-        boolean: 'Boolean',
-      },
-    };
-
     // Bind all methods to `this` (except for render method)
-    this.setFormData = this.setFormData.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   // Create custom methods ..
-
-  // Sets this.state.formData on user input for the other remaining elements
-  setFormData(elementName, value) {
-    let formData = Object.assign({}, this.state.formData);
-    formData[elementName] = value;
-    this.setState({formData});
-  }
 
   // On clicking 'Add item', call the call-back method passed in this.props.onSave
   // This call-back method can be anything you want it to be, what's important here is 
@@ -46,6 +26,13 @@ class AddCheckboxItemForm extends Component {
   // Define render method that returns JSX/React elements
   // The render() method is the only required method in a class component
   render() {
+    const addButton = (this.props.mode=='edit') ? null : (
+      <ButtonElement
+        name='submit'
+        type='submit'
+        label='Add item'
+      />
+    );
     // Return what you want the form to look like using components from `jsx/Form.js`
     return (
       <FormElement
@@ -57,7 +44,7 @@ class AddCheckboxItemForm extends Component {
           name='itemID'
           label='Item ID'
           value={this.state.formData.itemID}
-          onUserInput={this.setFormData}
+          onUserInput={this.props.onEditField}
           required={true}
         />
         <StaticElement
@@ -67,11 +54,7 @@ class AddCheckboxItemForm extends Component {
 
         // Add missing form elements
 
-        <ButtonElement
-          name='submit'
-          type='submit'
-          label='Add item'
-        />
+        {addButton}
       </FormElement>
     );
   }
@@ -79,7 +62,10 @@ class AddCheckboxItemForm extends Component {
 
 // Define props to pass to the component when called
 AddCheckboxItemForm.propTypes = {
+  formData: PropTypes.object,
   onSave: PropTypes.func.isRequired,   // a call-back function defined in parent class that will be triggered when called in this class 
+  mode: PropTypes.string,
+  onEditField: PropTypes.func,
 };
 
 // Export component to be used in other classes
