@@ -17,19 +17,11 @@ class AddListItemForm extends Component {
     };
 
     // Bind all methods to `this` (except for render method)
-    // this.setRules = this.setRules.bind(this);
     this.renderFieldOptions = this.renderFieldOptions.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   // Create custom methods ..
-
-  // Sets this.state.formData on user input for branching/scoring formula text element
-  // setRules(elementName, value) {
-  //   let formData = Object.assign({}, this.state.formData);
-  //   formData.rules[elementName] = value;
-  //   this.setState({formData});
-  // }
 
   // Render 'Label' and 'Value' text elements and '+' button element for each object in the choices array
   renderFieldOptions() {
@@ -144,8 +136,8 @@ class AddListItemForm extends Component {
         <CheckboxElement
           name='requiredValue'
           label='Required item'
-          value={false}
-          // onUserInput={}
+          value={this.props.formData.requiredValue}
+          onUserInput={this.props.onEditField}
         />
         {addButton}
       </FormElement>

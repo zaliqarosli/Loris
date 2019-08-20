@@ -102,6 +102,12 @@ class InstrumentBuilderApp extends Component {
 
   editFormData(elementName, value) {
     const currentField = this.state.selectedField;
+    const itemID = formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
+    const requiredValueIndex = (formData.schema['https://schema.repronim.org/required']).forEach((object, index) => {
+      if (object['@index'] == itemID) {
+        return index;
+      }
+    });
     let formData = Object.assign({}, this.state.formData);
     switch (elementName) {
       case 'itemID':
@@ -119,6 +125,9 @@ class InstrumentBuilderApp extends Component {
         break;
       case 'branching':
         formData.schema['https://schema.repronim.org/visibility'][currentField]['@value'] = value;
+        break;
+      case 'requiredValue':
+        formData.schema['https://schema.repronim.org/required'][requiredValueIndex]['@value'] = value;
         break;
       default:
         if (elementName.includes('name')) {
@@ -484,11 +493,13 @@ class InstrumentBuilderApp extends Component {
           });
         });
       }
+
       // Define multiplechoice boolean
       let multipleChoice = null;
       if ((this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.repronim.org/multipleChoice')) {
         multipleChoice = this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/multipleChoice'][0]['@value'];
       }
+
       // Define branching logic string
       // Find visibility array index where '@index' = currentField's altLabel
       const itemID = this.state.formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
@@ -498,6 +509,15 @@ class InstrumentBuilderApp extends Component {
           branching = object['@value'];
         }
       });
+
+      // Define required boolean
+      let requiredValue = null;
+      (this.state.formData.schema['https://schema.repronim.org/required']).forEach((object, index) => {
+        if (object['@index'] == itemID) {
+          requiredValue = object['@value'];
+        }
+      });
+      
       // Create field object to pass as prop to edit drawer component
       field = {
         itemID: itemID,
@@ -506,6 +526,7 @@ class InstrumentBuilderApp extends Component {
         choices: choices,
         multipleChoice: multipleChoice,
         branching: branching,
+        requiredValue: requiredValue,
       };
       inputType = this.state.formData.fields[currentField]['https://schema.repronim.org/inputType'][0]['@value'];
     }
