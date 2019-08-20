@@ -18,7 +18,6 @@ class AddCheckboxItemForm extends Component {
   // This call-back method can be anything you want it to be, what's important here is 
   // that handleSubmit calls `this.props.onSave`.
   handleSubmit(e) {
-    let formData = Object.assign({}, this.props.formData);
     this.props.onSave();
   }
 
