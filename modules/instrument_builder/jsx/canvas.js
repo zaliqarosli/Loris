@@ -74,6 +74,61 @@ class Canvas extends Component {
     mapped.forEach((option, index) => {
       options[Object.keys(option)] = option[Object.keys(option)];
     });
+    const requiredValue = this.props.requiredValues[name];
+    let input = null;
+    switch (inputType) {
+      case 'radio':
+      case 'select':
+        input = <SelectElement
+                  name={name}
+                  label={question}
+                  options={options}
+                  required={requiredValue}
+                />;
+        break;
+      case 'multiselect':
+        input = <SelectElement
+                  name={name}
+                  label={question}
+                  multiple={true}
+                  options={options}
+                  required={requiredValue}
+                />;
+        break;
+      case 'text':
+        input = <TextboxElement
+                  name={name}
+                  label={question}
+                  required={requiredValue}
+                />;
+        break;
+      case 'textarea':
+        input = <TextareaElement
+                  name={name}
+                  label={question}
+                  required={requiredValue}
+                />;
+        break;
+      case 'date':
+        input = <DateElement
+                  name={name}
+                  label={question}
+                  required={requiredValue}
+                />;
+        break;
+      case 'checkbox':
+        input = <CheckboxElement
+                  name={name}
+                  label={question}
+                  required={requiredValue}
+                />;
+        break;
+      case 'static':
+        input = <StaticElement
+                  label={question}
+                />;
+        break;
+    }
     const itemStyle = {
       borderRadius: '2px',
       background: 'transparent',
@@ -92,56 +147,8 @@ class Canvas extends Component {
       float: 'right',
       background: 'transparent',
       border: 0,
-      paddingRight: 0,
+      padding: 0,
     };
-    let input = null;
-    switch (inputType) {
-      case 'radio':
-      case 'select':
-        input = <SelectElement
-                  name={name}
-                  label={question}
-                  options={options}
-                />;
-        break;
-      case 'multiselect':
-        input = <SelectElement
-                  name={name}
-                  label={question}
-                  multiple={true}
-                  options={options}
-                />;
-        break;
-      case 'text':
-        input = <TextboxElement
-                  name={name}
-                  label={question}
-                />;
-        break;
-      case 'textarea':
-        input = <TextareaElement
-                  name={name}
-                  label={question}
-                />;
-        break;
-      case 'date':
-        input = <DateElement
-                  name={name}
-                  label={question}
-                />;
-        break;
-      case 'checkbox':
-        input = <CheckboxElement
-                  name={name}
-                  label={question}
-                />;
-        break;
-      case 'static':
-        input = <StaticElement
-                  label={question}
-                />;
-        break;
-    }
     return (
       <div
         className="items"
@@ -226,6 +233,13 @@ class Canvas extends Component {
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
+      padding: '10px',
+    };
+    const deleteBtnStyle = {
+      float: 'right',
+      background: 'transparent',
+      border: 0,
+      padding: 0,
     };
     return (
       <div
@@ -235,6 +249,18 @@ class Canvas extends Component {
         onDragOver={this.onDragOver}
         style={multipartStyle}
       >
+        <span>
+          <button
+            name="deleteMultipart"
+            type="button"
+            style={deleteBtnStyle}
+            onClick={this.props.deleteMultipart}
+          >
+            <span style={{background: '#FCFCFC', float: 'right'}}>
+              <i className="fas fa-times-circle"></i>
+            </span>
+          </button>
+        </span>
         <h3>Multipart</h3>
         {rendered}
       </div>
@@ -280,6 +306,13 @@ class Canvas extends Component {
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
+      padding: '10px',
+    };
+    const deleteBtnStyle = {
+      float: 'right',
+      background: 'transparent',
+      border: 0,
+      padding: 0,
     };
     return (
       <div
@@ -289,6 +322,18 @@ class Canvas extends Component {
         style={sectionStyle}
         onDragOver={this.onDragOver}
       >
+        <span>
+          <button
+            name="deleteSection"
+            type="button"
+            style={deleteBtnStyle}
+            onClick={this.props.deleteSection}
+          >
+            <span style={{background: '#FCFCFC', float: 'right'}}>
+              <i className="fas fa-times-circle"></i>
+            </span>
+          </button>
+        </span>
         <h2 style={{margin: '15px'}}>{title}</h2>
         {rendered}
       </div>
@@ -356,7 +401,7 @@ class Canvas extends Component {
         float: 'right',
         background: 'transparent',
         border: 0,
-        marginTop: '5px',
+        padding: 0,
       };
       return (
         <div
@@ -367,7 +412,7 @@ class Canvas extends Component {
         >
           <span>
             <button
-              name="deleteItem"
+              name="deletePage"
               type="button"
               style={deleteBtnStyle}
               onClick={this.props.deletePage}
@@ -408,9 +453,12 @@ Canvas.propTypes = {
   pages: PropTypes.array,
   sections: PropTypes.array,
   tables: PropTypes.array,
+  requiredValues: PropTypes.object,
   onDropFieldType: PropTypes.func.isRequired,
   // reIndexField: PropTypes.func.isRequired,
   deletePage: PropTypes.func.isRequired,
+  deleteMultipart: PropTypes.func.isRequired,
+  deleteSection: PropTypes.func.isRequired,
   deleteField: PropTypes.func.isRequired,
   selectField: PropTypes.func.isRequired,
 };

@@ -501,6 +501,13 @@ class InstrumentBuilderApp extends Component {
     // Setup variables for drawer component
     let field = {};
     let inputType = null;
+    // Define required boolean
+    let requiredValues = {};
+    if (this.state.formData.schema.hasOwnProperty('https://schema.repronim.org/required')) {
+      (this.state.formData.schema['https://schema.repronim.org/required']).map((required, index) => {
+        requiredValues[required['@index']] = required['@value'];
+      });
+    }
     if (this.state.selectedField != null) {
       const currentField = this.state.selectedField;
       // Define choices
@@ -530,14 +537,6 @@ class InstrumentBuilderApp extends Component {
         }
       });
 
-      // Define required boolean
-      let requiredValue = null;
-      (this.state.formData.schema['https://schema.repronim.org/required']).forEach((object, index) => {
-        if (object['@index'] == itemID) {
-          requiredValue = object['@value'];
-        }
-      });
-
       // Create field object to pass as prop to edit drawer component
       field = {
         itemID: itemID,
@@ -546,7 +545,7 @@ class InstrumentBuilderApp extends Component {
         choices: choices,
         multipleChoice: multipleChoice,
         branching: branching,
-        requiredValue: requiredValue,
+        requiredValue: requiredValues[itemID] || false,
       };
       inputType = this.state.formData.fields[currentField]['https://schema.repronim.org/inputType'][0]['@value'];
     }
@@ -565,9 +564,12 @@ class InstrumentBuilderApp extends Component {
             pages={pages}
             sections={this.state.formData.sections}
             tables={this.state.formData.tables}
+            requiredValues={requiredValues}
             onDropFieldType={this.onDropFieldType}
             // reIndexField={this.reIndexField}
             deletePage={this.deletePage}
+            deleteMultipart={this.deleteItem}
+            deleteSection={this.deleteItem}
             deleteField={this.deleteItem}
             selectField={this.selectField}
           >
