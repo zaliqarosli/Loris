@@ -83,7 +83,7 @@ class Canvas extends Component {
       textAlign: 'left',
       alignSelf: 'center',
       order: {fieldIndex} + 1,
-      minWidth: '90%',
+      width: '95%',
       minHeight: '20%',
       display: 'flex',
       flexDirection: 'column',
@@ -220,12 +220,20 @@ class Canvas extends Component {
           return this.renderField(itemIndex);
       }
     });
+    const multipartStyle = {
+      background: 'transparent',
+      margin: '10px 0px',
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+    };
     return (
       <div
         key={multipartIndex}
         id={'multipart_'+multipartIndex}
         className="items"
         onDragOver={this.onDragOver}
+        style={multipartStyle}
       >
         <h3>Multipart</h3>
         {rendered}
@@ -266,12 +274,19 @@ class Canvas extends Component {
           return this.renderField(itemIndex);
       }
     });
+    const sectionStyle = {
+      background: 'transparent',
+      margin: '10px 0px',
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+    };
     return (
       <div
         key={sectionIndex}
         id={'section_'+sectionIndex}
         className="items"
-        style={{margin: '10px 0px'}}
+        style={sectionStyle}
         onDragOver={this.onDragOver}
       >
         <h2 style={{margin: '15px'}}>{title}</h2>
@@ -328,12 +343,10 @@ class Canvas extends Component {
     const pageStyle = {
       background: 'white',
       boxShadow: '0px -1px 4px 2px rgba(0,0,0,0.175)',
-      margin: '20px 30px 0 30px',
+      margin: '20px auto 0',
       padding: '20px',
-      flex: '1',
       width: '612px',
       minHeight: '792px',
-      alignSelf: 'center',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'visible',
@@ -376,8 +389,6 @@ class Canvas extends Component {
       border: '1px solid #C3D5DB',
       order: 2,
       flex: '15',
-      display: 'flex',
-      flexDirection: 'column',
       overflow: 'auto',
       overflowX: 'scroll',
       margin: '-1px 0px 0 -1px',
