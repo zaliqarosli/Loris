@@ -222,7 +222,7 @@ class Canvas extends Component {
     });
     const multipartStyle = {
       background: 'transparent',
-      margin: '10px 0px',
+      margin: '10px 0',
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
@@ -276,7 +276,7 @@ class Canvas extends Component {
     });
     const sectionStyle = {
       background: 'transparent',
-      margin: '10px 0px',
+      margin: '10px 0',
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
@@ -342,7 +342,7 @@ class Canvas extends Component {
   renderPages() {
     const pageStyle = {
       background: 'white',
-      boxShadow: '0px -1px 4px 2px rgba(0,0,0,0.175)',
+      boxShadow: '0 -1px 4px 2px rgba(0,0,0,0.175)',
       margin: '20px auto 0',
       padding: '20px',
       width: '612px',
@@ -391,7 +391,7 @@ class Canvas extends Component {
       flex: '15',
       overflow: 'auto',
       overflowX: 'scroll',
-      margin: '-1px 0px 0 -1px',
+      margin: '-1px 0 0 -1px',
       paddingBottom: '20px',
    };
     return (
