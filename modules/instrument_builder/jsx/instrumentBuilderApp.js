@@ -8,6 +8,7 @@ import Toolbar from './toolbar';
 import Canvas from './canvas';
 import EditDrawer from './editdrawer';
 import AddListItemForm from './addListItemForm';
+import AddTextItemForm from './addTextItemForm';
 import AddPageForm from './addPageForm';
 
 import JsonLDExpander from './../../../htdocs/js/JsonLDExpander';
@@ -226,6 +227,24 @@ class InstrumentBuilderApp extends Component {
                     onSave={this.addItem}
                     onEditField={editField}
                     addChoices={addValueConstraint}
+                  />;
+        break;
+      case 'text':
+        addForm = <AddTextItemForm
+                    mode='add'
+                    uiType='text'
+                    formData={this.state.newField}
+                    onSave={this.addItem}
+                    onEditField={editField}
+                  />;
+        break;
+      case 'textarea':
+        addForm = <AddTextItemForm
+                    mode='add'
+                    uiType='textarea'
+                    formData={this.state.newField}
+                    onSave={this.addItem}
+                    onEditField={editField}
                   />;
         break;
     }

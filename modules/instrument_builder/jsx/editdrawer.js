@@ -2,13 +2,13 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
 import AddListItemForm from './addListItemForm';
+import AddTextItemForm from './addTextItemForm';
 
 class EditDrawer extends Component {
   constructor(props) {
     super(props);
 
     this.renderDrawerContent = this.renderDrawerContent.bind(this);
-    // this.getChoicesFromValueConstraints = this.getChoicesFromValueConstraints.bind(this);
   }
 
   renderDrawerContent() {
@@ -30,7 +30,6 @@ class EditDrawer extends Component {
     if (Object.keys(this.props.field).length != 0) {
       inputType = this.props.inputType;
     }
-    // const choices = this.getChoicesFromValueConstraints();
     switch (inputType) {
       case 'select':
       case 'multiselect':
@@ -51,6 +50,22 @@ class EditDrawer extends Component {
                      addChoices={this.props.addChoices}
                    />;
         break;
+      case 'text':
+        editForm = <AddTextItemForm
+                    mode='edit'
+                    uiType='text'
+                    formData={this.props.field}
+                    onEditField={this.props.onEditField}
+                  />;
+        break;
+      case 'textarea':
+        editForm = <AddTextItemForm
+                    mode='edit'
+                    uiType='textarea'
+                    formData={this.props.field}
+                    onEditField={this.props.onEditField}
+                  />;
+        break;
     }
     return (
       <div style={contentDiv} hidden={hidden}>
@@ -63,23 +78,6 @@ class EditDrawer extends Component {
       </div>
     );
   }
-
-  // getChoicesFromValueConstraints() {
-  //   if (this.props.selectedField.hasOwnProperty('https://schema.repronim.org/valueconstraints')) {
-  //     if ((this.props.selectedField['https://schema.repronim.org/valueconstraints']).hasOwnProperty(0)) {
-  //       if ((this.props.selectedField['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
-  //         const valueConstraints = this.props.selectedField['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'];
-  //         return valueConstraints.map((valueConstraint, index) => {
-  //           return ({
-  //             name: valueConstraint['http://schema.org/name'][0]['@value'],
-  //             value: valueConstraint['http://schema.org/value'][0]['@value'],
-  //           });
-  //         });
-  //       }
-  //     }
-  //   }
-  //   return null;
-  // }
 
   render() {
     let icon = 'fas fa-chevron-right';

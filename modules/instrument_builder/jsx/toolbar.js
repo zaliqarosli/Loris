@@ -13,6 +13,7 @@ class Toolbar extends Component {
         {type: 'section', label: 'Section'},
         {type: 'header', label: 'Header'},
         {type: 'text', label: 'Text'},
+        {type: 'textarea', label: 'Text Area'},
         {type: 'select', label: 'Select'},
         {type: 'radio', label: 'Radio'},
         {type: 'label', label: 'Label'},
