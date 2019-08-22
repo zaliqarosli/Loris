@@ -60,7 +60,7 @@ class AddPageForm extends Component {
               value={this.state.formData.order[key]}
             />
           </div>
-          <div style={{marginRight: '-5px'}}>
+          <div style={{marginRight: '-5px', alignSelf: 'flex-end', marginBottom: '15px'}}>
             <ButtonElement
               name='addContent'
               type='button'
