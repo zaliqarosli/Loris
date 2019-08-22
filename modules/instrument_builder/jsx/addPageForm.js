@@ -51,8 +51,8 @@ class AddPageForm extends Component {
   renderContentFields() {
     let contentBlock = this.state.formData.order.map((content, key) => {
       return (
-        <div key={key} style={{display: 'flex', justifyContent: 'space-between'}}>
-          <div style={{marginRight: '20px'}}>
+        <div key={key} style={{display: 'flex'}}>
+          <div style={{flex: '1', margin: 'auto 20px'}}>
             <TextboxElement
               name={key}
               label='ID'
@@ -60,25 +60,24 @@ class AddPageForm extends Component {
               value={this.state.formData.order[key]}
             />
           </div>
-          <ButtonElement
-            name='addContent'
-            type='button'
-            label={
-              <span><i className='fas fa-plus'></i></span>
-            }
-            onUserInput={this.addPageContent}
-          />
+          <div style={{marginRight: '-5px'}}>
+            <ButtonElement
+              name='addContent'
+              type='button'
+              label={
+                <span><i className='fas fa-plus'></i></span>
+              }
+              onUserInput={this.addPageContent}
+              columnSize=''
+              className=''
+            />
+          </div>
         </div>
       );
     });
 
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        marginRight: '15px',
-        marginLeft: '114px',
-      }}>
+      <div>
         {contentBlock}
       </div>
     );
