@@ -394,7 +394,7 @@ class InstrumentBuilderApp extends Component {
         const split = sibling.split('_');
         const type = split[0].concat('s');
         const index = split[1];
-        return (formData[type][index]['@id']).concat('.jsonld');
+        return formData[type][index]['@id'];
       } else {
         return null;
       }
@@ -411,11 +411,11 @@ class InstrumentBuilderApp extends Component {
     });
     if ((order[0]+1 == order[1]) || order[0] == undefined) {
       (formData[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(order[1], 0, {
-        '@id': (this.state.newField.itemID).concat('.jsonld'),
+        '@id': this.state.newField.itemID,
       });
     } else if (order[1] == undefined) {
       (formData[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).push({
-        '@id': (this.state.newField.itemID).concat('.jsonld'),
+        '@id': this.state.newField.itemID,
       });
     } else {
       swal.fire('Error.', 'Error indexing and adding new item.', 'error');

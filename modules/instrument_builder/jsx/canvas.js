@@ -204,9 +204,7 @@ class Canvas extends Component {
       // find itemID and return item
       itemTypes.forEach((type) => {
         this.props[type].forEach((searchItemSchema, searchIndex) => {
-          // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
-          // Need to add .jsonld back in to searchItemSchema.id
-          let correctedURI = searchItemSchema['@id'].concat('.jsonld');
+          let correctedURI = searchItemSchema['@id'];
           if (id === correctedURI && !seenIDs.includes(correctedURI)) {
             items[searchIndex] = searchItemSchema;
             seenIDs.push(id);
@@ -280,9 +278,7 @@ class Canvas extends Component {
       // find itemID and return item
       itemTypes.forEach((type) => {
         this.props[type].forEach((searchItemSchema, searchIndex) => {
-          // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
-          // Need to add .jsonld back in to searchItemSchema.id
-          let correctedURI = searchItemSchema['@id'].concat('.jsonld');
+          let correctedURI = searchItemSchema['@id'];
           if (id === correctedURI && !seenIDs.includes(correctedURI)) {
             items[searchIndex] = searchItemSchema;
             seenIDs.push(id);
@@ -355,10 +351,8 @@ class Canvas extends Component {
       // find itemID and return item
       itemTypes.forEach((type) => {
         this.props[type].forEach((searchItemSchema, searchIndex) => {
-          // Bug with jsonld.js dependency that knocks off '.jsonld' from the ends of expanded @id URI
-          // Need to add .jsonld back in to searchItemSchema.id
           if (searchItemSchema.hasOwnProperty('@id')) {
-            const correctedURI = searchItemSchema['@id'].concat('.jsonld');
+            const correctedURI = searchItemSchema['@id'];
             if (id == correctedURI) {
               items[searchIndex] = searchItemSchema;
             }
