@@ -39,7 +39,7 @@ const sortItems = async (itemList, pages, sections, multiparts, tables, fields, 
         break;
       default:
         // For leftover case i.e. fields
-        if (schema['@type'][0] === 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field.jsonld') {
+        if (schema['@type'][0] === 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field') {
           if (hasValueConstraints(schema)) {
             const valueSchema = await getValueConstraints(schema);
             schema['https://schema.repronim.org/valueconstraints'] = [...valueSchema];
