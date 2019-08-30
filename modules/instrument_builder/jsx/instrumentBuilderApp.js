@@ -43,6 +43,7 @@ class InstrumentBuilderApp extends Component {
         choices: [{name: '', value: ''}],
         multipleChoice: false,
         branching: '',
+        scoring: '',
         requiredValue: false,
         headerLevel: null,
       },
@@ -114,6 +115,12 @@ class InstrumentBuilderApp extends Component {
         requiredValueIndex = index;
       }
     });
+    let scoringLogicIndex = null;
+    (formData.schema['https://schema.repronim.org/scoringLogic']).forEach((object, index) => {
+      if (object['@index'] == itemID) {
+        scoringLogicIndex = index;
+      }
+    });
     switch (elementName) {
       case 'itemID':
         formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'] = value;
@@ -133,6 +140,9 @@ class InstrumentBuilderApp extends Component {
         break;
       case 'branching':
         formData.schema['https://schema.repronim.org/visibility'][currentField]['@value'] = value;
+        break;
+      case 'scoring':
+        formData.schema['https://schema.repronim.org/scoringLogic'][scoringLogicIndex]['@value'] = value;
         break;
       case 'requiredValue':
         formData.schema['https://schema.repronim.org/required'][requiredValueIndex]['@value'] = value;
@@ -179,6 +189,7 @@ class InstrumentBuilderApp extends Component {
       choices: [{name: '', value: ''}],
       multipleChoice: false,
       branching: '',
+      scoring: '',
       requiredValue: false,
       headerLevel: null,
     };
@@ -556,11 +567,23 @@ class InstrumentBuilderApp extends Component {
       // Find visibility array index where '@index' = currentField's altLabel
       const itemID = this.state.formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
       let branching = '';
-      (this.state.formData.schema['https://schema.repronim.org/visibility']).forEach((object, index) => {
-        if (object['@index'] == itemID) {
-          branching = object['@value'];
-        }
-      });
+      if (this.state.formData.schema['https://schema.repronim.org/visibility']) {
+        (this.state.formData.schema['https://schema.repronim.org/visibility']).forEach((object, index) => {
+          if (object['@index'] == itemID) {
+            branching = object['@value'];
+          }
+        });
+      }
+      // Define scoring logic string
+      // Find scoringLogic array index where '@index' = currentField's altLabel
+      let scoring = '';
+      if (this.state.formData.schema['https://schema.repronim.org/scoringLogic']) {
+        (this.state.formData.schema['https://schema.repronim.org/scoringLogic']).forEach((object, index) => {
+          if (object['@index'] == itemID) {
+            scoring = object['@value'];
+          }
+        });
+      }
       // Define header level if it exists
       let headerLevel = null;
       if (this.state.formData.fields[currentField]['https://schema.repronim.org/headerLevel']) {
@@ -576,6 +599,7 @@ class InstrumentBuilderApp extends Component {
         branching: branching,
         requiredValue: requiredValues[itemID] || false,
         headerLevel: headerLevel,
+        scoring: scoring,
       };
       inputType = this.state.formData.fields[currentField]['https://schema.repronim.org/inputType'][0]['@value'];
     }
