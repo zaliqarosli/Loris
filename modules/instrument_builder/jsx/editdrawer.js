@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import AddListItemForm from './addListItemForm';
 import AddTextItemForm from './addTextItemForm';
+import AddScoreItemForm from './addScoreItemForm';
+import AddHeaderItemForm from './addHeaderItemForm';
 
 class EditDrawer extends Component {
   constructor(props) {
@@ -65,6 +67,20 @@ class EditDrawer extends Component {
                     formData={this.props.field}
                     onEditField={this.props.onEditField}
                   />;
+        break;
+      case 'static_score':
+        editForm = <AddScoreItemForm
+                    mode='edit'
+                    formData={this.props.field}
+                    onEditField={this.props.onEditField}
+                   />;
+        break;
+      case 'header':
+        editForm = <AddHeaderItemForm
+                    mode='edit'
+                    formData={this.props.field}
+                    onEditField={this.props.onEditField}
+                   />;
         break;
     }
     return (

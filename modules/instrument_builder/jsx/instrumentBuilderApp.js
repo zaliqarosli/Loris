@@ -9,6 +9,8 @@ import Canvas from './canvas';
 import EditDrawer from './editdrawer';
 import AddListItemForm from './addListItemForm';
 import AddTextItemForm from './addTextItemForm';
+import AddScoreItemForm from './addScoreItemForm';
+import AddHeaderItemForm from './addHeaderItemForm';
 import AddPageForm from './addPageForm';
 
 import JsonLDExpander from './../../../htdocs/js/JsonLDExpander';
@@ -42,6 +44,7 @@ class InstrumentBuilderApp extends Component {
         multipleChoice: false,
         branching: '',
         requiredValue: false,
+        headerLevel: null,
       },
     };
     this.mapKeysToAlias = this.mapKeysToAlias.bind(this);
@@ -122,6 +125,9 @@ class InstrumentBuilderApp extends Component {
       case 'question':
         formData.fields[currentField]['http://schema.org/question'][0]['@value'] = value;
         break;
+      case 'headerLevel':
+        formData.fields[currentField]['https://schema.repronim.org/headerLevel'][0]['@value'] = value;
+        break;
       case 'multipleChoice':
          formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/multipleChoice'][0]['@value'] = value;
         break;
@@ -132,6 +138,7 @@ class InstrumentBuilderApp extends Component {
         formData.schema['https://schema.repronim.org/required'][requiredValueIndex]['@value'] = value;
         break;
       default:
+        // for value constraint choice options
         if (elementName.includes('name')) {
           const index = elementName.substring(elementName.indexOf('_')+1);
          formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'][index]['http://schema.org/name'][0]['@value'] = value;
@@ -173,6 +180,7 @@ class InstrumentBuilderApp extends Component {
       multipleChoice: false,
       branching: '',
       requiredValue: false,
+      headerLevel: null,
     };
     this.setState({showModal: false, newField});
   }
@@ -247,7 +255,24 @@ class InstrumentBuilderApp extends Component {
                     onEditField={editField}
                   />;
         break;
+      case 'static_score':
+        addForm = <AddScoreItemForm
+                    mode='add'
+                    formData={this.state.newField}
+                    onSave={this.addItem}
+                    onEditField={editField}
+                  />;
+        break;
+      case 'header':
+        addForm = <AddHeaderItemForm
+                    mode='add'
+                    formData={this.state.newField}
+                    onSave={this.addItem}
+                    onEditField={editField}
+                  />;
+        break;
     }
+
     return (
       <Modal
         title='Add Field'
@@ -512,21 +537,21 @@ class InstrumentBuilderApp extends Component {
       const currentField = this.state.selectedField;
       // Define choices
       let choices = [];
-      if ((this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
-        choices = this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'].map((valueConstraint, index) => {
-          return ({
-            name: valueConstraint['http://schema.org/name'][0]['@value'],
-            value: valueConstraint['http://schema.org/value'][0]['@value'],
-          });
-        });
-      }
-
-      // Define multiplechoice boolean
       let multipleChoice = null;
-      if ((this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.repronim.org/multipleChoice')) {
-        multipleChoice = this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/multipleChoice'][0]['@value'];
+      if (this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints']) {
+        if ((this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
+          choices = this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'].map((valueConstraint, index) => {
+            return ({
+              name: valueConstraint['http://schema.org/name'][0]['@value'],
+              value: valueConstraint['http://schema.org/value'][0]['@value'],
+            });
+          });
+        }
+        // Define multiplechoice boolean
+        if ((this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.repronim.org/multipleChoice')) {
+          multipleChoice = this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/multipleChoice'][0]['@value'];
+        }
       }
-
       // Define branching logic string
       // Find visibility array index where '@index' = currentField's altLabel
       const itemID = this.state.formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
@@ -536,7 +561,11 @@ class InstrumentBuilderApp extends Component {
           branching = object['@value'];
         }
       });
-
+      // Define header level if it exists
+      let headerLevel = null;
+      if (this.state.formData.fields[currentField]['https://schema.repronim.org/headerLevel']) {
+        headerLevel = this.state.formData.fields[currentField]['https://schema.repronim.org/headerLevel'][0]['@value'];
+      }
       // Create field object to pass as prop to edit drawer component
       field = {
         itemID: itemID,
@@ -546,6 +575,7 @@ class InstrumentBuilderApp extends Component {
         multipleChoice: multipleChoice,
         branching: branching,
         requiredValue: requiredValues[itemID] || false,
+        headerLevel: headerLevel,
       };
       inputType = this.state.formData.fields[currentField]['https://schema.repronim.org/inputType'][0]['@value'];
     }

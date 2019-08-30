@@ -63,18 +63,24 @@ class Canvas extends Component {
     const question = field['http://schema.org/question'][0]['@value'];
     const inputType = field['https://schema.repronim.org/inputType'][0]['@value'];
     let mapped = [];
-    if ((field['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
-      const valueconstraints = field['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'];
-      mapped = valueconstraints.map((option, index) => {
-        const key = option['http://schema.org/value'][0]['@value'];
-        return {[key]: option['http://schema.org/name'][0]['@value']};
-      });
+    if (field['https://schema.repronim.org/valueconstraints']) {
+      if ((field['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
+        const valueconstraints = field['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'];
+        mapped = valueconstraints.map((option, index) => {
+          const key = option['http://schema.org/value'][0]['@value'];
+          return {[key]: option['http://schema.org/name'][0]['@value']};
+        });
+      }
     }
     let options = {};
     mapped.forEach((option, index) => {
       options[Object.keys(option)] = option[Object.keys(option)];
     });
     const requiredValue = this.props.requiredValues[name];
+    let headerLevel = null;
+    if (field.hasOwnProperty('https://schema.repronim.org/headerLevel')) {
+      headerLevel = field['https://schema.repronim.org/headerLevel'][0]['@value'];
+    }
     let input = null;
     switch (inputType) {
       case 'radio':
@@ -126,6 +132,17 @@ class Canvas extends Component {
       case 'static':
         input = <StaticElement
                   label={question}
+                />;
+        break;
+      case 'static_score':
+        input = <StaticElement
+                  label={question}
+                />;
+        break;
+      case 'header':
+        input = <HeaderElement
+                  text={question}
+                  headerLevel={headerLevel}
                 />;
         break;
     }

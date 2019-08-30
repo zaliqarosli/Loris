@@ -1,5 +1,5 @@
 /* exported FormElement, FieldsetElement, SelectElement, TagsElement, SearchableDropdown, TextareaElement,
-TextboxElement, DateElement, NumericElement, FileElement, StaticElement, LinkElement,
+TextboxElement, DateElement, NumericElement, FileElement, StaticElement, HeaderElement, LinkElement,
 CheckboxElement, ButtonElement, LorisElement
 */
 
@@ -909,7 +909,7 @@ class TextboxElement extends Component {
     }
 
     // Add error message
-    if (this.props.errorMessage) {
+    if (this.props.hasError || (this.props.required && this.props.value === '')) {
       errorMessage = <span>{this.props.errorMessage}</span>;
       elementClass = 'row form-group has-error';
     }
@@ -947,6 +947,7 @@ TextboxElement.propTypes = {
   id: PropTypes.string,
   disabled: PropTypes.bool,
   required: PropTypes.bool,
+  hasError: PropTypes.bool,
   errorMessage: PropTypes.string,
   onUserInput: PropTypes.func,
   onUserBlur: PropTypes.func,
@@ -960,7 +961,8 @@ TextboxElement.defaultProps = {
   id: null,
   disabled: false,
   required: false,
-  errorMessage: '',
+  hasError: false,
+  errorMessage: 'The field is required!',
   onUserInput: function() {
     console.warn('onUserInput() callback is not set');
   },
@@ -1190,9 +1192,27 @@ class NumericElement extends Component {
     let disabled = this.props.disabled ? 'disabled' : null;
     let required = this.props.required ? 'required' : null;
     let requiredHTML = null;
+    let errorMessage = null;
+    let elementClass = 'row form-group';
+
+    // Add required asterisk
+    if (required) {
+      requiredHTML = <span className="text-danger">*</span>;
+    }
+
+    // Add error message if element is required
+    if (this.props.required && this.props.value === '') {
+      errorMessage = <span>{'The field is required!'}</span>;
+      elementClass = 'row form-group has-error';
+    } else if (this.props.value > this.props.max || this.props.value < this.props.min) {
+      // Add error message if value is not within min and max
+      errorMessage = <span>{'The value has to be between ' + this.props.min + ' and '
+        + this.props.max + '!'}</span>;
+      elementClass = 'row form-group has-error';
+    }
 
     return (
-      <div className="row form-group">
+      <div className={elementClass}>
         <label className="col-sm-3 control-label" htmlFor={this.props.id}>
           {this.props.label}
           {requiredHTML}
@@ -1210,6 +1230,7 @@ class NumericElement extends Component {
             required={required}
             onChange={this.handleChange}
           />
+          {errorMessage}
         </div>
       </div>
     );
@@ -1422,6 +1443,41 @@ StaticElement.propTypes = {
 StaticElement.defaultProps = {
   label: '',
   text: null,
+};
+
+/**
+ * Header element component.
+ * Used to display a header element with specific level (1-6) as part of a form
+ *
+ */
+class HeaderElement extends Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    const Tag = 'h' + this.props.headerLevel;
+    return (
+      <div className="row form-group">
+        <Tag className='col-xs-12'>
+          {this.props.text}
+        </Tag>
+      </div>
+    );
+  }
+}
+
+HeaderElement.propTypes = {
+  text: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.element,
+  ]).isRequired,
+  headerLevel: PropTypes.oneOf([
+    1, 2, 3, 4, 5, 6,
+  ]),
+};
+
+HeaderElement.defaultProps = {
+  headerLevel: 3,
 };
 
 /**
@@ -1669,6 +1725,9 @@ class LorisElement extends Component {
       case 'static':
         elementHtml = (<StaticElement {...elementProps} />);
         break;
+      case 'header':
+        elementHtml = (<HeaderElement {...elementProps} />);
+        break;
       case 'link':
         elementHtml = (<LinkElement {...elementProps} />);
         break;
@@ -1698,6 +1757,7 @@ window.TimeElement = TimeElement;
 window.NumericElement = NumericElement;
 window.FileElement = FileElement;
 window.StaticElement = StaticElement;
+window.HeaderElement = HeaderElement;
 window.LinkElement = LinkElement;
 window.CheckboxElement = CheckboxElement;
 window.ButtonElement = ButtonElement;
@@ -1717,6 +1777,7 @@ export default {
   NumericElement,
   FileElement,
   StaticElement,
+  HeaderElement,
   LinkElement,
   CheckboxElement,
   ButtonElement,

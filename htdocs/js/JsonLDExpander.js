@@ -40,9 +40,18 @@ const sortItems = async (itemList, pages, sections, multiparts, tables, fields, 
       default:
         // For leftover case i.e. fields
         if (schema['@type'][0] === 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field') {
-          if (hasValueConstraints(schema)) {
+          if (hasURIValueConstraints(schema)) {
             const valueSchema = await getValueConstraints(schema);
             schema['https://schema.repronim.org/valueconstraints'] = [...valueSchema];
+          } else if (hasDirectValueConstraints(schema)) {
+            // TODO: deal with when value constraint is an object, not a URI
+          } else {
+            // TODO: deal with when value constraint doesn't exist i.e. for a header element
+            if (schema['https://schema.repronim.org/inputType'][0]['@value'] === 'header') {
+               schema['https://schema.repronim.org/valueconstraints'] = null;
+            } else {
+              // TODO: return error
+            }
           }
           fields.push(schema);
         }
@@ -61,8 +70,15 @@ const hasItems = (schema) => {
   return false;
 };
 
-const hasValueConstraints = (schema) => {
-  if ((schema['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('@id')) {
+const hasURIValueConstraints = (schema) => {
+  if (schema['https://schema.repronim.org/valueconstraints'] && (schema['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('@id')) {
+    return true;
+  }
+  return false;
+};
+
+const hasDirectValueConstraints = (schema) => {
+  if (schema['https://schema.repronim.org/valueconstraints'] && !((schema['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('@id'))) {
     return true;
   }
   return false;
