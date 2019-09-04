@@ -57,10 +57,10 @@ class Canvas extends Component {
     }
   }
 
-  renderField(fieldIndex) {
+  renderField(fieldIndex, includeLabel = true) {
     const field = this.props.fields[fieldIndex];
     const name = field['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
-    const question = field['http://schema.org/question'][0]['@value'];
+    const question = includeLabel ? field['http://schema.org/question'][0]['@value'] : '';
     const inputType = field['https://schema.repronim.org/inputType'][0]['@value'];
     let mapped = [];
     if (field['https://schema.repronim.org/valueconstraints']) {
@@ -149,8 +149,8 @@ class Canvas extends Component {
     const itemStyle = {
       borderRadius: '2px',
       background: 'transparent',
+      margin: '10px 0',
       padding: '10px',
-      margin: '15px',
       color: '#333',
       textAlign: 'left',
       alignSelf: 'center',
@@ -367,7 +367,7 @@ class Canvas extends Component {
               this.props.fields.forEach((searchItemSchema, searchIndex) => {
                 let searchURI = searchItemSchema['@id'];
                 if (id === searchURI && !seenIDs.includes(searchURI)) {
-                  renderedField = this.renderField(searchIndex);
+                  renderedField = this.renderField(searchIndex, false);
                   seenIDs.push(id);
                 }
               });
@@ -389,12 +389,15 @@ class Canvas extends Component {
       </table>
     );
     const tableStyle = {
+      borderRadius: '2px',
       background: 'transparent',
-      margin: '15px',
+      margin: '10px 0',
+      padding: '10px',
+      alignSelf: 'center',
       width: '95%',
+      minHeight: '20%',
       display: 'flex',
       flexDirection: 'column',
-      padding: '10px',
     };
     const deleteBtnStyle = {
       float: 'right',
