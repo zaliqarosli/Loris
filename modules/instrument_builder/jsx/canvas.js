@@ -343,7 +343,89 @@ class Canvas extends Component {
   }
 
   renderTable(tableIndex) {
-
+    const thisTable = this.props.tables[tableIndex];
+    const title = thisTable['http://schema.repronim.org/preamble'][0]['@value'];
+    const headers = (
+      <tr key={'headers_'+tableIndex}>
+        {thisTable['https://schema.repronim.org/tableheaders'][0]['@list'].map((header) => {
+          const headerString = header['@value'];
+          return (
+            <th style={{borderTop: 'none'}} key={headerString}>
+              {headerString}
+            </th>
+          );
+        })}
+      </tr>
+    );
+    const rows = thisTable['https://schema.repronim.org/tablerows'][0]['@list'].map((row, rowIndex) => {
+      return (
+        <tr key={'tablerow_'+rowIndex+'_'+tableIndex}>
+          {row['https://schema.repronim.org/order'][0]['@list'].map((field, fieldIndex) => {
+              const id = field['@id'];
+              let seenIDs = [];
+              let renderedField = null;
+              this.props.fields.forEach((searchItemSchema, searchIndex) => {
+                let searchURI = searchItemSchema['@id'];
+                if (id === searchURI && !seenIDs.includes(searchURI)) {
+                  renderedField = this.renderField(searchIndex);
+                  seenIDs.push(id);
+                }
+              });
+              return (
+                <td style={{borderTop: 'none'}} key={fieldIndex+'_tablerow_'+rowIndex}>
+                  {renderedField}
+                </td>
+              );
+          })}
+        </tr>
+      );
+    });
+    const table = (
+      <table className='table table-instrument'>
+        <tbody>
+          {headers}
+          {rows}
+        </tbody>
+      </table>
+    );
+    const tableStyle = {
+      background: 'transparent',
+      margin: '15px',
+      width: '95%',
+      display: 'flex',
+      flexDirection: 'column',
+      padding: '10px',
+    };
+    const deleteBtnStyle = {
+      float: 'right',
+      background: 'transparent',
+      border: 0,
+      padding: 0,
+    };
+    return (
+      <div
+        key={tableIndex}
+        id={'table_'+tableIndex}
+        className="items"
+        style={tableStyle}
+        onDragOver={this.onDragOver}
+      >
+        <span>
+          <button
+            name="deleteTable"
+            type="button"
+            style={deleteBtnStyle}
+            onClick={this.props.deleteTable}
+          >
+            <span style={{background: '#FCFCFC', float: 'right'}}>
+              <i className="fas fa-times-circle"></i>
+            </span>
+          </button>
+        </span>
+        <label>{title}</label>
+        {table}
+      </div>
+    );
   }
 
   renderItems(pageIndex) {
