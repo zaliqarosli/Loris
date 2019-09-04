@@ -36,6 +36,12 @@ const sortItems = async (itemList, pages, sections, multiparts, tables, fields, 
         break;
       case 'table':
         tables.push(schema);
+        schema['https://schema.repronim.org/tablerows'][0]['@list'].map(async (row, rowIndex) => {
+          if (hasItems(row)) {
+            const newItemList = await getItems(row);
+            sortItems(newItemList, pages, sections, multiparts, tables, fields, valueconstraints);
+          }
+        });
         break;
       default:
         // For leftover case i.e. fields
