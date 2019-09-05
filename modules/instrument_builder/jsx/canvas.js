@@ -60,7 +60,7 @@ class Canvas extends Component {
   renderField(fieldIndex, includeLabel = true) {
     const field = this.props.fields[fieldIndex];
     const name = field['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
-    const question = includeLabel ? field['http://schema.org/question'][0]['@value'] : '';
+    const question = field['http://schema.org/question'][0]['@value'];
     const inputType = field['https://schema.repronim.org/inputType'][0]['@value'];
     let mapped = [];
     if (field['https://schema.repronim.org/valueconstraints']) {
@@ -85,12 +85,20 @@ class Canvas extends Component {
     switch (inputType) {
       case 'radio':
       case 'select':
-        input = <SelectElement
-                  name={name}
-                  label={question}
-                  options={options}
-                  required={requiredValue}
-                />;
+        input = includeLabel ? (
+          <SelectElement
+             name={name}
+             label={question}
+             options={options}
+             required={requiredValue}
+           />
+        ) : (
+          <SelectElement
+             name={name}
+             options={options}
+             required={requiredValue}
+           />
+        );
         break;
       case 'multiselect':
         input = <SelectElement
@@ -102,11 +110,18 @@ class Canvas extends Component {
                 />;
         break;
       case 'text':
-        input = <TextboxElement
-                  name={name}
-                  label={question}
-                  required={requiredValue}
-                />;
+        input = includeLabel ? (
+          <TextboxElement
+            name={name}
+            label={question}
+            required={requiredValue}
+          />
+        ) : (
+          <TextboxElement
+            name={name}
+            required={requiredValue}
+          />
+        );
         break;
       case 'textarea':
         input = <TextareaElement
