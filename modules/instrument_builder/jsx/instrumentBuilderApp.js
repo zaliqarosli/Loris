@@ -116,11 +116,13 @@ class InstrumentBuilderApp extends Component {
       }
     });
     let scoringLogicIndex = null;
-    (formData.schema['https://schema.repronim.org/scoringLogic']).forEach((object, index) => {
-      if (object['@index'] == itemID) {
-        scoringLogicIndex = index;
-      }
-    });
+    if (formData.schema.hasOwnProperty('https://schema.repronim.org/scoringLogic')) {
+      (formData.schema['https://schema.repronim.org/scoringLogic']).forEach((object, index) => {
+        if (object['@index'] == itemID) {
+          scoringLogicIndex = index;
+        }
+      });
+    }
     switch (elementName) {
       case 'itemID':
         formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'] = value;
