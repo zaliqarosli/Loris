@@ -22,7 +22,43 @@ class InstrumentBuilderApp extends Component {
     this.state = {
       error: false,
       formData: {
-        schema: {},
+        schema: {
+          '@id': '',
+          '@type': ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'],
+          'http://schema.ord/description': [{
+            '@language': 'en',
+            '@value': '',
+          }],
+          'http://schema.org/schemaVersion': [{
+            '@language': 'en',
+            '@value': '0.0.1',
+          }],
+          'http://schema.org/version': [{
+            '@language': 'en',
+            '@value': '0.0.1',
+          }],
+          'http://schema.repronim.org/preamble': [{
+            '@language': 'en',
+            '@value': '',
+          }],
+          'http://www.w3.org/2004/02/skos/core#altLabel': [{
+            '@language': 'en',
+            '@value': '',
+          }],
+          'http://www.w3.org/2004/02/skos/core#prefLabel': [{
+            '@language': 'en',
+            '@value': '',
+          }],
+          'https://schema.repronim.org/addStatus': [{}],
+          'https://schema.repronim.org/order': [{
+            '@list': [],
+          }],
+          'https://schema.repronim.org/required': [{}],
+          'https://schema.repronim.org/statusOptions': [{
+            '@list': [],
+          }],
+          'https://schema.repronim.org/visibility': [{}],
+        },
         fields: [],
         multiparts: [],
         pages: [],
