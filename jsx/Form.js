@@ -472,13 +472,22 @@ class SelectElement extends Component {
     // Default to empty string for regular select and to empty array for 'multiple' select
     const value = this.props.value || (multiple ? [] : '');
 
-    return (
-      <div className={elementClass}>
+    let label = null;
+    let inputClass = 'col-sm-12';
+    if (this.props.label || this.props.label == '') {
+      label = (
         <label className="col-sm-3 control-label" htmlFor={this.props.label}>
           {this.props.label}
           {requiredHTML}
         </label>
-        <div className="col-sm-9">
+      );
+      inputClass = 'col-sm-9';
+    }
+
+    return (
+      <div className={elementClass}>
+        {label}
+        <div className={inputClass}>
           <select
             name={this.props.name}
             multiple={multiple}
@@ -508,7 +517,6 @@ SelectElement.propTypes = {
     PropTypes.array,
   ]),
   id: PropTypes.string,
-  class: PropTypes.string,
   multiple: PropTypes.bool,
   disabled: PropTypes.bool,
   required: PropTypes.bool,
@@ -521,10 +529,8 @@ SelectElement.propTypes = {
 SelectElement.defaultProps = {
   name: '',
   options: {},
-  label: '',
   value: undefined,
   id: null,
-  class: '',
   multiple: false,
   disabled: false,
   required: false,
@@ -914,13 +920,21 @@ class TextboxElement extends Component {
       elementClass = 'row form-group has-error';
     }
 
-    return (
-      <div className={elementClass}>
+    let label = null;
+    let inputClass = 'col-sm-12';
+    if (this.props.label || this.props.label == '') {
+      label = (
         <label className="col-sm-3 control-label" htmlFor={this.props.id}>
           {this.props.label}
           {requiredHTML}
         </label>
-        <div className="col-sm-9">
+      );
+      inputClass = 'col-sm-9';
+    }
+    return (
+      <div className={elementClass}>
+        {label}
+        <div className={inputClass}>
           <input
             type="text"
             className="form-control"
@@ -956,7 +970,6 @@ TextboxElement.propTypes = {
 
 TextboxElement.defaultProps = {
   name: '',
-  label: '',
   value: '',
   id: null,
   disabled: false,
