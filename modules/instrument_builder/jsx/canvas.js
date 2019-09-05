@@ -225,18 +225,18 @@ class Canvas extends Component {
   }
 
   renderMultipart(multipartIndex) {
-    let title = this.props.multiparts[multipartIndex]['http://schema.repronim.org/preamble'][0]['@value'];
-    let itemTypes = ['fields', 'sections', 'tables'];
+    const title = this.props.multiparts[multipartIndex]['http://schema.repronim.org/preamble'][0]['@value'];
+    const itemTypes = ['fields', 'sections', 'tables'];
     let seenIDs = [];
     let rendered = [];
     (this.props.multiparts[multipartIndex]['https://schema.repronim.org/order'][0]['@list']).map((item, index) => {
-      let id = item['@id'];
+      const id = item['@id'];
       // find itemID and render item
       itemTypes.forEach((type) => {
         this.props[type].forEach((searchItemSchema, searchIndex) => {
-          let searchURI = searchItemSchema['@id'];
+          const searchURI = searchItemSchema['@id'];
           if (id === searchURI && !seenIDs.includes(searchURI)) {
-            let inputType = searchItemSchema['https://schema.repronim.org/inputType'][0]['@value'];
+            const inputType = searchItemSchema['https://schema.repronim.org/inputType'][0]['@value'];
             switch (inputType) {
               case 'section':
                 rendered.push(this.renderSection(searchIndex));
@@ -293,18 +293,18 @@ class Canvas extends Component {
   }
 
   renderSection(sectionIndex) {
-    let title = this.props.sections[sectionIndex]['http://schema.repronim.org/preamble'][0]['@value'];
-    let itemTypes = ['fields', 'tables'];
+    const title = this.props.sections[sectionIndex]['http://schema.repronim.org/preamble'][0]['@value'];
+    const itemTypes = ['fields', 'tables'];
     let seenIDs = [];
     let rendered = [];
     (this.props.sections[sectionIndex]['https://schema.repronim.org/order'][0]['@list']).map((item, index) => {
-      let id = item['@id'];
+      const id = item['@id'];
       // find itemID and render item
       itemTypes.forEach((type) => {
         this.props[type].forEach((searchItemSchema, searchIndex) => {
-          let searchURI = searchItemSchema['@id'];
+          const searchURI = searchItemSchema['@id'];
           if (id === searchURI && !seenIDs.includes(searchURI)) {
-            let inputType = searchItemSchema['https://schema.repronim.org/inputType'][0]['@value'];
+            const inputType = searchItemSchema['https://schema.repronim.org/inputType'][0]['@value'];
             switch (inputType) {
               case 'table':
                 rendered.push(this.renderTable(searchIndex));
@@ -380,7 +380,7 @@ class Canvas extends Component {
               let seenIDs = [];
               let renderedField = null;
               this.props.fields.forEach((searchItemSchema, searchIndex) => {
-                let searchURI = searchItemSchema['@id'];
+                const searchURI = searchItemSchema['@id'];
                 if (id === searchURI && !seenIDs.includes(searchURI)) {
                   renderedField = this.renderField(searchIndex, false);
                   seenIDs.push(id);
