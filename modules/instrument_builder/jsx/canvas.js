@@ -450,8 +450,8 @@ class Canvas extends Component {
     // what we essentially want is an array of items on this page
     // then map for each item in the array, call this.render[ItemType].
     const itemTypes = ['fields', 'multiparts', 'sections', 'tables'];
-    let items = [];
-    // ItemsID array of items on this page
+    let seenIDs = [];
+    let rendered = [];
     (this.props.pages[pageIndex]['https://schema.repronim.org/order'][0]['@list']).map((item, index) => {
       const id = item['@id'];
       // find itemID and return item
@@ -459,29 +459,28 @@ class Canvas extends Component {
         this.props[type].forEach((searchItemSchema, searchIndex) => {
           if (searchItemSchema.hasOwnProperty('@id')) {
             const searchURI = searchItemSchema['@id'];
-            if (id == searchURI) {
-              items[searchIndex] = searchItemSchema;
+            if (id == searchURI && !seenIDs.includes(searchURI)) {
+              const inputType = searchItemSchema['https://schema.repronim.org/inputType'][0]['@value'];
+              switch (inputType) {
+                case 'multipart':
+                  rendered.push(this.renderMultipart(searchIndex));
+                  break;
+                case 'section':
+                  rendered.push(this.renderSection(searchIndex));
+                  break;
+                case 'table':
+                  rendered.push(this.renderTable(searchIndex));
+                  break;
+                default:
+                  rendered.push(this.renderField(searchIndex));
+              }
+              seenIDs.push(id);
             }
           }
         });
       });
     });
-    return items.map((itemSchema, itemIndex) => {
-      let inputType = itemSchema['https://schema.repronim.org/inputType'][0]['@value'];
-      switch (inputType) {
-        case 'multipart':
-          return this.renderMultipart(itemIndex);
-          break;
-        case 'section':
-          return this.renderSection(itemIndex);
-          break;
-        case 'table':
-          return this.renderTable(itemIndex);
-          break;
-        default:
-          return this.renderField(itemIndex);
-      }
-    });
+    return rendered;
   }
 
   renderPages() {
