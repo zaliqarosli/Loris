@@ -9,6 +9,7 @@ import Canvas from './canvas';
 import EditDrawer from './editdrawer';
 import AddListItemForm from './addListItemForm';
 import AddTextItemForm from './addTextItemForm';
+import AddLabelItemForm from './addLabelItemForm';
 import AddScoreItemForm from './addScoreItemForm';
 import AddHeaderItemForm from './addHeaderItemForm';
 import AddPageForm from './addPageForm';
@@ -51,7 +52,9 @@ class InstrumentBuilderApp extends Component {
           }],
           'https://schema.repronim.org/addStatus': [{}],
           'https://schema.repronim.org/order': [{
-            '@list': [],
+            '@list': [{
+              '@id': 'page1',
+            }],
           }],
           'https://schema.repronim.org/required': [{}],
           'https://schema.repronim.org/statusOptions': [{
@@ -59,9 +62,85 @@ class InstrumentBuilderApp extends Component {
           }],
           'https://schema.repronim.org/visibility': [{}],
         },
-        fields: [],
+        fields: [{
+          '@id': 'field_1',
+          '@type': ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field'],
+          'http://schema.org/description': [{
+            '@language': 'en',
+            '@value': '',
+          }],
+          'http://schema.org/question': [{
+            '@language': 'en',
+            '@value': '',
+          }],
+          'http://schema.org/schemaVersion': [{
+            '@language': 'en',
+            '@value': '0.0.1',
+          }],
+          'http://schema.org/version': [{
+            '@language': 'en',
+            '@value': '0.0.1',
+          }],
+          'http://schema.repronim.org/preamble': [{
+            '@language': 'en',
+            '@value': '',
+          }],
+          'http://www.w3.org/2004/02/skos/core#altLabel': [{
+            '@language': 'en',
+            '@value': 'field_1',
+          }],
+          'http://www.w3.org/2004/02/skos/core#prefLabel': [{
+            '@language': 'en',
+            '@value': 'Field 1',
+          }],
+          'https://schema.repronim.org/headerLevel': [{
+            '@type': 'http://www.w3.org/2001/XMLSchema#int',
+            '@value': '3',
+          }],
+          'https://schema.repronim.org/inputType': [{
+            '@type': 'http://www.w3.org/2001/XMLSchema#string',
+            '@value': 'header',
+          }],
+          'https://schema.repronim.org/valueconstraints': null,
+        }],
         multiparts: [],
-        pages: [],
+        pages: [{
+          '@id': 'page1',
+          '@type': ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'],
+          'http://schema.ord/description': [{
+            '@language': 'en',
+            '@value': '',
+          }],
+          'http://schema.org/schemaVersion': [{
+            '@language': 'en',
+            '@value': '0.0.1',
+          }],
+          'http://schema.org/version': [{
+            '@language': 'en',
+            '@value': '0.0.1',
+          }],
+          'http://schema.repronim.org/preamble': [{
+            '@language': 'en',
+            '@value': '',
+          }],
+          'http://www.w3.org/2004/02/skos/core#altLabel': [{
+            '@language': 'en',
+            '@value': 'page1',
+          }],
+          'http://www.w3.org/2004/02/skos/core#prefLabel': [{
+            '@language': 'en',
+            '@value': 'Page 1',
+          }],
+          'https://schema.repronim.org/inputType': [{
+            '@type': 'http://www.w3.org/2001/XMLSchema#string',
+            '@value': 'page',
+          }],
+          'https://schema.repronim.org/order': [{
+            '@list': [{
+              '@id': 'field_1',
+            }],
+          }],
+        }],
         sections: [],
         tables: [],
       },
@@ -304,6 +383,14 @@ class InstrumentBuilderApp extends Component {
                     onEditField={editField}
                   />;
         break;
+      case 'label':
+        addForm = <AddLabelItemForm
+                    mode='add'
+                    formData={this.state.newField}
+                    onSave={this.addItem}
+                    onEditField={editField}
+                  />;
+        break;
       case 'static_score':
         addForm = <AddScoreItemForm
                     mode='add'
@@ -463,7 +550,7 @@ class InstrumentBuilderApp extends Component {
     const parentContainer = (document.getElementById(this.state.prevItem)).parentNode || (document.getElementById(this.state.nextItem)).parentNode;
     const parentItem = (parentContainer.id).split('_');
     const siblings = [this.state.prevItem, this.state.nextItem];
-    const siblingsID = siblings.map((sibling, key) => {
+    const siblingsID = siblings.map((sibling) => {
       if (sibling != null) {
         const split = sibling.split('_');
         const type = split[0].concat('s');
@@ -478,11 +565,16 @@ class InstrumentBuilderApp extends Component {
     // return location in parent of ids
     const parentType = parentItem[0].concat('s');
     const parentIndex = parentItem[1];
-    const order = (formData[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).map((item, index) => {
-      if (siblingsID.includes(item['@id'])) {
-        return index;
-      }
+    const order = siblingsID.map((id) => {
+      let siblingOrder = null;
+      (formData[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
+        if (item['@id'] === id) {
+          siblingOrder = index;
+        }
+      });
+      return siblingOrder;
     });
+
     if ((order[0]+1 == order[1]) || order[0] == undefined) {
       (formData[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(order[1], 0, {
         '@id': this.state.newField.itemID,
