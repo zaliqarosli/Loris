@@ -138,7 +138,6 @@ class Toolbar extends Component {
   onDragStart(e) {
     e.dataTransfer.effectAllowed = 'move';
     // Firefox requires dataTransfer data to be set
-    console.log(e.target.id);
     e.dataTransfer.setData('text/plain', e.target.id);
   }
 
