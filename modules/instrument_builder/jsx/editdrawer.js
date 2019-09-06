@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import AddListItemForm from './addListItemForm';
 import AddTextItemForm from './addTextItemForm';
+import AddLabelItemForm from './addLabelItemForm';
 import AddScoreItemForm from './addScoreItemForm';
 import AddHeaderItemForm from './addHeaderItemForm';
 
@@ -67,6 +68,13 @@ class EditDrawer extends Component {
                     formData={this.props.field}
                     onEditField={this.props.onEditField}
                   />;
+        break;
+      case 'label':
+        editForm = <AddLabelItemForm
+                    mode='edit'
+                    formData={this.props.field}
+                    onEditField={this.props.onEditField}
+                   />;
         break;
       case 'static_score':
         editForm = <AddScoreItemForm
