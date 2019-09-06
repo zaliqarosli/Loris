@@ -144,11 +144,7 @@ class Canvas extends Component {
                   required={requiredValue}
                 />;
         break;
-      case 'static':
-        input = <StaticElement
-                  label={question}
-                />;
-        break;
+      case 'label':
       case 'static_score':
         input = <StaticElement
                   label={question}
