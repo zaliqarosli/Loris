@@ -45,7 +45,7 @@ class AddScoreItemForm extends Component {
         />
         <StaticElement
           label='UI type'
-          text='Static score'
+          text='Scored Field'
         />
         <TextboxElement
           name='question'
