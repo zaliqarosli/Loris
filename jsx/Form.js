@@ -1432,12 +1432,20 @@ class StaticElement extends Component {
     super(props);
   }
   render() {
+    let labelClass = 'col-sm-3 control-label';
+    let textClass = 'col-sm-9';
+    if (!this.props.label && this.props.label != '') {
+      textClass = 'col-sm-12';
+    }
+    if (!this.props.text && this.props.text != '') {
+      labelClass = 'col-sm-12 control-label';
+    }
     return (
       <div className="row form-group">
-        <label className="col-sm-3 control-label">
+        <label className={labelClass}>
           {this.props.label}
         </label>
-        <div className="col-sm-9">
+        <div className={textClass}>
           <p className="form-control-static">{this.props.text}</p>
         </div>
       </div>
@@ -1454,7 +1462,7 @@ StaticElement.propTypes = {
 };
 
 StaticElement.defaultProps = {
-  label: '',
+  label: null,
   text: null,
 };
 
