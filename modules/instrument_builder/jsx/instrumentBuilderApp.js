@@ -602,7 +602,7 @@ class InstrumentBuilderApp extends Component {
   }
 
   addPage(formData) {
-    pushToPages(formData);
+    this.pushToPages(formData);
     swal.fire('Success!', 'Page added.', 'success').then((result) => {
       if (result.value) {
         this.closeModal();
