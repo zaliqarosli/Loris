@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
+import JsonLDExpander from './../../../htdocs/js/JsonLDExpander';
 import swal from 'sweetalert2';
 import Modal from 'Modal';
 
@@ -13,8 +14,9 @@ import AddLabelItemForm from './addLabelItemForm';
 import AddScoreItemForm from './addScoreItemForm';
 import AddHeaderItemForm from './addHeaderItemForm';
 import AddPageForm from './addPageForm';
-
-import JsonLDExpander from './../../../htdocs/js/JsonLDExpander';
+import AddSectionForm from './addSectionForm';
+import AddMultipartForm from './addMultipartForm';
+import AddTableForm from './addTableForm';
 
 class InstrumentBuilderApp extends Component {
   constructor(props) {
@@ -146,7 +148,7 @@ class InstrumentBuilderApp extends Component {
       },
       schemaURI: this.props.schemaURI,
       selectedField: null,
-      selectedFieldType: null,
+      selectedItemType: null,
       prevItem: null,
       nextItem: null,
       showModal: false,
@@ -162,6 +164,13 @@ class InstrumentBuilderApp extends Component {
         requiredValue: false,
         headerLevel: null,
       },
+      newSubActivity: {
+        itemID: '',
+        description: '',
+        preamble: '',
+        branching: '',
+        order: [],
+      },
     };
     this.mapKeysToAlias = this.mapKeysToAlias.bind(this);
     this.updateProfile = this.updateProfile.bind(this);
@@ -175,10 +184,13 @@ class InstrumentBuilderApp extends Component {
     // this.reIndexField = this.reIndexField.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.deletePage = this.deletePage.bind(this);
-    this.addItem = this.addItem.bind(this);
-    this.addPage = this.addPage.bind(this);
-    this.pushToFields = this.pushToFields.bind(this);
+    this.addField = this.addField.bind(this);
+    this.addSubActivity = this.addSubActivity.bind(this);
+    this.addItemToParent = this.addItemToParent.bind(this);
     this.pushToPages = this.pushToPages.bind(this);
+    this.pushToMultiparts = this.pushToMultiparts.bind(this);
+    this.pushToSections = this.pushToSections.bind(this);
+    this.pushToTables = this.pushToTables.bind(this);
     this.selectField = this.selectField.bind(this);
   }
 
@@ -338,19 +350,50 @@ class InstrumentBuilderApp extends Component {
       }
       this.setState({newField});
     };
-    switch (this.state.selectedFieldType) {
+    const editSubActivity = (elementName, value) => {
+      let newSubActivity = Object.assign({}, this.state.newSubActivity);
+      newSubActivity[elementName] = value;
+      this.setState({newSubActivity});
+    };
+    switch (this.state.selectedItemType) {
       case 'pageBreak':
-        addForm = <AddPageForm onSave={this.addPage}/>;
+        addForm = <AddPageForm
+                    mode= 'add'
+                    formData={this.state.newSubActivity}
+                    onSave={this.addSubActivity}
+                    onEdit={editSubActivity}
+                  />;
         break;
       case 'section':
-
+        addForm = <AddSectionForm
+                    mode= 'add'
+                    formData={this.state.newSubActivity}
+                    onSave={this.addSubActivity}
+                    onEdit={editSubActivity}
+                  />;
+        break;
+      case 'multipart':
+        addForm = <AddMultipartForm
+                    mode= 'add'
+                    formData={this.state.newSubActivity}
+                    onSave={this.addSubActivity}
+                    onEdit={editSubActivity}
+                  />;
+        break;
+      case 'addTable':
+        addForm = <AddTableForm
+                    mode= 'add'
+                    formData={this.state.newSubActivity}
+                    onSave={this.addSubActivity}
+                    onEdit={editSubActivity}
+                  />;
         break;
       case 'select':
         addForm = <AddListItemForm
                     mode='add'
                     uiType='select'
                     formData={this.state.newField}
-                    onSave={this.addItem}
+                    onSave={this.addField}
                     onEditField={editField}
                     addChoices={addValueConstraint}
                   />;
@@ -360,7 +403,7 @@ class InstrumentBuilderApp extends Component {
                     mode='add'
                     uiType='radio'
                     formData={this.state.newField}
-                    onSave={this.addItem}
+                    onSave={this.addField}
                     onEditField={editField}
                     addChoices={addValueConstraint}
                   />;
@@ -370,7 +413,7 @@ class InstrumentBuilderApp extends Component {
                     mode='add'
                     uiType='text'
                     formData={this.state.newField}
-                    onSave={this.addItem}
+                    onSave={this.addField}
                     onEditField={editField}
                   />;
         break;
@@ -379,7 +422,7 @@ class InstrumentBuilderApp extends Component {
                     mode='add'
                     uiType='textarea'
                     formData={this.state.newField}
-                    onSave={this.addItem}
+                    onSave={this.addField}
                     onEditField={editField}
                   />;
         break;
@@ -387,7 +430,7 @@ class InstrumentBuilderApp extends Component {
         addForm = <AddLabelItemForm
                     mode='add'
                     formData={this.state.newField}
-                    onSave={this.addItem}
+                    onSave={this.addField}
                     onEditField={editField}
                   />;
         break;
@@ -395,7 +438,7 @@ class InstrumentBuilderApp extends Component {
         addForm = <AddScoreItemForm
                     mode='add'
                     formData={this.state.newField}
-                    onSave={this.addItem}
+                    onSave={this.addField}
                     onEditField={editField}
                   />;
         break;
@@ -403,7 +446,7 @@ class InstrumentBuilderApp extends Component {
         addForm = <AddHeaderItemForm
                     mode='add'
                     formData={this.state.newField}
-                    onSave={this.addItem}
+                    onSave={this.addField}
                     onEditField={editField}
                   />;
         break;
@@ -422,7 +465,7 @@ class InstrumentBuilderApp extends Component {
   }
 
   onDropFieldType(e) {
-    const selectedFieldType = e.dataTransfer.getData('text');
+    const selectedItemType = e.dataTransfer.getData('text');
     const placeholder = e.target;
     const prevSibling = placeholder.previousElementSibling;
     const nextSibling = placeholder.nextElementSibling;
@@ -434,7 +477,7 @@ class InstrumentBuilderApp extends Component {
     if (nextSibling != null) {
       nextItem = nextSibling.id;
     }
-    this.setState({selectedFieldType, prevItem, nextItem});
+    this.setState({selectedItemType, prevItem, nextItem});
     this.openModal();
     e.dataTransfer.clearData();
   }
@@ -497,7 +540,7 @@ class InstrumentBuilderApp extends Component {
     });
   }
 
-  addItem(e) {
+  addField(e) {
     let formData = Object.assign({}, this.state.formData);
     const valueConstraints = this.state.newField.choices.map((choice, index) => {
       return {
@@ -513,7 +556,7 @@ class InstrumentBuilderApp extends Component {
     });
     let field = {
       '@id': this.state.newField.itemID,
-      '@type': [],
+      '@type': ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field'],
       'http://schema.org/description': [{
         '@language': 'en',
         '@value': this.state.newField.description,
@@ -532,7 +575,7 @@ class InstrumentBuilderApp extends Component {
       }],
       'https://schema.repronim.org/inputType': [{
         '@type': 'http://www.w3.org/2001/XMLSchema#string',
-        '@value': this.state.selectedFieldType,
+        '@value': this.state.selectedItemType,
       }],
       'https://schema.repronim.org/valueconstraints': [{
         'http://schema.org/itemListElement': [{
@@ -544,7 +587,7 @@ class InstrumentBuilderApp extends Component {
         '@value': this.state.newField.multipleChoice,
       }],
     };
-    if (this.state.selectedFieldType === 'header') {
+    if (this.state.selectedItemType === 'header') {
       field['https://schema.repronim.org/headerLevel'] = [{
         '@type': 'http://www.w3.org/2001/XMLSchema#int',
         '@value': this.state.newField.headerLevel,
@@ -601,25 +644,153 @@ class InstrumentBuilderApp extends Component {
     });
   }
 
-  addPage(formData) {
-    this.pushToPages(formData);
-    swal.fire('Success!', 'Page added.', 'success').then((result) => {
-      if (result.value) {
-        this.closeModal();
-      }
-    });
+  addSubActivity(e) {
+    const itemType = this.state.selectedItemType;
+    let subActivity = {
+      '@id': this.state.newSubActivity.itemID,
+      '@type': ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'],
+      'http://schema.org/description': [{
+        '@language': 'en',
+        '@value': this.state.newSubActivity.description,
+      }],
+      'http://schema.repronim.org/preamble': [{
+        '@language': 'en',
+        '@value': this.state.newSubActivity.preamble,
+      }],
+      'http://www.w3.org/2004/02/skos/core#altLabel': [{
+        '@language': 'en',
+        '@value': this.state.newSubActivity.itemID,
+      }],
+      'http://www.w3.org/2004/02/skos/core#prefLabel': [{
+        '@language': 'en',
+        '@value': this.state.newSubActivity.description,
+      }],
+      'https://schema.repronim.org/inputType': [{
+        '@type': 'http://www.w3.org/2001/XMLSchema#string',
+        '@value': itemType,
+      }],
+      'https://schema.repronim.org/order': [
+        {
+          '@list': this.state.newSubActivity.order,
+        },
+      ],
+    };
+    switch (itemType) {
+      case 'pageBreak':
+        this.pushToPages(subActivity);
+        break;
+      case 'section':
+        this.pushToSections(subActivity);
+        break;
+      case 'multipart':
+        this.pushToMultiparts(subActivity);
+        break;
+      case 'addTable':
+        this.pushToTables(subActivity);
+        break;
+    }
   }
 
-  pushToFields(field) {
-    let formData = Object.assign([], this.state.formData);
-    formData.fields.push(field);
-    this.setState({formData});
+  addItemToParent(itemID, formDataCopy) {
+    // Add new item to parent's order list
+    const parentContainer = (document.getElementById(this.state.prevItem)).parentNode || (document.getElementById(this.state.nextItem)).parentNode;
+    const parentItem = (parentContainer.id).split('_');
+    const siblings = [this.state.prevItem, this.state.nextItem];
+    const siblingsID = siblings.map((sibling) => {
+      if (sibling != null) {
+        const split = sibling.split('_');
+        const type = split[0].concat('s');
+        const index = split[1];
+        return formDataCopy[type][index]['@id'];
+      } else {
+        return null;
+      }
+    });
+    // for each '@id' of this.state.prevItem/nextItem, return location in parent of ids
+    const parentType = parentItem[0].concat('s');
+    const parentIndex = parentItem[1];
+    const order = siblingsID.map((id) => {
+      let siblingOrder = null;
+      (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
+        if (item['@id'] === id) {
+          siblingOrder = index;
+        }
+      });
+      return siblingOrder;
+    });
+    // insert new item ID in correct location of order list
+    if ((order[0]+1 == order[1]) || order[0] == undefined) {
+      (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(order[1], 0, {
+        '@id': itemID,
+      });
+    } else if (order[1] == undefined) {
+      (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).push({
+        '@id': itemID,
+      });
+    } else {
+      swal.fire('Error.', 'Error indexing and adding new item.', 'error');
+    }
+    return formDataCopy;
   }
 
   pushToPages(page) {
+    const pageID = this.state.newSubActivity.itemID;
     let formData = Object.assign([], this.state.formData);
     formData.pages.push(page);
-    this.setState({formData});
+    // Add new page to schema order list
+    formData = addItemToParent(pageID, formData);
+    this.setState({formData}, () => {
+      swal.fire('Success!', 'Page added.', 'success').then((result) => {
+        if (result.value) {
+          this.closeModal();
+        }
+      });
+    });
+  }
+
+  pushToMultiparts(multipart) {
+    const multipartID = this.state.newSubActivity.itemID;
+    let formData = Object.assign([], this.state.formData);
+    formData.multiparts.push(multipart);
+    // Add new multipart to parent's order list
+    formData = addItemToParent(multipartID, formData);
+    this.setState({formData}, () => {
+      swal.fire('Success!', 'Multipart added.', 'success').then((result) => {
+        if (result.value) {
+          this.closeModal();
+        }
+      });
+    });
+  }
+
+  pushToSections(section) {
+    const sectionID = this.state.newSubActivity.itemID;
+    let formData = Object.assign([], this.state.formData);
+    formData.sections.push(section);
+    // Add new section to parent's order list
+    formData = addItemToParent(sectionID, formData);
+    this.setState({formData}, () => {
+      swal.fire('Success!', 'Section added.', 'success').then((result) => {
+        if (result.value) {
+          this.closeModal();
+        }
+      });
+    });
+  }
+
+  pushToTables(table) {
+    const tableID = this.state.newSubActivity.itemID;
+    let formData = Object.assign([], this.state.formData);
+    formData.tables.push(table);
+    // Add new table to parent's order list
+    formData = addItemToParent(tableID, formData);
+    this.setState({formData}, () => {
+      swal.fire('Success!', 'Table added.', 'success').then((result) => {
+        if (result.value) {
+          this.closeModal();
+        }
+      });
+    });
   }
 
   selectField(e) {
