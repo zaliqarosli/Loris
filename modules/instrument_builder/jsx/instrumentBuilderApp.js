@@ -544,6 +544,12 @@ class InstrumentBuilderApp extends Component {
         '@value': this.state.newField.multipleChoice,
       }],
     };
+    if (this.state.selectedFieldType === 'header') {
+      field['https://schema.repronim.org/headerLevel'] = [{
+        '@type': 'http://www.w3.org/2001/XMLSchema#int',
+        '@value': this.state.newField.headerLevel,
+      }];
+    }
     formData.fields.push(field);
 
     // Add new item to parent's order list
