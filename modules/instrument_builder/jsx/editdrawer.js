@@ -6,6 +6,7 @@ import AddTextItemForm from './addTextItemForm';
 import AddLabelItemForm from './addLabelItemForm';
 import AddScoreItemForm from './addScoreItemForm';
 import AddHeaderItemForm from './addHeaderItemForm';
+import AddNumericItemForm from './addNumericItemForm';
 
 class EditDrawer extends Component {
   constructor(props) {
@@ -65,6 +66,14 @@ class EditDrawer extends Component {
         editForm = <AddTextItemForm
                     mode='edit'
                     uiType='textarea'
+                    formData={this.props.field}
+                    onEditField={this.props.onEditField}
+                  />;
+        break;
+      case 'number':
+        editForm = <AddNumericItemForm
+                    mode='edit'
+                    uiType='Numeric'
                     formData={this.props.field}
                     onEditField={this.props.onEditField}
                   />;

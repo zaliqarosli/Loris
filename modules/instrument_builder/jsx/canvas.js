@@ -144,6 +144,13 @@ class Canvas extends Component {
                   required={requiredValue}
                 />;
         break;
+      case 'number':
+        input = <NumericElement
+                  name={name}
+                  label={question}
+                  required={requiredValue}
+                />;
+        break;
       case 'label':
       case 'static_score':
         input = <StaticElement

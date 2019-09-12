@@ -13,6 +13,7 @@ import AddTextItemForm from './addTextItemForm';
 import AddLabelItemForm from './addLabelItemForm';
 import AddScoreItemForm from './addScoreItemForm';
 import AddHeaderItemForm from './addHeaderItemForm';
+import AddNumericItemForm from './addNumericItemForm';
 import AddPageForm from './addPageForm';
 import AddSectionForm from './addSectionForm';
 import AddMultipartForm from './addMultipartForm';
@@ -437,6 +438,14 @@ class InstrumentBuilderApp extends Component {
         addForm = <AddTextItemForm
                     mode='add'
                     uiType='textarea'
+                    formData={this.state.newField}
+                    onSave={this.addField}
+                    onEditField={editField}
+                  />;
+        break;
+      case 'number':
+        addForm = <AddNumericItemForm
+                    mode='add'
                     formData={this.state.newField}
                     onSave={this.addField}
                     onEditField={editField}

@@ -19,7 +19,7 @@ class Toolbar extends Component {
         {type: 'select', label: 'Select'},
         {type: 'radio', label: 'Radio'},
         {type: 'label', label: 'Label'},
-        {type: 'numeric', label: 'Numeric'},
+        {type: 'number', label: 'Numeric'},
         {type: 'date', label: 'Date'},
         {type: 'boolean', label: 'Boolean'},
         {type: 'score', label: 'Score'},
