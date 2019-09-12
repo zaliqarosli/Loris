@@ -73,7 +73,15 @@ class EditDrawer extends Component {
       case 'number':
         editForm = <AddNumericItemForm
                     mode='edit'
-                    uiType='Numeric'
+                    uiType='numeric'
+                    formData={this.props.field}
+                    onEditField={this.props.onEditField}
+                  />;
+        break;
+      case 'slider':
+        editForm = <AddNumericItemForm
+                    mode='edit'
+                    uiType='slider'
                     formData={this.props.field}
                     onEditField={this.props.onEditField}
                   />;

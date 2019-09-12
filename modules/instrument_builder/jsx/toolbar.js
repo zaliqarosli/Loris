@@ -20,6 +20,7 @@ class Toolbar extends Component {
         {type: 'radio', label: 'Radio'},
         {type: 'label', label: 'Label'},
         {type: 'number', label: 'Numeric'},
+        {type: 'slider', label: 'Slider'},
         {type: 'date', label: 'Date'},
         {type: 'boolean', label: 'Boolean'},
         {type: 'score', label: 'Score'},

@@ -8,6 +8,13 @@ class AddNumericItemForm extends Component {
     // Pass props to parent constructor
     super(props);
 
+    this.state = {
+      uiType: {
+        slider: 'Slider',
+        numeric: 'Numeric',
+      },
+    };
+
     // Bind all methods to `this` (except for render method)
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -45,7 +52,7 @@ class AddNumericItemForm extends Component {
         />
         <StaticElement
           label='UI type'
-          text='Numeric'
+          text={this.state.uiType[this.props.uiType]}
         />
         <TextboxElement
           name='question'
@@ -92,7 +99,7 @@ class AddNumericItemForm extends Component {
 
 // Define props to pass to the component when called
 AddNumericItemForm.propTypes = {
-  uiType: PropTypes.string.isRequired, // i.e. whether it is "text" or "textarea"
+  uiType: PropTypes.string.isRequired, // i.e. whether it is "numeric" or "slider"
   formData: PropTypes.object,
   onSave: PropTypes.func, // a call-back function defined in parent class that will be triggered when called in this class
   mode: PropTypes.string,

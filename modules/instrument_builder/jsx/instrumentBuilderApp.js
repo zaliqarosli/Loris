@@ -446,6 +446,16 @@ class InstrumentBuilderApp extends Component {
       case 'number':
         addForm = <AddNumericItemForm
                     mode='add'
+                    uiType='numeric'
+                    formData={this.state.newField}
+                    onSave={this.addField}
+                    onEditField={editField}
+                  />;
+        break;
+      case 'slider':
+        addForm = <AddNumericItemForm
+                    mode='add'
+                    uiType='slider'
                     formData={this.state.newField}
                     onSave={this.addField}
                     onEditField={editField}

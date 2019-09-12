@@ -150,7 +150,7 @@ class Canvas extends Component {
                   label={question}
                   required={requiredValue}
                 />;
-        break;
+        break; // TODO: Add rendering for slider inputType
       case 'label':
       case 'static_score':
         input = <StaticElement
