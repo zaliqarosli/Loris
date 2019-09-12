@@ -169,7 +169,7 @@ class InstrumentBuilderApp extends Component {
         description: '',
         preamble: '',
         branching: '',
-        order: [''],
+        order: [{list: '', inputType: ''}],
       },
     };
     this.mapKeysToAlias = this.mapKeysToAlias.bind(this);
@@ -187,6 +187,7 @@ class InstrumentBuilderApp extends Component {
     this.deletePage = this.deletePage.bind(this);
     this.addField = this.addField.bind(this);
     this.addSubActivity = this.addSubActivity.bind(this);
+    this.addPageToSchema = this.addPageToSchema.bind(this);
     this.addItemToParent = this.addItemToParent.bind(this);
     this.pushToPages = this.pushToPages.bind(this);
     this.pushToMultiparts = this.pushToMultiparts.bind(this);
@@ -343,8 +344,9 @@ class InstrumentBuilderApp extends Component {
     const editField = (elementName, value) => {
       let newField = Object.assign({}, this.state.newField);
       if (elementName.includes('name') || elementName.includes('value')) {
-        const index = elementName.substring(elementName.indexOf('_')+1);
-        const name = elementName.substring(0, elementName.indexOf('_'));
+        const split = elementName.split('_');
+        const index = split[1];
+        const name = split[0];
         newField.choices[index][name] = value;
       } else {
         newField[elementName] = value;
@@ -353,7 +355,19 @@ class InstrumentBuilderApp extends Component {
     };
     const editSubActivity = (elementName, value) => {
       let newSubActivity = Object.assign({}, this.state.newSubActivity);
-      newSubActivity[elementName] = value;
+      if (elementName.includes('list') || elementName.includes('inputType')) {
+        const split = elementName.split('_');
+        const index = split[1];
+        const name = split[0];
+        newSubActivity.order[index][name] = value;
+      } else {
+        newSubActivity[elementName] = value;
+      }
+      this.setState({newSubActivity});
+    };
+    const addToOrderList = () => {
+      let newSubActivity = Object.assign({}, this.state.newSubActivity);
+      newSubActivity.order.push('');
       this.setState({newSubActivity});
     };
     switch (this.state.selectedItemType) {
@@ -363,6 +377,7 @@ class InstrumentBuilderApp extends Component {
                     formData={this.state.newSubActivity}
                     onSave={this.addSubActivity}
                     onEdit={editSubActivity}
+                    addPageContent={addToOrderList}
                   />;
         break;
       case 'section':
@@ -651,7 +666,97 @@ class InstrumentBuilderApp extends Component {
   }
 
   addSubActivity(e) {
-    const itemType = this.state.selectedItemType;
+    // add accompanying field(s) to their arrays in formdata
+    let formData = Object.assign({}, this.state.formData);
+    this.state.newSubActivity.order.map((item) => {
+      let contentType = null;
+      let itemType = null;
+      switch (item.inputType) {
+        case 'boolean':
+        case 'date':
+        case 'header':
+        case 'label':
+        case 'numeric':
+        case 'radio':
+        case 'score':
+        case 'select':
+        case 'text':
+        case 'textarea':
+          contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field'];
+          itemType = 'fields';
+          break;
+        case 'multipart':
+          contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'];
+          itemType = 'multiparts';
+          break;
+        case 'section':
+          contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'];
+          itemType = 'sections';
+          break;
+        case 'table':
+          contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'];
+          itemType = 'tables';
+          break;
+      }
+      let content = {
+        '@id': item.list,
+        '@type': contentType,
+        'http://schema.org/description': [{
+          '@language': 'en',
+          '@value': '',
+        }],
+        'http://schema.org/question': [{
+          '@language': 'en',
+          '@value': '',
+        }],
+        'http://www.w3.org/2004/02/skos/core#altLabel': [{
+          '@language': 'en',
+          '@value': item.list,
+        }],
+        'http://www.w3.org/2004/02/skos/core#prefLabel': [{
+          '@language': 'en',
+          '@value': '',
+        }],
+        'https://schema.repronim.org/inputType': [{
+          '@type': 'http://www.w3.org/2001/XMLSchema#string',
+          '@value': item.inputType,
+        }],
+        'https://schema.repronim.org/valueconstraints': [{
+          'http://schema.org/itemListElement': [{
+            '@list': [{
+              'http://schema.org/name': [{
+                '@language': 'en',
+                '@value': '',
+              }],
+              'http://schema.org/value': [{
+                '@language': 'en',
+                '@value': '',
+              }],
+            }],
+          }],
+        }],
+        'http://schema.repronim.org/multipleChoice': [{
+          '@type': 'http://schema.org/Boolean',
+          '@value': '',
+        }],
+      };
+      if (item.inputType === 'header') {
+        content['https://schema.repronim.org/headerLevel'] = [{
+          '@type': 'http://www.w3.org/2001/XMLSchema#int',
+          '@value': '',
+        }];
+      }
+      formData[itemType].push(content);
+    });
+    this.setState({formData});
+
+    // push subactivity to their type arrays
+    const subActivityType = this.state.selectedItemType;
+    const orderList = this.state.newSubActivity.order.map((item) => {
+      return {
+        '@id': item.list,
+      };
+    });
     let subActivity = {
       '@id': this.state.newSubActivity.itemID,
       '@type': ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'],
@@ -673,15 +778,15 @@ class InstrumentBuilderApp extends Component {
       }],
       'https://schema.repronim.org/inputType': [{
         '@type': 'http://www.w3.org/2001/XMLSchema#string',
-        '@value': itemType,
+        '@value': subActivityType,
       }],
       'https://schema.repronim.org/order': [
         {
-          '@list': this.state.newSubActivity.order,
+          '@list': orderList,
         },
       ],
     };
-    switch (itemType) {
+    switch (subActivityType) {
       case 'pageBreak':
         this.pushToPages(subActivity);
         break;
@@ -705,10 +810,21 @@ class InstrumentBuilderApp extends Component {
   addPageToSchema(pageID, formDataCopy) {
     // Add new item to schema order list
     const currentDropPage = (document.getElementById(this.state.prevItem)).parentNode || (document.getElementById(this.state.nextItem)).parentNode;
-    const pageIdInfo = (parentContainer.id).split('_');
+    const pageIdInfo = (currentDropPage.id).split('_');
     const currentPageIndex = pageIdInfo[1];
     const currentPageItemId = formDataCopy.pages[currentPageIndex]['@id'];
-    const current
+    let currentPageOrder = null;
+    (formDataCopy.schema['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
+      if (item['@id'] === currentPageItemId) {
+        currentPageOrder = index;
+      }
+    });
+    // insert new page in correct location of schema's order list
+    // correct location is directly after currentPageOrder
+    (formDataCopy.schema['https://schema.repronim.org/order'][0]['@list']).splice(currentPageOrder+1, 0, {
+      '@id': pageID,
+    });
+
     // TODO: Add functionality of breaking nextItem into the new page
     // depending on where the page break is dropped
     // const siblings = [this.state.prevItem, this.state.nextItem];
@@ -723,30 +839,7 @@ class InstrumentBuilderApp extends Component {
     //   }
     // });
 
-    // for each '@id' of this.state.prevItem/nextItem, return location in parent of ids
-    const order = siblingsID.map((id) => {
-      let siblingOrder = null;
-      (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
-        if (item['@id'] === id) {
-          siblingOrder = index;
-        }
-      });
-      return siblingOrder;
-    });
-    // insert new item ID in correct location of order list
-    if ((order[0]+1 == order[1]) || order[0] == undefined) {
-      (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(order[1], 0, {
-        '@id': itemID,
-      });
-    } else if (order[1] == undefined) {
-      (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).push({
-        '@id': itemID,
-      });
-    } else {
-      swal.fire('Error.', 'Error indexing and adding new item.', 'error');
-    }
     return formDataCopy;
-
   }
 
   addItemToParent(itemID, formDataCopy) {
@@ -793,10 +886,10 @@ class InstrumentBuilderApp extends Component {
 
   pushToPages(page) {
     const pageID = this.state.newSubActivity.itemID;
-    let formData = Object.assign([], this.state.formData);
-    formData.pages.push(page);
+    let formDataCopy = Object.assign([], this.state.formData);
+    formDataCopy.pages.push(page);
     // Add new page to schema order list
-    formData = this.addPageToSchema(pageID, formData);
+    const formData = this.addPageToSchema(pageID, formDataCopy);
     this.setState({formData}, () => {
       swal.fire('Success!', 'Page added.', 'success').then((result) => {
         if (result.value) {
@@ -880,25 +973,6 @@ class InstrumentBuilderApp extends Component {
       };
     }
 
-    // Setup variables for canvas component
-    let pages = [];
-    if ((this.state.formData['pages']).length == 0) {
-      pages.push({
-        'http://www.w3.org/2004/02/skos/core#altLabel': '',
-        'http://schema.org/description': '',
-        '@id': '',
-        'http://schema.repronim.org/preamble': '',
-        'http://www.w3.org/2004/02/skos/core#prefLabel': '',
-        'https://schema.repronim.org/order': [
-          {
-            '@list': [],
-          },
-        ],
-      });
-    } else {
-      pages = [...this.state.formData.pages];
-    }
-
     // Setup variables for drawer component
     let field = {};
     let inputType = null;
@@ -980,7 +1054,7 @@ class InstrumentBuilderApp extends Component {
           <Canvas
             fields={this.state.formData.fields}
             multiparts={this.state.formData.multiparts}
-            pages={pages}
+            pages={this.state.formData.pages}
             sections={this.state.formData.sections}
             tables={this.state.formData.tables}
             requiredValues={requiredValues}
