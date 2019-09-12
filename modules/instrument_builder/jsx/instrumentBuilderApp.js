@@ -650,6 +650,7 @@ class InstrumentBuilderApp extends Component {
     this.state.newSubActivity.order.map((item) => {
       let contentType = null;
       let itemType = null;
+      let displayText = null;
       switch (item.inputType) {
         case 'boolean':
         case 'date':
@@ -663,18 +664,22 @@ class InstrumentBuilderApp extends Component {
         case 'textarea':
           contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field'];
           itemType = 'fields';
+          displayText = 'http://schema.org/description';
           break;
         case 'multipart':
           contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'];
           itemType = 'multiparts';
+          displayText = 'http://schema.repronim.org/preamble';
           break;
         case 'section':
           contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'];
           itemType = 'sections';
+          displayText = 'http://schema.repronim.org/preamble';
           break;
         case 'table':
           contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'];
           itemType = 'tables';
+          displayText = 'http://schema.repronim.org/preamble';
           break;
       }
       let content = {
@@ -684,7 +689,7 @@ class InstrumentBuilderApp extends Component {
           '@language': 'en',
           '@value': '',
         }],
-        'http://schema.org/question': [{
+        [displayText]: [{
           '@language': 'en',
           '@value': '',
         }],
@@ -723,6 +728,13 @@ class InstrumentBuilderApp extends Component {
         content['https://schema.repronim.org/headerLevel'] = [{
           '@type': 'http://www.w3.org/2001/XMLSchema#int',
           '@value': '',
+        }];
+      }
+      if (item.inputType === 'multipart' || item.inputType === 'section' || item.inputType === 'table') {
+        content['https://schema.repronim.org/order'] = [{
+          '@list': [{
+            '@id': '',
+          }],
         }];
       }
       formData[itemType].push(content);
