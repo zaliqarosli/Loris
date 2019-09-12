@@ -562,7 +562,7 @@ class InstrumentBuilderApp extends Component {
   }
 
   addField(e) {
-    let formData = Object.assign({}, this.state.formData);
+    let formDataCopy = Object.assign({}, this.state.formData);
     const valueConstraints = this.state.newField.choices.map((choice, index) => {
       return {
         'http://schema.org/name': [{
@@ -614,48 +614,8 @@ class InstrumentBuilderApp extends Component {
         '@value': this.state.newField.headerLevel,
       }];
     }
-    formData.fields.push(field);
-
-    // Add new item to parent's order list
-    const parentContainer = (document.getElementById(this.state.prevItem)).parentNode || (document.getElementById(this.state.nextItem)).parentNode;
-    const parentItem = (parentContainer.id).split('_');
-    const siblings = [this.state.prevItem, this.state.nextItem];
-    const siblingsID = siblings.map((sibling) => {
-      if (sibling != null) {
-        const split = sibling.split('_');
-        const type = split[0].concat('s');
-        const index = split[1];
-        return formData[type][index]['@id'];
-      } else {
-        return null;
-      }
-    });
-
-    // for each '@id' of this.state.prevItem/nextItem
-    // return location in parent of ids
-    const parentType = parentItem[0].concat('s');
-    const parentIndex = parentItem[1];
-    const order = siblingsID.map((id) => {
-      let siblingOrder = null;
-      (formData[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
-        if (item['@id'] === id) {
-          siblingOrder = index;
-        }
-      });
-      return siblingOrder;
-    });
-
-    if ((order[0]+1 == order[1]) || order[0] == undefined) {
-      (formData[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(order[1], 0, {
-        '@id': this.state.newField.itemID,
-      });
-    } else if (order[1] == undefined) {
-      (formData[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).push({
-        '@id': this.state.newField.itemID,
-      });
-    } else {
-      swal.fire('Error.', 'Error indexing and adding new item.', 'error');
-    }
+    formDataCopy.fields.push(field);
+    const formData = this.addItemToParent(this.state.newField.itemID, formDataCopy);
     this.setState({formData}, () => {
       swal.fire('Success!', 'Item added.', 'success').then((result) => {
         if (result.value) {
