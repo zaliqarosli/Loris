@@ -49,7 +49,7 @@ class AddLabelItemForm extends Component {
         />
         <TextboxElement
           name='question'
-          label='Question text'
+          label='Text'
           value={this.props.formData.question}
           onUserInput={this.props.onEditField}
           required={true}

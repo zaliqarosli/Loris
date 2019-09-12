@@ -14,7 +14,7 @@ class AddPageForm extends Component {
   }
 
   renderContentFields() {
-    let contentBlock = this.state.formData.order.map((content, key) => {
+    let contentBlock = this.props.formData.order.map((content, key) => {
       return (
         <div key={key} style={{display: 'flex'}}>
           <div style={{flex: '1', margin: 'auto 20px'}}>
@@ -22,7 +22,7 @@ class AddPageForm extends Component {
               name={key}
               label='ID'
               onUserInput={this.setPageContent}
-              value={this.state.formData.order[key]}
+              value={this.props.formData.order[key]}
             />
           </div>
           <div style={{marginRight: '-5px', alignSelf: 'flex-end', marginBottom: '15px'}}>
@@ -82,7 +82,7 @@ class AddPageForm extends Component {
           label='UI type'
           text='Page'
         />
-        <NumericElement
+        <TextboxElement
           name='pageNumber'
           label='Page Number'
           value={this.props.formData.pageNumber}
@@ -95,6 +95,7 @@ class AddPageForm extends Component {
           onUserInput={this.props.onEdit}
         />
         <StaticElement
+          label=''
           text='*Optional: Add ID of items or sub activities you want to add to this page'
         />
         {this.renderContentFields()}

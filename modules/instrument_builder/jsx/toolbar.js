@@ -10,7 +10,9 @@ class Toolbar extends Component {
     this.state = {
       fieldTypes: [
         {type: 'pageBreak', label: 'Page Break'},
+        {type: 'multipart', label: 'Multipart'},
         {type: 'section', label: 'Section'},
+        {type: 'addTable', label: 'Table'},
         {type: 'header', label: 'Header'},
         {type: 'text', label: 'Text'},
         {type: 'textarea', label: 'Text Area'},

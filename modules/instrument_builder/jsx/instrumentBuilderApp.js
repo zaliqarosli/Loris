@@ -169,7 +169,7 @@ class InstrumentBuilderApp extends Component {
         description: '',
         preamble: '',
         branching: '',
-        order: [],
+        order: [''],
       },
     };
     this.mapKeysToAlias = this.mapKeysToAlias.bind(this);
@@ -182,6 +182,7 @@ class InstrumentBuilderApp extends Component {
     this.renderModal = this.renderModal.bind(this);
     this.onDropFieldType = this.onDropFieldType.bind(this);
     // this.reIndexField = this.reIndexField.bind(this);
+    this.deleteItemFromParent = this.deleteItemFromParent.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.deletePage = this.deletePage.bind(this);
     this.addField = this.addField.bind(this);
@@ -505,8 +506,12 @@ class InstrumentBuilderApp extends Component {
   // }
 
   deleteItem(e) {
-    const fieldKey = e.currentTarget.parentNode.id;
+    const itemDOMID = e.currentTarget.parentNode.parentNode.id;
+    const itemInfo = itemDOMID.split('_');
+    const itemType = itemInfo[0].concat('s');
+    const itemIndex = itemInfo[1];
     let formData = Object.assign({}, this.state.formData);
+    const itemID = formData[itemType][itemIndex]['@id'];
     swal.fire({
       title: 'Are you sure?',
       text: 'You will lose all field information.',
@@ -515,7 +520,8 @@ class InstrumentBuilderApp extends Component {
       confirmButtonText: 'Yes, delete field!',
     }).then((result) => {
       if (result.value) {
-        formData.fields.splice(fieldKey, 1);
+        formData[itemType].splice(itemIndex, 1);
+        this.deleteItemFromParent(itemID, formData);
         this.setState({formData});
         swal.fire('Deleted!', 'Field has been deleted.', 'success');
       }
@@ -691,6 +697,58 @@ class InstrumentBuilderApp extends Component {
     }
   }
 
+  deleteItemFromParent(itemID, formDataCopy) {
+    // TODO: delete itemID from item's parent's order list
+    // need to find parent id somehow
+  }
+
+  addPageToSchema(pageID, formDataCopy) {
+    // Add new item to schema order list
+    const currentDropPage = (document.getElementById(this.state.prevItem)).parentNode || (document.getElementById(this.state.nextItem)).parentNode;
+    const pageIdInfo = (parentContainer.id).split('_');
+    const currentPageIndex = pageIdInfo[1];
+    const currentPageItemId = formDataCopy.pages[currentPageIndex]['@id'];
+    const current
+    // TODO: Add functionality of breaking nextItem into the new page
+    // depending on where the page break is dropped
+    // const siblings = [this.state.prevItem, this.state.nextItem];
+    // const siblingsID = siblings.map((sibling) => {
+    //   if (sibling != null) {
+    //     const split = sibling.split('_');
+    //     const type = split[0].concat('s');
+    //     const index = split[1];
+    //     return formDataCopy[type][index]['@id'];
+    //   } else {
+    //     return null;
+    //   }
+    // });
+
+    // for each '@id' of this.state.prevItem/nextItem, return location in parent of ids
+    const order = siblingsID.map((id) => {
+      let siblingOrder = null;
+      (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
+        if (item['@id'] === id) {
+          siblingOrder = index;
+        }
+      });
+      return siblingOrder;
+    });
+    // insert new item ID in correct location of order list
+    if ((order[0]+1 == order[1]) || order[0] == undefined) {
+      (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(order[1], 0, {
+        '@id': itemID,
+      });
+    } else if (order[1] == undefined) {
+      (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).push({
+        '@id': itemID,
+      });
+    } else {
+      swal.fire('Error.', 'Error indexing and adding new item.', 'error');
+    }
+    return formDataCopy;
+
+  }
+
   addItemToParent(itemID, formDataCopy) {
     // Add new item to parent's order list
     const parentContainer = (document.getElementById(this.state.prevItem)).parentNode || (document.getElementById(this.state.nextItem)).parentNode;
@@ -738,7 +796,7 @@ class InstrumentBuilderApp extends Component {
     let formData = Object.assign([], this.state.formData);
     formData.pages.push(page);
     // Add new page to schema order list
-    formData = addItemToParent(pageID, formData);
+    formData = this.addPageToSchema(pageID, formData);
     this.setState({formData}, () => {
       swal.fire('Success!', 'Page added.', 'success').then((result) => {
         if (result.value) {
@@ -753,7 +811,7 @@ class InstrumentBuilderApp extends Component {
     let formData = Object.assign([], this.state.formData);
     formData.multiparts.push(multipart);
     // Add new multipart to parent's order list
-    formData = addItemToParent(multipartID, formData);
+    formData = this.addItemToParent(multipartID, formData);
     this.setState({formData}, () => {
       swal.fire('Success!', 'Multipart added.', 'success').then((result) => {
         if (result.value) {
@@ -768,7 +826,7 @@ class InstrumentBuilderApp extends Component {
     let formData = Object.assign([], this.state.formData);
     formData.sections.push(section);
     // Add new section to parent's order list
-    formData = addItemToParent(sectionID, formData);
+    formData = this.addItemToParent(sectionID, formData);
     this.setState({formData}, () => {
       swal.fire('Success!', 'Section added.', 'success').then((result) => {
         if (result.value) {
@@ -783,7 +841,7 @@ class InstrumentBuilderApp extends Component {
     let formData = Object.assign([], this.state.formData);
     formData.tables.push(table);
     // Add new table to parent's order list
-    formData = addItemToParent(tableID, formData);
+    formData = this.addItemToParent(tableID, formData);
     this.setState({formData}, () => {
       swal.fire('Success!', 'Table added.', 'success').then((result) => {
         if (result.value) {
