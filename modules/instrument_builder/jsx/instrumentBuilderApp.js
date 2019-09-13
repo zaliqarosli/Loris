@@ -263,11 +263,10 @@ class InstrumentBuilderApp extends Component {
         break;
       default:
         // for value constraint choice options
+        const index = (elementName.split('_'))[1];
         if (elementName.includes('name')) {
-          const index = elementName.substring(elementName.indexOf('_')+1);
          formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'][index]['http://schema.org/name'][0]['@value'] = value;
         } else if (elementName.includes('value')) {
-          const index = elementName.substring(elementName.indexOf('_')+1);
          formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'][index]['http://schema.org/value'][0]['@value'] = value;
         }
     }
@@ -499,14 +498,6 @@ class InstrumentBuilderApp extends Component {
     e.dataTransfer.clearData();
   }
 
-  // addNewFieldTo(itemType, itemIndex) {
-  //   const formDataKey = itemType.concat('s');
-  // we want to add a new field to the order list of this.state.formData[formDataKey][itemIndex];
-  // we need to push to fields array first
-  // this function actually only needs to be called after data on add item form has been submitted
-  // }
-
-
   // reIndexField(e) {
   // // should actually be reindexing the order array in each parent div i.e. section/ pages.
   // // splice(e.target.id??, 0, tempfield) insert temp field element into current index of fields array
@@ -524,7 +515,7 @@ class InstrumentBuilderApp extends Component {
   deleteItem(e) {
     const itemDOMID = e.currentTarget.parentNode.parentNode.id;
     const itemInfo = itemDOMID.split('_');
-    const itemType = itemInfo[0].concat('s');
+    const itemType = itemInfo[0];
     const itemIndex = itemInfo[1];
     let formDataCopy = Object.assign({}, this.state.formData);
     const itemID = formDataCopy[itemType][itemIndex]['@id'];
@@ -783,7 +774,7 @@ class InstrumentBuilderApp extends Component {
   deleteItemFromParent(itemID, itemDOMID, formDataCopy) {
     const parentDOMID = (document.getElementById(itemDOMID)).parentNode.id;
     const parentInfo = parentDOMID.split('_');
-    const parentType = parentInfo[0].concat('s');
+    const parentType = parentInfo[0];
     const parentIndex = parentInfo[1];
     let itemOrder = null;
     formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list'].forEach((item, index) => {
@@ -832,7 +823,7 @@ class InstrumentBuilderApp extends Component {
     // const siblingsID = siblings.map((sibling) => {
     //   if (sibling != null) {
     //     const split = sibling.split('_');
-    //     const type = split[0].concat('s');
+    //     const type = split[0];
     //     const index = split[1];
     //     return formDataCopy[type][index]['@id'];
     //   } else {
@@ -851,7 +842,7 @@ class InstrumentBuilderApp extends Component {
     const siblingsID = siblings.map((sibling) => {
       if (sibling != null) {
         const split = sibling.split('_');
-        const type = split[0].concat('s');
+        const type = split[0];
         const index = split[1];
         return formDataCopy[type][index]['@id'];
       } else {
@@ -859,7 +850,7 @@ class InstrumentBuilderApp extends Component {
       }
     });
     // for each '@id' of this.state.prevItem/nextItem, return location in parent of ids
-    const parentType = parentItem[0].concat('s');
+    const parentType = parentItem[0];
     const parentIndex = parentItem[1];
     const order = siblingsID.map((id) => {
       let siblingOrder = null;
@@ -946,7 +937,7 @@ class InstrumentBuilderApp extends Component {
   }
 
   selectField(e) {
-    let fieldIndex = (e.currentTarget.id).substring((e.currentTarget.id).indexOf('_')+1);
+    let fieldIndex = ((e.currentTarget.id).split('_'))[1];
     this.setState({
       selectedField: fieldIndex,
       openDrawer: true,

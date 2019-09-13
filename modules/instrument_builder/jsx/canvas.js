@@ -187,8 +187,8 @@ class Canvas extends Component {
     return (
       <div
         className="items"
-        key={'field_'+fieldIndex}
-        id={'field_'+fieldIndex}
+        key={'fields_'+fieldIndex}
+        id={'fields_'+fieldIndex}
         style={itemStyle}
         draggable={true}
         onDragStart={this.onDragStart}
@@ -271,8 +271,8 @@ class Canvas extends Component {
     };
     return (
       <div
-        key={'multipart_'+multipartIndex}
-        id={'multipart_'+multipartIndex}
+        key={'multiparts_'+multipartIndex}
+        id={'multiparts_'+multipartIndex}
         className="items"
         onDragOver={this.onDragOver}
         style={multipartStyle}
@@ -336,8 +336,8 @@ class Canvas extends Component {
     };
     return (
       <div
-        key={'section_'+sectionIndex}
-        id={'section_'+sectionIndex}
+        key={'sections_'+sectionIndex}
+        id={'sections_'+sectionIndex}
         className="items"
         style={sectionStyle}
         onDragOver={this.onDragOver}
@@ -425,8 +425,8 @@ class Canvas extends Component {
     };
     return (
       <div
-        key={'table_'+tableIndex}
-        id={'table_'+tableIndex}
+        key={'tables_'+tableIndex}
+        id={'tables_'+tableIndex}
         className="items"
         style={tableStyle}
         onDragOver={this.onDragOver}
@@ -508,8 +508,8 @@ class Canvas extends Component {
       return (
         <div
           className="pages"
-          key={'page_'+index}
-          id={'page_'+index}
+          key={'pages_'+index}
+          id={'pages_'+index}
           style={pageStyle}
         >
           <span>
