@@ -173,7 +173,6 @@ class InstrumentBuilderApp extends Component {
         order: [{list: '', inputType: ''}],
       },
     };
-    this.mapKeysToAlias = this.mapKeysToAlias.bind(this);
     this.updateProfile = this.updateProfile.bind(this);
     this.editFormData = this.editFormData.bind(this);
     this.addValueConstraints = this.addValueConstraints.bind(this);
@@ -209,24 +208,6 @@ class InstrumentBuilderApp extends Component {
         console.error(error);
       }
     }
-  }
-
-  mapKeysToAlias(data) {
-    const keyValues = Object.keys(data).map((key) => {
-      let newKey = '';
-      if (key.charAt(0) === '@') {
-        newKey = key.substring(1);
-      } else {
-        let lastPiece = key.substring(key.lastIndexOf('/') + 1);
-        if (lastPiece.lastIndexOf('#') > -1) {
-          lastPiece = key.substring(key.lastIndexOf('#') + 1);
-        }
-        newKey = lastPiece;
-      }
-      return {[newKey]: data[key]};
-    });
-
-    return Object.assign({}, ...keyValues);
   }
 
   updateProfile(element, value) {
