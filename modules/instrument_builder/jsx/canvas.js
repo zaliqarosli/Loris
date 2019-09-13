@@ -187,7 +187,7 @@ class Canvas extends Component {
     return (
       <div
         className="items"
-        key={fieldIndex}
+        key={'field_'+fieldIndex}
         id={'field_'+fieldIndex}
         style={itemStyle}
         draggable={true}
@@ -271,7 +271,7 @@ class Canvas extends Component {
     };
     return (
       <div
-        key={multipartIndex}
+        key={'multipart_'+multipartIndex}
         id={'multipart_'+multipartIndex}
         className="items"
         onDragOver={this.onDragOver}
@@ -336,7 +336,7 @@ class Canvas extends Component {
     };
     return (
       <div
-        key={sectionIndex}
+        key={'section_'+sectionIndex}
         id={'section_'+sectionIndex}
         className="items"
         style={sectionStyle}
@@ -425,7 +425,7 @@ class Canvas extends Component {
     };
     return (
       <div
-        key={tableIndex}
+        key={'table_'+tableIndex}
         id={'table_'+tableIndex}
         className="items"
         style={tableStyle}
@@ -508,7 +508,7 @@ class Canvas extends Component {
       return (
         <div
           className="pages"
-          key={index}
+          key={'page_'+index}
           id={'page_'+index}
           style={pageStyle}
         >
