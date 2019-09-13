@@ -185,6 +185,7 @@ class InstrumentBuilderApp extends Component {
     // this.reIndexField = this.reIndexField.bind(this);
     this.deleteItemFromParent = this.deleteItemFromParent.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
+    this.deletePageFromSchema = this.deletePageFromSchema.bind(this);
     this.deletePage = this.deletePage.bind(this);
     this.addField = this.addField.bind(this);
     this.addSubActivity = this.addSubActivity.bind(this);
@@ -544,8 +545,8 @@ class InstrumentBuilderApp extends Component {
     const itemInfo = itemDOMID.split('_');
     const itemType = itemInfo[0].concat('s');
     const itemIndex = itemInfo[1];
-    let formData = Object.assign({}, this.state.formData);
-    const itemID = formData[itemType][itemIndex]['@id'];
+    let formDataCopy = Object.assign({}, this.state.formData);
+    const itemID = formDataCopy[itemType][itemIndex]['@id'];
     swal.fire({
       title: 'Are you sure?',
       text: 'You will lose all field information.',
@@ -554,17 +555,20 @@ class InstrumentBuilderApp extends Component {
       confirmButtonText: 'Yes, delete field!',
     }).then((result) => {
       if (result.value) {
-        formData[itemType].splice(itemIndex, 1);
-        this.deleteItemFromParent(itemID, formData);
-        this.setState({formData});
-        swal.fire('Deleted!', 'Field has been deleted.', 'success');
+        formDataCopy[itemType].splice(itemIndex, 1);
+        const formData = this.deleteItemFromParent(itemID, itemDOMID, formDataCopy);
+        this.setState({formData}, () => {
+          swal.fire('Deleted!', 'Field has been deleted.', 'success');
+        });
       }
     });
   }
 
   deletePage(e) {
-    const pageKey = e.currentTarget.parentNode.id;
-    let formData = Object.assign([], this.state.formData);
+    const pageDOMID = e.currentTarget.parentNode.parentNode.id;
+    const pageIndex = (pageDOMID.split('_'))[1];
+    let formDataCopy = Object.assign([], this.state.formData);
+    const pageID = formDataCopy.pages[pageIndex]['@id'];
     swal.fire({
       title: 'Are you sure?',
       text: 'You will lose all page information.',
@@ -573,9 +577,11 @@ class InstrumentBuilderApp extends Component {
       confirmButtonText: 'Yes, delete page!',
     }).then((result) => {
       if (result.value) {
-        formData.pages.splice(pageKey, 2);
-        this.setState({formData});
-        swal.fire('Deleted!', 'Page has been deleted.', 'success');
+        formDataCopy.pages.splice(pageIndex, 1);
+        const formData = this.deletePageFromSchema(pageID, formDataCopy);
+        this.setState({formData}, () => {
+          swal.fire('Deleted!', 'Page has been deleted.', 'success');
+        });
       }
     });
   }
@@ -793,9 +799,32 @@ class InstrumentBuilderApp extends Component {
     }
   }
 
-  deleteItemFromParent(itemID, formDataCopy) {
-    // TODO: delete itemID from item's parent's order list
-    // need to find parent id somehow
+  deleteItemFromParent(itemID, itemDOMID, formDataCopy) {
+    const parentDOMID = (document.getElementById(itemDOMID)).parentNode.id;
+    const parentInfo = parentDOMID.split('_');
+    const parentType = parentInfo[0].concat('s');
+    const parentIndex = parentInfo[1];
+    let itemOrder = null;
+    formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list'].forEach((item, index) => {
+      if (item['@id'] === itemID) {
+        itemOrder = index;
+      }
+    });
+    // splice out that index
+    (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(itemOrder, 1);
+    return formDataCopy;
+  }
+
+  deletePageFromSchema(pageID, formDataCopy) {
+    let pageOrder = null;
+    formDataCopy.schema['https://schema.repronim.org/order'][0]['@list'].forEach((page, index) => {
+      if (page['@id'] === pageID) {
+        pageOrder = index;
+      }
+    });
+    // splice out that index
+    (formDataCopy.schema['https://schema.repronim.org/order'][0]['@list']).splice(pageOrder, 1);
+    return formDataCopy;
   }
 
   addPageToSchema(pageID, formDataCopy) {
@@ -1052,9 +1081,7 @@ class InstrumentBuilderApp extends Component {
             onDropFieldType={this.onDropFieldType}
             // reIndexField={this.reIndexField}
             deletePage={this.deletePage}
-            deleteMultipart={this.deleteItem}
-            deleteSection={this.deleteItem}
-            deleteField={this.deleteItem}
+            deleteItem={this.deleteItem}
             selectField={this.selectField}
           >
           </Canvas>

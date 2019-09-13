@@ -201,7 +201,7 @@ class Canvas extends Component {
             name="deleteField"
             type="button"
             style={deleteBtnStyle}
-            onClick={this.props.deleteField}
+            onClick={this.props.deleteItem}
           >
             <span style={{background: '#FCFCFC', float: 'right'}}>
               <i className="fas fa-times-circle"></i>
@@ -282,7 +282,7 @@ class Canvas extends Component {
             name="deleteMultipart"
             type="button"
             style={deleteBtnStyle}
-            onClick={this.props.deleteMultipart}
+            onClick={this.props.deleteItem}
           >
             <span style={{background: '#FCFCFC', float: 'right'}}>
               <i className="fas fa-times-circle"></i>
@@ -347,7 +347,7 @@ class Canvas extends Component {
             name="deleteSection"
             type="button"
             style={deleteBtnStyle}
-            onClick={this.props.deleteSection}
+            onClick={this.props.deleteItem}
           >
             <span style={{background: '#FCFCFC', float: 'right'}}>
               <i className="fas fa-times-circle"></i>
@@ -436,7 +436,7 @@ class Canvas extends Component {
             name="deleteTable"
             type="button"
             style={deleteBtnStyle}
-            onClick={this.props.deleteTable}
+            onClick={this.props.deleteItem}
           >
             <span style={{background: '#FCFCFC', float: 'right'}}>
               <i className="fas fa-times-circle"></i>
@@ -559,9 +559,7 @@ Canvas.propTypes = {
   onDropFieldType: PropTypes.func.isRequired,
   // reIndexField: PropTypes.func.isRequired,
   deletePage: PropTypes.func.isRequired,
-  deleteMultipart: PropTypes.func.isRequired,
-  deleteSection: PropTypes.func.isRequired,
-  deleteField: PropTypes.func.isRequired,
+  deleteItem: PropTypes.func.isRequired,
   selectField: PropTypes.func.isRequired,
 };
 
