@@ -181,7 +181,7 @@ class InstrumentBuilderApp extends Component {
     this.showDrawer = this.showDrawer.bind(this);
     this.renderModal = this.renderModal.bind(this);
     this.onDropFieldType = this.onDropFieldType.bind(this);
-    // this.reIndexField = this.reIndexField.bind(this);
+    this.reIndexField = this.reIndexField.bind(this);
     this.deleteItemFromParent = this.deleteItemFromParent.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.deletePageFromSchema = this.deletePageFromSchema.bind(this);
@@ -498,19 +498,51 @@ class InstrumentBuilderApp extends Component {
     e.dataTransfer.clearData();
   }
 
-  // reIndexField(e) {
-  // // should actually be reindexing the order array in each parent div i.e. section/ pages.
-  // // splice(e.target.id??, 0, tempfield) insert temp field element into current index of fields array
-  //   const targetField = e.target.id;
-  //   const selectedField = e.dataTransfer.getData('text');
-  //   let formData = Object.assign({}, this.state.formData);
-  //   formData.fields.splice();
-  //   let temp = formData.fields[selectedField];
-  //   formData.fields[selectedField] = formData.fields[targetField];
-  //   formData.fields[targetField] = temp;
-  //   this.setState({formData});
-  //   e.dataTransfer.clearData();
-  // }
+  reIndexField(from, to, fromParent, toParent) {
+    let formData = Object.assign({}, this.state.formData);
+    // dragged item info
+    const fromInfo = from.split('_');
+    const fromType = fromInfo[0];
+    const fromIndex = fromInfo[1];
+    const fromID = formData[fromType][fromIndex]['@id'];
+    // dragged parent info
+    const fromParentInfo = fromParent.split('_');
+    const fromParentType = fromParentInfo[0];
+    const fromParentIndex = fromParentInfo[1];
+    // get dragged item order in parent's order list
+    const fromOrder = null;
+    (formData[fromParentType][fromParentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
+      if (item['@id'] === fromID) {
+        fromOrder = index;
+      }
+    });
+
+    // over item info
+    const toInfo = to.split('_');
+    const toType = toInfo[0];
+    const toIndex = toInfo[1];
+    const toID = formData[toType][toIndex]['@id'];
+    // over parent info
+    const toParentInfo = toParent.split('_');
+    const toParentType = toParentInfo[0];
+    const toParentIndex = toParentInfo[1];
+    // get over item order in parent's order list
+    const toOrder = null;
+    (fromData[toParentType][toParentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
+      if (item['@id'] === toID) {
+        toOrder = index;
+      }
+    });
+
+    // TODO: case where dragged reindexes to itself
+    // case of to-- if from < to, and to++ if nodePlacement === 'after'
+    // case where field gets pulled out of subactivity into another parent subactivity
+
+    // start splicing
+    const elementToAdd = ((fromData[fromParentType][fromParentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(fromOrder, 1))[0];
+    (formData[toParentType][toParentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(toOrder, 0, elementToAdd);
+    this.setState({formData});
+  }
 
   deleteItem(e) {
     const itemDOMID = e.currentTarget.parentNode.parentNode.id;
@@ -1051,7 +1083,7 @@ class InstrumentBuilderApp extends Component {
             tables={this.state.formData.tables}
             requiredValues={requiredValues}
             onDropFieldType={this.onDropFieldType}
-            // reIndexField={this.reIndexField}
+            reIndexField={this.reIndexField}
             deletePage={this.deletePage}
             deleteItem={this.deleteItem}
             selectField={this.selectField}
