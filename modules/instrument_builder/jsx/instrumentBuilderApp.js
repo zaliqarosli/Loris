@@ -510,7 +510,7 @@ class InstrumentBuilderApp extends Component {
     const fromParentType = fromParentInfo[0];
     const fromParentIndex = fromParentInfo[1];
     // get dragged item order in parent's order list
-    const fromOrder = null;
+    let fromOrder = null;
     (formData[fromParentType][fromParentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
       if (item['@id'] === fromID) {
         fromOrder = index;
@@ -527,8 +527,8 @@ class InstrumentBuilderApp extends Component {
     const toParentType = toParentInfo[0];
     const toParentIndex = toParentInfo[1];
     // get over item order in parent's order list
-    const toOrder = null;
-    (fromData[toParentType][toParentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
+    let toOrder = null;
+    (formData[toParentType][toParentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
       if (item['@id'] === toID) {
         toOrder = index;
       }
@@ -539,7 +539,7 @@ class InstrumentBuilderApp extends Component {
     // case where field gets pulled out of subactivity into another parent subactivity
 
     // start splicing
-    const elementToAdd = ((fromData[fromParentType][fromParentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(fromOrder, 1))[0];
+    const elementToAdd = ((formData[fromParentType][fromParentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(fromOrder, 1))[0];
     (formData[toParentType][toParentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(toOrder, 0, elementToAdd);
     this.setState({formData});
   }
