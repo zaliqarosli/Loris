@@ -25,19 +25,42 @@ class Canvas extends Component {
       placeholder.addEventListener('dragover', (e) => {
         e.preventDefault();
       });
-      placeholder.addEventListener('drop', (e) => {
-        this.props.onDropFieldType(e);
-      });
+      if (this.dragged == undefined) {
+        placeholder.addEventListener('drop', (e) => {
+          this.props.onDropFieldType(e);
+        });
+      }
       this.placeholder = placeholder;
     }
     return this.placeholder;
   }
 
+  onDragStart(e) {
+    this.dragged = e.target;
+    e.dataTransfer.effectAllowed = 'move';
+    // Firefox requires dataTransfer data to be set
+    e.dataTransfer.setData('text/plain', e.target.id);
+  }
+
+  onDragEnd(e) {
+    // remove placeholder node and let dragged item reappear
+    this.dragged.style.display = 'flex';
+    let container = this.placeholder.parentNode;
+    container.removeChild(this.getPlaceholder());
+    // update data and splice item array
+    this.props.reIndexField(this.dragged.id, this.over.id, this.dragged.parentNode.id, container.id);
+    this.dragged = undefined;
+  }
+
   onDragOver(e) {
     e.preventDefault();
+    console.log(this.dragged);
     let dropLocation = e.target;
+    if (this.dragged) {
+      this.dragged.style.display = 'none';
+    }
     if (dropLocation.id != '') {
-      if (dropLocation.className === 'placeholder') {
+      if (dropLocation.id === 'placeholder') {
         return;
       }
       this.over = dropLocation;
@@ -193,7 +216,6 @@ class Canvas extends Component {
         draggable={true}
         onDragStart={this.onDragStart}
         onDragEnd={this.onDragEnd}
-        onDragOver={this.onDragOver}
         onClick={this.props.selectField}
       >
         <span>
@@ -213,18 +235,6 @@ class Canvas extends Component {
         </div>
       </div>
     );
-  }
-
-  onDragStart(e) {
-    e.dataTransfer.effectAllowed = 'move';
-    // Firefox requires dataTransfer data to be set
-    e.dataTransfer.setData('text/plain', e.target.id);
-  }
-
-  onDragEnd(e) {
-  // remove placeholder node
-  // update data
-  // do the whole splice thing
   }
 
   renderMultipart(multipartIndex) {
@@ -557,7 +567,7 @@ Canvas.propTypes = {
   tables: PropTypes.array,
   requiredValues: PropTypes.object,
   onDropFieldType: PropTypes.func.isRequired,
-  // reIndexField: PropTypes.func.isRequired,
+  reIndexField: PropTypes.func.isRequired,
   deletePage: PropTypes.func.isRequired,
   deleteItem: PropTypes.func.isRequired,
   selectField: PropTypes.func.isRequired,
