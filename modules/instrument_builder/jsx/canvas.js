@@ -25,12 +25,14 @@ class Canvas extends Component {
       placeholder.addEventListener('dragover', (e) => {
         e.preventDefault();
       });
-      if (this.dragged == undefined) {
-        placeholder.addEventListener('drop', (e) => {
-          this.props.onDropFieldType(e);
-        });
-      }
       this.placeholder = placeholder;
+    }
+    if (this.dragged === undefined) {
+      this.placeholder.addEventListener('drop', (e) => {
+        this.props.onDropFieldType(e);
+      });
+    } else {
+      this.placeholder.removeEventListener('drop', this.props.onDropFieldType);
     }
     return this.placeholder;
   }
