@@ -163,7 +163,7 @@ class InstrumentBuilderApp extends Component {
         branching: '',
         scoring: '',
         requiredValue: false,
-        headerLevel: null,
+        headerLevel: '',
       },
       newSubActivity: {
         itemID: '',
