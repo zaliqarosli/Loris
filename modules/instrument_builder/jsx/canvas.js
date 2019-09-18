@@ -84,7 +84,7 @@ class Canvas extends Component {
     }
   }
 
-  renderField(fieldIndex, includeLabel = true) {
+  renderField(fieldIndex, inTable = false) {
     const field = this.props.fields[fieldIndex];
     const name = field['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
     const question = field['http://schema.org/question'][0]['@value'];
@@ -112,7 +112,7 @@ class Canvas extends Component {
     switch (inputType) {
       case 'radio':
       case 'select':
-        input = includeLabel ? (
+        input = !inTable ? (
           <SelectElement
              name={name}
              label={question}
@@ -137,7 +137,7 @@ class Canvas extends Component {
                 />;
         break;
       case 'text':
-        input = includeLabel ? (
+        input = !inTable ? (
           <TextboxElement
             name={name}
             label={question}
@@ -211,29 +211,33 @@ class Canvas extends Component {
       border: 0,
       padding: 0,
     };
+    const draggable = !inTable;
+    const deleteButton = !inTable ? (
+      <span>
+        <button
+          name="deleteField"
+          type="button"
+          style={deleteBtnStyle}
+          onClick={this.props.deleteItem}
+        >
+          <span style={{background: '#FCFCFC', float: 'right'}}>
+            <i className="fas fa-times-circle"></i>
+          </span>
+        </button>
+      </span>
+    ) : null;
     return (
       <div
         className="items"
         key={'fields_'+fieldIndex}
         id={'fields_'+fieldIndex}
         style={itemStyle}
-        draggable={true}
+        draggable={draggable}
         onDragStart={this.onDragStart}
         onDragEnd={this.onDragEnd}
         onClick={this.props.selectField}
       >
-        <span>
-          <button
-            name="deleteField"
-            type="button"
-            style={deleteBtnStyle}
-            onClick={this.props.deleteItem}
-          >
-            <span style={{background: '#FCFCFC', float: 'right'}}>
-              <i className="fas fa-times-circle"></i>
-            </span>
-          </button>
-        </span>
+        {deleteButton}
         <div style={{marginTop: '10px'}}>
           {input}
         </div>
@@ -399,7 +403,7 @@ class Canvas extends Component {
               this.props.fields.forEach((searchItemSchema, searchIndex) => {
                 const searchURI = searchItemSchema['@id'];
                 if (id === searchURI && !seenIDs.includes(searchURI)) {
-                  renderedField = this.renderField(searchIndex, false);
+                  renderedField = this.renderField(searchIndex, true);
                   seenIDs.push(id);
                 }
               });
