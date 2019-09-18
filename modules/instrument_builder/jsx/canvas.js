@@ -9,6 +9,7 @@ class Canvas extends Component {
     this.onDragOver = this.onDragOver.bind(this);
     this.onDragStart = this.onDragStart.bind(this);
     this.onDragEnd = this.onDragEnd.bind(this);
+    this.onDrop = this.onDrop.bind(this);
     this.renderField = this.renderField.bind(this);
     this.renderMultipart = this.renderMultipart.bind(this);
     this.renderSection = this.renderSection.bind(this);
@@ -28,13 +29,15 @@ class Canvas extends Component {
       this.placeholder = placeholder;
     }
     if (this.dragged === undefined) {
-      this.placeholder.addEventListener('drop', (e) => {
-        this.props.onDropFieldType(e);
-      });
+      this.placeholder.addEventListener('drop', this.onDrop);
     } else {
-      this.placeholder.removeEventListener('drop', this.props.onDropFieldType);
+      this.placeholder.removeEventListener('drop', this.onDrop);
     }
     return this.placeholder;
+  }
+
+  onDrop(e) {
+    this.props.onDropFieldType(e);
   }
 
   onDragStart(e) {
@@ -56,7 +59,6 @@ class Canvas extends Component {
 
   onDragOver(e) {
     e.preventDefault();
-    console.log(this.dragged);
     let dropLocation = e.target;
     if (this.dragged) {
       this.dragged.style.display = 'none';
