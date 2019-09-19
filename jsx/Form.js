@@ -1217,7 +1217,8 @@ class NumericElement extends Component {
     if (this.props.required && this.props.value === '') {
       errorMessage = <span>{'The field is required!'}</span>;
       elementClass = 'row form-group has-error';
-    } else if (this.props.value > this.props.max || this.props.value < this.props.min) {
+    } else if (this.props.max != null && this.props.min != null
+      && (this.props.value > this.props.max || this.props.value < this.props.min)) {
       // Add error message if value is not within min and max
       errorMessage = <span>{'The value has to be between ' + this.props.min + ' and '
         + this.props.max + '!'}</span>;
