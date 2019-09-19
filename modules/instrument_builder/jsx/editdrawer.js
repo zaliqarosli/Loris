@@ -114,6 +114,7 @@ class EditDrawer extends Component {
                     mode='edit'
                     formData={this.props.item}
                     onEdit={this.props.onEditSubActivity}
+                    addHeader={this.props.addHeader}
                    />;
         break;
     }

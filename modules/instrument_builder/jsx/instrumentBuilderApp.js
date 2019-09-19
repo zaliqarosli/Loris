@@ -197,7 +197,8 @@ class InstrumentBuilderApp extends Component {
     this.pushToSections = this.pushToSections.bind(this);
     this.pushToTables = this.pushToTables.bind(this);
     this.selectItem = this.selectItem.bind(this);
-    this.getAltLabelById = this.getAltLabelById.bind(this);
+    // this.getAltLabelById = this.getAltLabelById.bind(this);
+    this.addTableHeader = this.addTableHeader.bind(this);
   }
 
   async componentDidMount() {
@@ -248,13 +249,33 @@ class InstrumentBuilderApp extends Component {
       case 'branching':
         formData.schema['https://schema.repronim.org/visibility'][branchingLogicIndex]['@value'] = value;
         break;
+      case 'noOfRows':
+        // TODO: Fix that you can't change value by keyboard
+        const currentNumber = formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].length;
+        let lastIndex = currentNumber - 1;
+        const rowToCopy = formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'][0];
+        if (value === '') {
+          value = currentNumber;
+        }
+        const toAdd = value - currentNumber;
+        console.log(value);
+        console.log(toAdd);
+        if (toAdd > 0) {
+          for (let i = 0; i < value; i++) {
+            formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].splice(lastIndex, 0, rowToCopy);
+            lastIndex += 1;
+          }
+        } else if (toAdd < 0) {
+          formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].splice(toAdd);
+        }
+        break;
       default:
         // for table elements
         const index = (elementName.split('_'))[1];
         if (elementName.includes('header')) {
-          formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tableheaders'][0]['@list'][index]['@value'] = value;
+          formData.tables[currentItemIndex]['https://schema.repronim.org/tableheaders'][0]['@list'][index]['@value'] = value;
         } else if (elementName.includes('list')) {
-          formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].forEach((row, rowIndex) => {
+          formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].forEach((row, rowIndex) => {
             row['https://schema.repronim.org/order'][0]['@list'][index]['@id'] = value;
           });
         }
@@ -1024,14 +1045,23 @@ class InstrumentBuilderApp extends Component {
     });
   }
 
-  getAltLabelById(itemId, itemType) {
-    let altLabel = null;
-    this.state.formData[itemType].forEach((item, index) => {
-      if (item['@id'] === itemId) {
-        altLabel = item['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
-      }
+  // getAltLabelById(itemId, itemType) {
+  //   let altLabel = null;
+  //   this.state.formData[itemType].forEach((item, index) => {
+  //     if (item['@id'] === itemId) {
+  //       altLabel = item['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
+  //     }
+  //   });
+  //   return altLabel;
+  // }
+
+  addTableHeader(e) {
+    let tableIndex = this.state.selectedItem.split('_')[1];
+    let formData = Object.assign({}, this.state.formData);
+    formData.tables[tableIndex]['https://schema.repronim.org/tableheaders'][0]['@list'].push({
+      '@language': 'en',
+      '@value': '',
     });
-    return altLabel;
   }
 
   render() {
@@ -1119,24 +1149,32 @@ class InstrumentBuilderApp extends Component {
       if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('http://schema.org/question')) {
         question = this.state.formData[currentItemType][currentItemIndex]['http://schema.org/question'][0]['@value'];
       }
-      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('https://schema.repronim.org/preamble')) {
-        preamble = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/preamble'][0]['@value'];
+      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('http://schema.repronim.org/preamble')) {
+        preamble = this.state.formData[currentItemType][currentItemIndex]['http://schema.repronim.org/preamble'][0]['@value'];
       }
 
       // Define table headers if it exists
       let tableHeaders = [];
-      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tableheaders')) {
-        tableHeaders = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tableheaders'][0]['@list'].map((header) => {
+      if ((this.state.formData.tables[currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tableheaders')) {
+        tableHeaders = this.state.formData.tables[currentItemIndex]['https://schema.repronim.org/tableheaders'][0]['@list'].map((header) => {
           return header['@value'];
         });
       }
       // Define table rows if it exists
       let tableRows = [];
-      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tablerows')) {
-        tableRows = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'][0]['https://schema.repronim.org/order'][0]['@list'].map((row) => {
+      let noOfRows = null;
+      if ((this.state.formData.tables[currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tablerows')) {
+        tableRows = this.state.formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'][0]['https://schema.repronim.org/order'][0]['@list'].map((row) => {
           const fieldID = row['@id'];
-          return getAltLabelById(fieldID, currentItemType);
+          let altLabel = null;
+          this.state.formData.fields.forEach((item) => {
+            if (item['@id'] === fieldID) {
+              altLabel = item['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
+            }
+          });
+          return altLabel;
         });
+        noOfRows = this.state.formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].length;
       }
 
       // Create field object to pass as prop to edit drawer component
@@ -1153,6 +1191,7 @@ class InstrumentBuilderApp extends Component {
         scoring: scoring,
         tableHeaders: tableHeaders,
         tableRows: tableRows,
+        noOfRows: noOfRows,
       };
       inputType = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/inputType'][0]['@value'];
     }
@@ -1187,6 +1226,7 @@ class InstrumentBuilderApp extends Component {
             onEditField={this.editField}
             onEditSubActivity={this.editSubActivity}
             addChoices={this.addValueConstraints}
+            addHeader={this.addTableHeader}
           >
           </EditDrawer>
         </div>
