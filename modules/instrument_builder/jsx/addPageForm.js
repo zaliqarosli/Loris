@@ -14,7 +14,7 @@ class AddPageForm extends Component {
   }
 
   renderContentFields() {
-    let inputTypeOptions = {
+    const inputTypeOptions = {
       multipart: 'Multipart',
       section: 'Section',
       table: 'Table',
