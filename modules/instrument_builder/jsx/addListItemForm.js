@@ -117,6 +117,7 @@ class AddListItemForm extends Component {
         />
         <StaticElement
           label='Field options:'
+          text=''
         />
         {this.renderFieldOptions()}
         <CheckboxElement
