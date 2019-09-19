@@ -7,6 +7,7 @@ import AddLabelItemForm from './addLabelItemForm';
 import AddScoreItemForm from './addScoreItemForm';
 import AddHeaderItemForm from './addHeaderItemForm';
 import AddNumericItemForm from './addNumericItemForm';
+import AddTableForm from './addTableForm';
 
 class EditDrawer extends Component {
   constructor(props) {
@@ -16,11 +17,12 @@ class EditDrawer extends Component {
   }
 
   renderDrawerContent() {
-    let hidden = (!this.props.open || Object.keys(this.props.field).length == 0);
+    let hidden = (!this.props.open || Object.keys(this.props.item).length == 0);
     let contentDiv = {
       order: 2,
       flex: 10,
-      padding: '20px',
+      paddingTop: '20px',
+      marginLeft: '-15px',
       overflow: 'scroll',
     };
     if (!this.props.open) {
@@ -31,7 +33,7 @@ class EditDrawer extends Component {
     }
     let editForm = null;
     let inputType = null;
-    if (Object.keys(this.props.field).length != 0) {
+    if (Object.keys(this.props.item).length != 0) {
       inputType = this.props.inputType;
     }
     switch (inputType) {
@@ -39,7 +41,7 @@ class EditDrawer extends Component {
       case 'multiselect':
         editForm = <AddListItemForm
                      uiType='select'
-                     formData={this.props.field}
+                     formData={this.props.item}
                      onEditField={this.props.onEditField}
                      mode='edit'
                      addChoices={this.props.addChoices}
@@ -48,7 +50,7 @@ class EditDrawer extends Component {
       case 'radio':
         editForm = <AddListItemForm
                      uiType='radio'
-                     formData={this.props.field}
+                     formData={this.props.item}
                      onEditField={this.props.onEditField}
                      mode='edit'
                      addChoices={this.props.addChoices}
@@ -58,7 +60,7 @@ class EditDrawer extends Component {
         editForm = <AddTextItemForm
                     mode='edit'
                     uiType='text'
-                    formData={this.props.field}
+                    formData={this.props.item}
                     onEditField={this.props.onEditField}
                   />;
         break;
@@ -66,7 +68,7 @@ class EditDrawer extends Component {
         editForm = <AddTextItemForm
                     mode='edit'
                     uiType='textarea'
-                    formData={this.props.field}
+                    formData={this.props.item}
                     onEditField={this.props.onEditField}
                   />;
         break;
@@ -74,7 +76,7 @@ class EditDrawer extends Component {
         editForm = <AddNumericItemForm
                     mode='edit'
                     uiType='numeric'
-                    formData={this.props.field}
+                    formData={this.props.item}
                     onEditField={this.props.onEditField}
                   />;
         break;
@@ -82,29 +84,36 @@ class EditDrawer extends Component {
         editForm = <AddNumericItemForm
                     mode='edit'
                     uiType='slider'
-                    formData={this.props.field}
+                    formData={this.props.item}
                     onEditField={this.props.onEditField}
                   />;
         break;
       case 'label':
         editForm = <AddLabelItemForm
                     mode='edit'
-                    formData={this.props.field}
+                    formData={this.props.item}
                     onEditField={this.props.onEditField}
                    />;
         break;
       case 'static_score':
         editForm = <AddScoreItemForm
                     mode='edit'
-                    formData={this.props.field}
+                    formData={this.props.item}
                     onEditField={this.props.onEditField}
                    />;
         break;
       case 'header':
         editForm = <AddHeaderItemForm
                     mode='edit'
-                    formData={this.props.field}
+                    formData={this.props.item}
                     onEditField={this.props.onEditField}
+                   />;
+        break;
+      case 'table':
+        editForm = <AddTableForm
+                    mode='edit'
+                    formData={this.props.item}
+                    onEdit={this.props.onEditSubActivity}
                    />;
         break;
     }

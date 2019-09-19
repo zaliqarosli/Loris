@@ -235,7 +235,8 @@ class Canvas extends Component {
         draggable={draggable}
         onDragStart={this.onDragStart}
         onDragEnd={this.onDragEnd}
-        onClick={this.props.selectField}
+        onDragOver={this.onDragOver}
+        onClick={this.props.selectItem}
       >
         {deleteButton}
         <div style={{marginTop: '10px'}}>
@@ -448,6 +449,7 @@ class Canvas extends Component {
         className="items"
         style={tableStyle}
         onDragOver={this.onDragOver}
+        onClick={this.props.selectItem}
       >
         <span>
           <button

@@ -148,7 +148,7 @@ class InstrumentBuilderApp extends Component {
         tables: [],
       },
       schemaURI: this.props.schemaURI,
-      selectedField: null,
+      selectedItem: null,
       selectedItemType: null,
       prevItem: null,
       nextItem: null,
@@ -171,10 +171,12 @@ class InstrumentBuilderApp extends Component {
         preamble: '',
         branching: '',
         order: [{list: '', inputType: ''}],
+        headers: [''],
       },
     };
     this.updateProfile = this.updateProfile.bind(this);
-    this.editFormData = this.editFormData.bind(this);
+    this.editField = this.editField.bind(this);
+    this.editSubActivity = this.editSubActivity.bind(this);
     this.addValueConstraints = this.addValueConstraints.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -194,7 +196,8 @@ class InstrumentBuilderApp extends Component {
     this.pushToMultiparts = this.pushToMultiparts.bind(this);
     this.pushToSections = this.pushToSections.bind(this);
     this.pushToTables = this.pushToTables.bind(this);
-    this.selectField = this.selectField.bind(this);
+    this.selectItem = this.selectItem.bind(this);
+    this.getAltLabelById = this.getAltLabelById.bind(this);
   }
 
   async componentDidMount() {
@@ -217,8 +220,50 @@ class InstrumentBuilderApp extends Component {
     this.setState({formData});
   }
 
-  editFormData(elementName, value) {
-    const currentField = this.state.selectedField;
+  editSubActivity(elementName, value) {
+    const currentItem = this.state.selectedItem.split('_');
+    const currentItemType = currentItem[0];
+    const currentItemIndex = currentItem[1];
+    let formData = Object.assign({}, this.state.formData);
+    const itemID = formData[currentItemType][currentItemIndex]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
+    let branchingLogicIndex = null;
+    if (formData.schema.hasOwnProperty('https://schema.repronim.org/visibility')) {
+      (formData.schema['https://schema.repronim.org/visibility']).forEach((object, index) => {
+        if (object['@index'] == itemID) {
+          branchingLogicIndex = index;
+        }
+      });
+    }
+    switch (elementName) {
+      case 'itemID':
+        formData[currentItemType][currentItemIndex]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'] = value;
+        break;
+      case 'description':
+        formData[currentItemType][currentItemIndex]['http://schema.org/description'][0]['@value'] = value;
+        formDatap[currentItemType][currentItemIndex]['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'] = value;
+        break;
+      case 'preamble':
+        formData[currentItemType][currentItemIndex]['https://schema.repronim.org/preamble'][0]['@value'] = value;
+        break;
+      case 'branching':
+        formData.schema['https://schema.repronim.org/visibility'][branchingLogicIndex]['@value'] = value;
+        break;
+      default:
+        // for table elements
+        const index = (elementName.split('_'))[1];
+        if (elementName.includes('header')) {
+          formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tableheaders'][0]['@list'][index]['@value'] = value;
+        } else if (elementName.includes('list')) {
+          formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].forEach((row, rowIndex) => {
+            row['https://schema.repronim.org/order'][0]['@list'][index]['@id'] = value;
+          });
+        }
+    }
+    this.setState({formData});
+  }
+
+  editField(elementName, value) {
+    const currentField = (this.state.selectedItem).split('_')[1];
     let formData = Object.assign({}, this.state.formData);
     const itemID = formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
     let requiredValueIndex = null;
@@ -274,7 +319,7 @@ class InstrumentBuilderApp extends Component {
   }
 
   addValueConstraints(e) {
-    const currentField = this.state.selectedField;
+    const currentField = this.state.selectedItem;
     let formData = Object.assign({}, this.state.formData);
     const newValueConstraint = {
       'http://schema.org/name': [{
@@ -342,6 +387,10 @@ class InstrumentBuilderApp extends Component {
         const index = split[1];
         const name = split[0];
         newSubActivity.order[index][name] = value;
+      } else if (elementName.includes('header')) {
+        const split = elementName.split('_');
+        const index = split[1];
+        newSubActivity.headers[index] = value;
       } else {
         newSubActivity[elementName] = value;
       }
@@ -968,12 +1017,21 @@ class InstrumentBuilderApp extends Component {
     });
   }
 
-  selectField(e) {
-    let fieldIndex = ((e.currentTarget.id).split('_'))[1];
+  selectItem(e) {
     this.setState({
-      selectedField: fieldIndex,
+      selectedItem: e.currentTarget.id,
       openDrawer: true,
     });
+  }
+
+  getAltLabelById(itemId, itemType) {
+    let altLabel = null;
+    this.state.formData[itemType].forEach((item, index) => {
+      if (item['@id'] === itemId) {
+        altLabel = item['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
+      }
+    });
+    return altLabel;
   }
 
   render() {
@@ -998,7 +1056,7 @@ class InstrumentBuilderApp extends Component {
     }
 
     // Setup variables for drawer component
-    let field = {};
+    let item = {};
     let inputType = null;
     // Define required boolean
     let requiredValues = {};
@@ -1007,14 +1065,16 @@ class InstrumentBuilderApp extends Component {
         requiredValues[required['@index']] = required['@value'];
       });
     }
-    if (this.state.selectedField != null) {
-      const currentField = this.state.selectedField;
+    if (this.state.selectedItem != null) {
+      const currentItem = this.state.selectedItem.split('_');
+      const currentItemType = currentItem[0];
+      const currentItemIndex = currentItem[1];
       // Define choices
       let choices = [];
       let multipleChoice = null;
-      if (this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints']) {
-        if ((this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
-          choices = this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'].map((valueConstraint, index) => {
+      if (this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/valueconstraints']) {
+        if ((this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
+          choices = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'].map((valueConstraint, index) => {
             return ({
               name: valueConstraint['http://schema.org/name'][0]['@value'],
               value: valueConstraint['http://schema.org/value'][0]['@value'],
@@ -1022,13 +1082,13 @@ class InstrumentBuilderApp extends Component {
           });
         }
         // Define multiplechoice boolean
-        if ((this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.repronim.org/multipleChoice')) {
-          multipleChoice = this.state.formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/multipleChoice'][0]['@value'];
+        if ((this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.repronim.org/multipleChoice')) {
+          multipleChoice = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/multipleChoice'][0]['@value'];
         }
       }
       // Define branching logic string
-      // Find visibility array index where '@index' = currentField's altLabel
-      const itemID = this.state.formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
+      // Find visibility array index where '@index' = currentItem's altLabel
+      const itemID = this.state.formData[currentItemType][currentItemIndex]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
       let branching = '';
       if (this.state.formData.schema['https://schema.repronim.org/visibility']) {
         (this.state.formData.schema['https://schema.repronim.org/visibility']).forEach((object, index) => {
@@ -1038,7 +1098,7 @@ class InstrumentBuilderApp extends Component {
         });
       }
       // Define scoring logic string
-      // Find scoringLogic array index where '@index' = currentField's altLabel
+      // Find scoringLogic array index where '@index' = currentItem's altLabel
       let scoring = '';
       if (this.state.formData.schema['https://schema.repronim.org/scoringLogic']) {
         (this.state.formData.schema['https://schema.repronim.org/scoringLogic']).forEach((object, index) => {
@@ -1048,23 +1108,53 @@ class InstrumentBuilderApp extends Component {
         });
       }
       // Define header level if it exists
-      let headerLevel = null;
-      if (this.state.formData.fields[currentField]['https://schema.repronim.org/headerLevel']) {
-        headerLevel = this.state.formData.fields[currentField]['https://schema.repronim.org/headerLevel'][0]['@value'];
+      let headerLevel = '';
+      if (this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/headerLevel']) {
+        headerLevel = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/headerLevel'][0]['@value'];
       }
+
+      // Define preamble and question if it exists
+      let question = '';
+      let preamble = '';
+      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('http://schema.org/question')) {
+        question = this.state.formData[currentItemType][currentItemIndex]['http://schema.org/question'][0]['@value'];
+      }
+      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('https://schema.repronim.org/preamble')) {
+        preamble = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/preamble'][0]['@value'];
+      }
+
+      // Define table headers if it exists
+      let tableHeaders = [];
+      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tableheaders')) {
+        tableHeaders = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tableheaders'][0]['@list'].map((header) => {
+          return header['@value'];
+        });
+      }
+      // Define table rows if it exists
+      let tableRows = [];
+      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tablerows')) {
+        tableRows = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'][0]['https://schema.repronim.org/order'][0]['@list'].map((row) => {
+          const fieldID = row['@id'];
+          return getAltLabelById(fieldID, currentItemType);
+        });
+      }
+
       // Create field object to pass as prop to edit drawer component
-      field = {
+      item = {
         itemID: itemID,
-        description: this.state.formData.fields[currentField]['http://schema.org/description'][0]['@value'],
-        question: this.state.formData.fields[currentField]['http://schema.org/question'][0]['@value'],
+        description: this.state.formData[currentItemType][currentItemIndex]['http://schema.org/description'][0]['@value'],
+        question: question,
+        preamble: preamble,
         choices: choices,
         multipleChoice: multipleChoice,
         branching: branching,
         requiredValue: requiredValues[itemID] || false,
         headerLevel: headerLevel,
         scoring: scoring,
+        tableHeaders: tableHeaders,
+        tableRows: tableRows,
       };
-      inputType = this.state.formData.fields[currentField]['https://schema.repronim.org/inputType'][0]['@value'];
+      inputType = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/inputType'][0]['@value'];
     }
     return (
       <div>
@@ -1086,15 +1176,16 @@ class InstrumentBuilderApp extends Component {
             reIndexField={this.reIndexField}
             deletePage={this.deletePage}
             deleteItem={this.deleteItem}
-            selectField={this.selectField}
+            selectItem={this.selectItem}
           >
           </Canvas>
           <EditDrawer
             open={this.state.openDrawer}
             showDrawer={this.showDrawer}
             inputType={inputType}
-            field={field}
-            onEditField={this.editFormData}
+            item={item}
+            onEditField={this.editField}
+            onEditSubActivity={this.editSubActivity}
             addChoices={this.addValueConstraints}
           >
           </EditDrawer>
