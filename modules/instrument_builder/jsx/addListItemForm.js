@@ -116,8 +116,7 @@ class AddListItemForm extends Component {
           onUserInput={this.props.onEditField}
         />
         <StaticElement
-          label='Field options:'
-          text=''
+          label='Select options:'
         />
         {this.renderFieldOptions()}
         <CheckboxElement
