@@ -744,7 +744,7 @@ class InstrumentBuilderApp extends Component {
         case 'textarea':
           contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field'];
           itemType = 'fields';
-          displayText = 'http://schema.org/description';
+          displayText = 'http://schema.org/question';
           break;
         case 'multipart':
           contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'];
