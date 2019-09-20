@@ -1152,29 +1152,30 @@ class InstrumentBuilderApp extends Component {
       if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('http://schema.repronim.org/preamble')) {
         preamble = this.state.formData[currentItemType][currentItemIndex]['http://schema.repronim.org/preamble'][0]['@value'];
       }
-
-      // Define table headers if it exists
       let tableHeaders = [];
-      if ((this.state.formData.tables[currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tableheaders')) {
-        tableHeaders = this.state.formData.tables[currentItemIndex]['https://schema.repronim.org/tableheaders'][0]['@list'].map((header) => {
-          return header['@value'];
-        });
-      }
-      // Define table rows if it exists
       let tableRows = [];
       let noOfRows = null;
-      if ((this.state.formData.tables[currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tablerows')) {
-        tableRows = this.state.formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'][0]['https://schema.repronim.org/order'][0]['@list'].map((row) => {
-          const fieldID = row['@id'];
-          let altLabel = null;
-          this.state.formData.fields.forEach((item) => {
-            if (item['@id'] === fieldID) {
-              altLabel = item['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
-            }
+      if (currentItemType === 'tables') {
+        // Define table headers if it exists
+        if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tableheaders')) {
+          tableHeaders = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tableheaders'][0]['@list'].map((header) => {
+            return header['@value'];
           });
-          return altLabel;
-        });
-        noOfRows = this.state.formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].length;
+        }
+        // Define table rows if it exists
+        if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tablerows')) {
+          tableRows = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'][0]['https://schema.repronim.org/order'][0]['@list'].map((row) => {
+            const fieldID = row['@id'];
+            let altLabel = null;
+            this.state.formData.fields.forEach((item) => {
+              if (item['@id'] === fieldID) {
+                altLabel = item['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
+              }
+            });
+            return altLabel;
+          });
+          noOfRows = this.state.formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].length;
+        }
       }
 
       // Create field object to pass as prop to edit drawer component
