@@ -125,7 +125,7 @@ class InstrumentBuilderIndex extends Component {
         result = <td><a href={url}>{cell}</a></td>;
         break;
       case 'Schema URI':
-        result = <td><a href={cell}>Link</a></td>;
+        result = <td><a href={cell} target='_blank'>Link</a></td>;
         break;
     }
     return result;

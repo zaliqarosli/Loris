@@ -69,6 +69,7 @@ const sortItems = async (itemList, pages, sections, multiparts, tables, fields, 
   });
 };
 
+// TODO: Refactor: grab node values and check that if '@id' i.e. a node object, getItems() that @id
 const hasItems = (schema) => {
   if (schema['https://schema.repronim.org/order']) {
     return true;
