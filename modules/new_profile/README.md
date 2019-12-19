@@ -41,4 +41,4 @@ for the user creating a candidate.
 ## Interactions With LORIS
 
 Upon candidate creation, the module includes a link to the
-timepoint_list module for the newly created candidate.
+candidate_profile module for the newly created candidate.

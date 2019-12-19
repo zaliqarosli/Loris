@@ -10,7 +10,7 @@ It is referred to as "Access Profiles" in the LORIS menus.
 ## Intended Users
 
 The candidate list is primarily used by data entry staff in order
-to access the `timepoint_list` module (and `instrument_list`
+to access the `candidate_profile` module (and `instrument_list`
 from there) in order to access the candidate and perform data entry.
 
 Other user groups may use it for filtering candidate profiles for
@@ -45,7 +45,7 @@ for that candidate. When a scan was performed (i.e. it has the value
 prefiltered for that candidate.
 
 Clicking on the cell in the PSCID column takes the user to the
-`timepoint_list` page for that candidate. The link is only clickable
+`candidate_profile` page for that candidate. The link is only clickable
 if the user does *not* have the `data_entry` permission. For users
 who have the `data_entry` permission, a separate form appears for
 the user to type the CandID/PSCID combo in order to access the
