@@ -27,9 +27,13 @@ use \Loris\StudyEntities\Candidate\CandID;
  * @license  Loris license
  * @link     https://www.github.com/aces/Loris/
  */
-class Candidate_Profile extends \NDB_Menu
+class Candidate_Profile extends \NDB_Page
 {
+    public $skipTemplate = true;
+
+    protected $jsonData;
     protected $candID;
+    protected $pscid;
 
     /**
      * Overloading this method to allow access to candidate_profile
@@ -85,7 +89,7 @@ class Candidate_Profile extends \NDB_Menu
         RequestHandlerInterface $handler
     ) : ResponseInterface {
         // FIXME: Update the code to add the singleton here, not the identifier.
-        $this->candID = new CandID($request->getAttribute('CandID'));
+       $this->candID = new CandID($request->getAttribute('CandID'));
         return parent::process($request, $handler);
     }
 
@@ -101,11 +105,8 @@ class Candidate_Profile extends \NDB_Menu
         $DB        =& \Database::singleton();
         $user      =& \User::singleton();
 
-        $numberOfVisits           = 0;
-        $this->tpl_data['candID'] = $candidate->getData('CandID');
-        $this->tpl_data['PSCID']  = $candidate->getPSCID();
-        $listOfTimePoints         = $candidate->getListOfTimePoints();
-        $this->tpl_data['candidate'] = $candidate->getData();
+        $this->pscid      = $candidate->getPSCID();
+        $listOfTimePoints = $candidate->getListOfTimePoints();
 
         if (!empty($listOfTimePoints)) {
             $username = $user->getData('UserID');
@@ -113,14 +114,12 @@ class Candidate_Profile extends \NDB_Menu
             if ($user->hasPermission('bvl_feedback')) {
                 $feedback_select_inactive = 'Y';
             }
-
-            /*
-             * List of visits
-             */
-            $x = 0;
+            // List of visits
+            $x              = 0;
+            $numberOfVisits = 0;
+            $timePoints     = array();
             foreach ($listOfTimePoints as $currentTimePoint) {
                 $timePoint =& \TimePoint::singleton($currentTimePoint);
-
                 // get the first date of visit in order to
                 // turn on the future time points bit if we have a date of visit
                 $dateOfVisit = $timePoint->getDateOfVisit();
@@ -130,17 +129,15 @@ class Candidate_Profile extends \NDB_Menu
                     }
                     $numberOfVisits++;
                 }
-
                 // get timepoint data
-                $this->tpl_data['timePoints'][$x]
-                    = $timePoint->getData();
+                $timePoints[$x] = $timePoint->getData();
 
                 // get current status
-                $this->tpl_data['timePoints'][$x]['currentStatus']
+                $timePoints[$x]['currentStatus']
                     = $timePoint->getCurrentStatus();
                 // get current date
-                $this->tpl_data['timePoints'][$x]['currentDate']
-                    =   $timePoint->getCurrentDate();
+                $timePoints[$x]['currentDate']
+                    = $timePoint->getCurrentDate();
 
                 // create feedback object for the time point
                 $feedback = \NDB_BVL_Feedback::singleton(
@@ -155,15 +152,15 @@ class Candidate_Profile extends \NDB_Menu
 
                 $feedback_count = $feedback->getThreadCount();
 
-                $this->tpl_data['timePoints'][$x]['feedbackCount']
+                $timePoints[$x]['feedbackCount']
                     = (empty($feedback_count))
                        ? $feedback_status
                        : $feedback_count;
 
-                $this->tpl_data['timePoints'][$x]['feedbackStatus']
+                $timePoints[$x]['feedbackStatus']
                     = $feedback_status;
 
-                $this->tpl_data['timePoints'][$x]['feedbackColor']
+                $timePoints[$x]['feedbackColor']
                     = $feedback->getThreadColor($feedback_status);
 
                 if (!in_array(
@@ -177,7 +174,7 @@ class Candidate_Profile extends \NDB_Menu
                 )
                 ) {
                     // for static stages, don't bother showing current status
-                    $this->tpl_data['timePoints'][$x]['staticStage'] = true;
+                    $timePoints[$x]['staticStage'] = true;
 
                     // get the outcome data
                     $outcomeStage
@@ -189,42 +186,37 @@ class Candidate_Profile extends \NDB_Menu
                     $getDateMethod = 'getDateOf'.$outcomeStage;
 
                     // set the template data
-                    $this->tpl_data['timePoints'][$x]['outcomeStage']
+                    $this->timePoints[$x]['outcomeStage']
                         = $outcomeStage;
 
                     if (method_exists($timePoint, $getStatusMethod)) {
-                          $this->tpl_data['timePoints'][$x]['outcomeStatus']
+                          $timePoints[$x]['outcomeStatus']
                               = $timePoint->$getStatusMethod();
                     }
                     if (method_exists($timePoint, $getDateMethod)) {
-                        $this->tpl_data['timePoints'][$x]['outcomeDate']
+                        $timePoints[$x]['outcomeDate']
                             = $timePoint->$getDateMethod();
                     }
                 }
                 $x++;
-            } // end list
-
-            /*
-             * List of future visits
-             */
+            }
+            // List of future visits
             if (isset($firstDateOfVisit)) {
-                $timePoint = \TimePoint::singleton($listOfTimePoints[0]);
-
-                $this->tpl_data['SubprojectID'] = $timePoint->getSubprojectID();
-
-            } // end list
+                $timePoint    = \TimePoint::singleton($listOfTimePoints[0]);
+                $subprojectID = $timePoint->getSubprojectID();
+            }
         }
+        $cand_CenterID     = $candidate->getData('RegistrationCenterID');
+        $isDataEntryPerson = $user->hasCenterPermission("data_entry", $cand_CenterID);
 
-        $user_CenterID = $user->getData('CenterIDs');
-        $cand_CenterID = $candidate->getData('RegistrationCenterID');
-
-        $this->tpl_data['isDataEntryPerson']
-            = $user->hasCenterPermission("data_entry", $cand_CenterID);
-
-        //set the baseurl of the tpl_data
-        $factory  = \NDB_Factory::singleton();
-        $settings = $factory->settings();
-        $this->tpl_data['baseurl'] = $settings->getBaseURL();
+        $this->jsonData = array(
+            'candID'            => $candidate->getData('CandID'),
+            'pscid'             => $candidate->getPSCID(),
+            'candidateData'     => $candidate->getData(),
+            'timepointData'     => $timePoints,
+            'subprojectID'      => $subprojectID,
+            'isDataEntryPerson' => $isDataEntryPerson,
+        );
     }
     /**
      * Determining Previous Stage
@@ -265,6 +257,16 @@ class Candidate_Profile extends \NDB_Menu
         $html          = $feedbackPanel->display();
         return $html;
     }
+
+    /**
+     * Converts data to a JSON format to be retrieved with ?format=json
+     *
+     * @return string JSON
+     */
+    function toJSON()
+    {
+        return json_encode($this->jsonData);
+    }
     
     /**
      * Get dependencies to candidate_profile for image browsing link
@@ -276,7 +278,10 @@ class Candidate_Profile extends \NDB_Menu
         $factory = \NDB_Factory::singleton();
         $baseURL = $factory->settings()->getBaseURL();
         $deps    = parent::getJSDependencies();
-        return $deps;
+        return array_merge(
+            $deps,
+            array($baseURL . '/candidate_profile/js/candidateProfileIndex.js')
+        );
     }
 
     /**
@@ -286,8 +291,8 @@ class Candidate_Profile extends \NDB_Menu
      */
     public function getBreadcrumbs(): \LORIS\BreadcrumbTrail
     {
-        $candid = $this->tpl_data['candID'];
-        $pscid  = $this->tpl_data['PSCID'];
+        $candid = $this->candID;
+        $pscid  = $this->pscid;
 
         return new \LORIS\BreadcrumbTrail(
             new \LORIS\Breadcrumb(

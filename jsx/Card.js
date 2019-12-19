@@ -44,7 +44,7 @@ class Card extends Component {
             label={info.label}
           />
         );
-      });
+      })
     );
     return (
       <div
