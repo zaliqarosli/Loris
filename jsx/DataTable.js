@@ -568,18 +568,20 @@ class DataTable extends Component {
 }
 DataTable.propTypes = {
   data: PropTypes.array.isRequired,
+  fields: PropTypes.array,
   rowNumLabel: PropTypes.string,
+  filter: PropTypes.obj,
   // Function of which returns a JSX element for a table cell, takes
   // parameters of the form: func(ColumnName, CellData, EntireRowData)
   getFormattedCell: PropTypes.func,
   onSort: PropTypes.func,
-  actions: PropTypes.object,
+  actions: PropTypes.array,
   hide: PropTypes.object,
   nullTableShow: PropTypes.bool,
 };
 DataTable.defaultProps = {
-  headers: [],
-  data: {},
+  data: [],
+  fields: [],
   rowNumLabel: 'No.',
   filter: {},
   hide: {

@@ -52,7 +52,7 @@ class Panel extends Component {
         data-target={'#' + this.props.id}
         style={{cursor: 'pointer'}}
       >
-        {this.props.title}
+        <b>{this.props.title}</b>
         <span className={glyphClass}></span>
       </div>
     ) : '';
