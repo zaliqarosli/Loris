@@ -11,23 +11,12 @@ import PropTypes from 'prop-types';
 import Panel from 'jsx/Panel';
 
 /**
- * Card component
- * Wraps children in a customizable card
+ * Card component - Wraps children in a customizable card
  *
- * Prop data an array of objects in the form:
- * {
- *   label: '',
- *   value: '',
- * }
  */
 class Card extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      collapsed: this.props.initCollapsed,
-    };
-
     this.handleClick = this.handleClick.bind(this);
   }
 
@@ -36,29 +25,19 @@ class Card extends Component {
   }
 
   render() {
-    const cardInfo = (
-      this.props.data.map((info) => {
-        return (
-          <StaticElement
-            text={info.value}
-            label={info.label}
-          />
-        );
-      })
-    );
+    const cursorStyle = this.props.onClick ? {
+      cursor: 'pointer',
+    } : null;
     return (
-      <div
-        key={this.props.id}
-        onClick={this.handleClick}
-      >
-        <Panel title={this.props.title}>
-          <FormElement
-            name={"Card_"+this.props.id}
-          >
-            {cardInfo}
-          </FormElement>
-        </Panel>
-      <div>
+      <Panel title={this.props.title}>
+        <div
+          key={this.props.id}
+          onClick={this.handleClick}
+          style={cursorStyle}
+        >
+          {this.props.children}
+        </div>
+      </Panel>
     );
   }
 }
@@ -66,7 +45,6 @@ class Card extends Component {
 Card.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  data: PropTypes.array.isRequired,
   onClick: PropTypes.func,
 };
 

@@ -1,6 +1,11 @@
-import Loader from 'Loader';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+
 import swal from 'sweetalert2';
-// import Card from 'Card';
+import Loader from 'Loader';
+
+import DataTable from 'jsx/DataTable';
+import Card from 'Card';
 
 /**
  * Candidate Profile Menu
@@ -10,17 +15,25 @@ import swal from 'sweetalert2';
  * @author  Shen Wang
  * @version 1.0.0
  * */
-class CandidateProfileIndex extends React.Component {
+class CandidateProfileIndex extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoaded: false,
       error: false,
       data: {},
-      hasDataEntryPerm: false,
     };
     this.fetchData = this.fetchData.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.setFormData = this.setFormData.bind(this);
+    this.formatDataTable = this.formatDataTable.bind(this);
     this.createTimepoint = this.createTimepoint.bind(this);
+    this.viewImagingDataset = this.viewImagingDataset.bind(this);
+    this.viewCandParams = this.viewCandParams.bind(this);
+    this.renderCandInfoCard = this.renderCandInfoCard.bind(this);
+    this.renderImagingCard = this.renderImagingCard.bind(this);
+    this.renderCandParameters = this.renderCandParameters.bind(this);
+    this.renderTimepoints = this.renderTimepoints.bind(this);
   }
 
   componentDidMount() {
@@ -109,8 +122,235 @@ class CandidateProfileIndex extends React.Component {
     this.setState({formData: formData});
   }
 
+  /**
+   * Modify behaviour of specified column cells in the Data Table component
+   *
+   * @param {string} column - column name
+   * @param {string} cell - cell content
+   * @param {object} row - row content indexed by column
+   *
+   * @return {*} a formated table cell for a given column
+   */
+  formatDataTable(column, cell, row) {
+    let result = <td>{cell}</td>;
+    return result;
+  }
+
   createTimepoint() {
     location.href='/create_timepoint/?candID=' + this.state.data.candID + '&identifier=' + this.state.data.candID;
+  }
+
+  viewImagingDataset() {
+    location.href='/imaging_browser/?DCCID=' + this.state.data.candID;
+  }
+
+  viewCandParams() {
+    location.href='/candidate_parameters/?candID=' + this.state.data.candID + '&identifier=' + this.state.data.candID;
+  }
+
+  renderCandInfoCard() {
+    const dataLeft = [
+      {
+        value: this.state.data.pscid,
+        label: 'PSCID',
+      },
+      {
+        value: this.state.data.candID,
+        label: 'DCCID',
+      },
+      {
+        value: this.state.data.candidateData.DoB,
+        label: 'Date of Birth',
+      },
+      {
+        value: this.state.data.candidateData.Sex,
+        label: 'Sex',
+      },
+    ];
+    const dataRight = [
+      {
+        value: this.state.data.candidateData.ProjectTitle,
+        label: 'Project',
+      },
+      {
+        value: this.state.data.candidateData.Active,
+        label: 'Active',
+      },
+      {
+        value: this.state.data.candidateData.PSC,
+        label: 'Site',
+      },
+    ];
+    const cardInfoLeft = dataLeft.map((info) => {
+      return (
+        <StaticElement
+          text={
+            <span>
+              <h2>{info.value}</h2>
+            </span>
+          }
+          label={info.label}
+        />
+      );
+    });
+    const cardInfoRight = dataRight.map((info) => {
+      return (
+        <StaticElement
+          text={
+            <span>
+              <h2>{info.value}</h2>
+            </span>
+          }
+          label={info.label}
+        />
+      );
+    });
+    return (
+      <Card
+        id='candidate_info'
+        title='Candidate Info'
+      >
+        <div style={{display: 'flex'}}>
+          <div style={{flexGrow: '1', order: '1'}}>
+            <FormElement
+              name='candinfo_form1'
+            >
+              {cardInfoLeft}
+            </FormElement>
+          </div>
+          <div style={{flexGrow: '1', order: '2'}}>
+            <FormElement
+              name='candinfo_form2'
+            >
+              {cardInfoRight}
+            </FormElement>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  renderImagingCard() {
+    const data = [
+      {
+        value: '',
+        label: 'Number of MINCS inserted',
+      },
+    ];
+    const cardInfo = data.map((info) => {
+      return (
+        <StaticElement
+          text={info.value}
+          label={info.label}
+        />
+      );
+    });
+    return (
+      <Card
+        id='imaging_info'
+        title='Imaging Dataset'
+        onClick={this.viewImagingDataset}
+      >
+        {cardInfo}
+      </Card>
+    );
+  }
+
+  renderCandParameters() {
+    const data = [
+      {
+        value: '',
+        label: 'Participant Status',
+      },
+      {
+        value: '',
+        label: 'Consent Status',
+      },
+      {
+        value: '',
+        label: 'Date of Consent',
+      },
+      {
+        value: '',
+        label: 'Date of Withdrawal',
+      },
+    ];
+    const cardInfo = data.map((info) => {
+      return (
+        <StaticElement
+          text={info.value}
+          label={info.label}
+        />
+      );
+    });
+    return (
+      <Card
+        id='cand_parameters'
+        title='Candidate Parameters'
+        onClick={this.viewCandParams}
+      >
+        {cardInfo}
+        <p style={{textAlign: 'center'}}>Click for more details</p>
+      </Card>
+    );
+  }
+
+  renderTimepoints() {
+    const data = this.state.data.timepointData.map((timepoint) => {
+      return (
+        [
+          timepoint.Visit_label,
+          timepoint.SubprojectTitle,
+          timepoint.SiteAlias,
+          timepoint.Current_stage,
+          timepoint.currentStatus,
+          timepoint.currentDate,
+          timepoint.Submitted,
+          timepoint.Scan_done,
+          timepoint.feedbackStatus,
+          timepoint.feedbackCount,
+          timepoint.feedbackColor,
+          timepoint.BVLQCType,
+          timepoint.BVLQCStatus,
+          timepoint.BVLQCExclusion,
+          timepoint.Real_name,
+        ]
+      );
+    });
+    return (
+      <Card
+        id='timepoint_list'
+        title='Timepoints'
+        onClick={this.viewCandParams}
+      >
+        <DataTable
+          fields={[
+            {label: 'Visit Label', show: true},
+            {label: 'Subproject', show: true},
+            {label: 'Site', show: true},
+            {label: 'Stage', show: true},
+            {label: 'Stage Status', show: true},
+            {label: 'Date of Stage', show: true},
+            {label: 'Sent To DCC', show: true},
+            {label: 'Imaging Scan Done', show: true},
+            {label: 'Feedback', show: true},
+            {label: 'Feedback Count', show: false},
+            {label: 'Feedback Color', show: false},
+            {label: 'BVL QC', show: true},
+            {label: 'BVL QC Status', show: false},
+            {label: 'BVL Exclusion', show: true},
+            {label: 'Registered By', show: true},
+          ]}
+          data={data}
+          getFormattedCell={this.formatDataTable}
+          hide={{
+            rowsPerPage: true,
+            downloadCSV: true,
+            defaultColumn: false,
+          }}
+        />
+      </Card>
+    );
   }
 
   render() {
@@ -122,21 +362,89 @@ class CandidateProfileIndex extends React.Component {
     if (!this.state.isLoaded) {
       return <Loader/>;
     }
-    const actionButtons = (
-      <CTA
-        label="Create Time Point"
-        buttonClass="btn btn-default"
-        onUserInput={this.createTimepoint}
-      />
+    const createTimepointButton = this.state.data.isDataEntryPerson ? (
+      <div style={{margin: '10px 0px'}}>
+        <CTA
+          label='Create Time Point'
+          buttonClass='btn btn-default'
+          onUserInput={this.createTimepoint}
+        />
+      </div>
+    ) : null;
+    const candInfoCard = this.state.data.isDataEntryPerson ? this.renderCandInfoCard() : null;
+
+    const cards = (
+      <div
+        id='cards'
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          flexDirection: 'column',
+        }}
+      >
+        <div
+          id='cardblock_top'
+          style={{
+            display: 'flex',
+            // flexWrap: 'wrap',
+            flexGrow: '2',
+            order: '1',
+            justifyContent: 'space-between',
+            alignItems: 'stretch',
+          }}
+
+        >
+          <div
+            id='cardblock_left'
+            style={{
+              display: 'flex',
+              order: '1',
+              flexGrow: '1',
+              flexShrink: '5',
+              flexDirection: 'column',
+              marginRight: '5px',
+            }}
+          >
+            {candInfoCard}
+            {this.renderCandParameters()}
+          </div>
+          <div
+            id='cardblock_right'
+            style={{
+              display: 'flex',
+              order: '2',
+              flexGrow: '5',
+              flexDirection: 'column',
+              marginLeft: '5px',
+            }}
+          >
+            {this.renderImagingCard()}
+          </div>
+        </div>
+        <div
+          id='cardblock_middle'
+          style={{
+            flexGrow: '1',
+            order: '2',
+          }}
+        >
+            {this.renderTimepoints()}
+        </div>
+      </div>
     );
     return (
       <div>
-        {actionButtons}
+        {createTimepointButton}
         {cards}
       </div>
     );
   }
 }
+
+CandidateProfileIndex.propTypes = {
+  dataURL: PropTypes.string.isRequired,
+};
+
 window.addEventListener('load', () => {
   const candID = location.href.split('/')[3];
   ReactDOM.render(
