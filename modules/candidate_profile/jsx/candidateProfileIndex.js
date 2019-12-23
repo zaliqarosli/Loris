@@ -133,6 +133,54 @@ class CandidateProfileIndex extends Component {
    */
   formatDataTable(column, cell, row) {
     let result = <td>{cell}</td>;
+    switch (column) {
+      case 'Visit Label':
+        const url = loris.BaseURL + '/instrument_list/?candID=' + this.state.data.candID + '&sessionID=' + row['Session ID'];
+        result = <td><a href={url}>{cell}</a></td>;
+        break;
+      case 'Sent To DCC':
+        if (cell === 'Y') {
+          const img = loris.BaseURL + '/images/check_blue.gif';
+          result = <td><img src={img} border='0' /></td>;
+        } else if (cell === 'N') {
+          result = <td>-</td>;
+        }
+        break;
+      case 'Imaging Scan Done':
+        if (cell === 'N') {
+          result = <td>No</td>;
+        } else if (cell === 'Y') {
+          const url = loris.BaseURL + '/imaging_browser/viewSession/?sessionID=' + row['Session ID'];
+          result = <td><a href={url}>Yes</a></td>;
+        }
+        break;
+      case 'Feedback':
+        if (row['Feedback Count'] === null) {
+          result = <td bgColor={row['Feedback Color']}>-</td>;
+        } else {
+          result = <td bgColor = {row['Feedback Color']}>{cell}</td>;
+        }
+        break;
+      case 'BVL QC':
+        if (row['BVL QC Status'] === null) {
+          const img = loris.BaseURL + '/images/delete.gif';
+          result = <td><img src={img} border='0' /></td>;
+        } else {
+          result = <td>{cell}</td>;
+        }
+      case 'BVL Exclusion':
+        if (cell === null) {
+          const img = loris.BaseURL + '/images/delete.gif';
+          result = <td><img src={img} border='0' /></td>;
+        } else {
+          if (cell === 'Not Excluded') {
+            result = <td>Pass</td>;
+          } else {
+            result= <td>Fail</td>;
+          }
+        }
+        break;
+    }
     return result;
   }
 
@@ -186,7 +234,7 @@ class CandidateProfileIndex extends Component {
         <StaticElement
           text={
             <span>
-              <h2>{info.value}</h2>
+              <h3>{info.value}</h3>
             </span>
           }
           label={info.label}
@@ -198,7 +246,7 @@ class CandidateProfileIndex extends Component {
         <StaticElement
           text={
             <span>
-              <h2>{info.value}</h2>
+              <h3>{info.value}</h3>
             </span>
           }
           label={info.label}
@@ -314,6 +362,7 @@ class CandidateProfileIndex extends Component {
           timepoint.BVLQCStatus,
           timepoint.BVLQCExclusion,
           timepoint.Real_name,
+          timepoint.SessionID,
         ]
       );
     });
@@ -340,6 +389,7 @@ class CandidateProfileIndex extends Component {
             {label: 'BVL QC Status', show: false},
             {label: 'BVL Exclusion', show: true},
             {label: 'Registered By', show: true},
+            {label: 'Session ID', show: false},
           ]}
           data={data}
           getFormattedCell={this.formatDataTable}
