@@ -29,9 +29,11 @@ class Card extends Component {
       cursor: 'pointer',
     } : null;
     return (
-      <Panel title={this.props.title}>
+      <Panel
+        id={this.props.id}
+        title={this.props.title}
+      >
         <div
-          key={this.props.id}
           onClick={this.handleClick}
           style={cursorStyle}
         >
