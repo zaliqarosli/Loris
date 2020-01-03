@@ -151,7 +151,7 @@ class CandidateProfileIndex extends Component {
           result = <td>No</td>;
         } else if (cell === 'Y') {
           const url = loris.BaseURL + '/imaging_browser/viewSession/?sessionID=' + row['Session ID'];
-          result = <td><a href={url}>Yes</a></td>;
+          result = <td><a href={url}>Yes (View Images)</a></td>;
         }
         break;
       case 'Feedback':
@@ -234,7 +234,14 @@ class CandidateProfileIndex extends Component {
         <StaticElement
           text={
             <span>
-              <h3>{info.value}</h3>
+              <h3
+                style={{
+                  lineHeight: '1.42857143',
+                  marginTop: '-7px',
+                }}
+              >
+                {info.value}
+              </h3>
             </span>
           }
           label={info.label}
@@ -246,7 +253,14 @@ class CandidateProfileIndex extends Component {
         <StaticElement
           text={
             <span>
-              <h3>{info.value}</h3>
+              <h3
+                style={{
+                  lineHeight: '1.42857143',
+                  marginTop: '-7px',
+                }}
+              >
+                {info.value}
+              </h3>
             </span>
           }
           label={info.label}
@@ -300,34 +314,33 @@ class CandidateProfileIndex extends Component {
         onClick={this.viewImagingDataset}
       >
         {cardInfo}
+        <p style={{textAlign: 'center'}}>Click for more details</p>
       </Card>
     );
   }
 
   renderCandParameters() {
-    const data = [
-      {
-        value: '',
-        label: 'Participant Status',
-      },
-      {
-        value: '',
-        label: 'Consent Status',
-      },
-      {
-        value: '',
-        label: 'Date of Consent',
-      },
-      {
-        value: '',
-        label: 'Date of Withdrawal',
-      },
-    ];
-    const cardInfo = data.map((info) => {
+    const participantStatus = (
+      <StaticElement
+        text={this.state.data.participant_status}
+        label='Participant Status'
+      />
+    );
+    const consentData = Object.keys(this.state.data.consentData).map((key) => {
+      const consent = this.state.data.consentData[key];
+      let consentStatus = '-';
+      switch (consent.Status) {
+        case 'yes':
+          consentStatus = 'Yes';
+          break;
+        case 'no':
+          consentStatus = 'No';
+          break;
+      }
       return (
         <StaticElement
-          text={info.value}
-          label={info.label}
+          text={consentStatus}
+          label={consent.Label}
         />
       );
     });
@@ -337,7 +350,8 @@ class CandidateProfileIndex extends Component {
         title='Candidate Parameters'
         onClick={this.viewCandParams}
       >
-        {cardInfo}
+        {participantStatus}
+        {consentData}
         <p style={{textAlign: 'center'}}>Click for more details</p>
       </Card>
     );
@@ -366,12 +380,21 @@ class CandidateProfileIndex extends Component {
         ]
       );
     });
+    const createTimepointButton = this.state.data.isDataEntryPerson ? (
+      <div style={{margin: '10px 10px'}}>
+        <CTA
+          label='Create Time Point'
+          buttonClass='btn btn-default'
+          onUserInput={this.createTimepoint}
+        />
+      </div>
+    ) : null;
     return (
       <Card
         id='timepoint_list'
         title='Timepoints'
-        onClick={this.viewCandParams}
       >
+        {createTimepointButton}
         <DataTable
           fields={[
             {label: 'Visit Label', show: true},
@@ -412,15 +435,6 @@ class CandidateProfileIndex extends Component {
     if (!this.state.isLoaded) {
       return <Loader/>;
     }
-    const createTimepointButton = this.state.data.isDataEntryPerson ? (
-      <div style={{margin: '10px 0px'}}>
-        <CTA
-          label='Create Time Point'
-          buttonClass='btn btn-default'
-          onUserInput={this.createTimepoint}
-        />
-      </div>
-    ) : null;
     const candInfoCard = this.state.data.isDataEntryPerson ? this.renderCandInfoCard() : null;
 
     const cards = (
@@ -453,6 +467,7 @@ class CandidateProfileIndex extends Component {
               flexShrink: '5',
               flexDirection: 'column',
               marginRight: '5px',
+              width: '30%',
             }}
           >
             {candInfoCard}
@@ -484,7 +499,6 @@ class CandidateProfileIndex extends Component {
     );
     return (
       <div>
-        {createTimepointButton}
         {cards}
       </div>
     );

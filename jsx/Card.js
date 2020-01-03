@@ -49,9 +49,6 @@ Card.propTypes = {
 };
 
 Card.defaultProps = {
-  onClick: function() {
-    console.warn('onClick() Card callback not set!');
-  },
 };
 
 export default Card;

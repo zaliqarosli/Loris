@@ -55,7 +55,7 @@ class CandidateParameters extends Component {
            href={loris.BaseURL + '/' + this.props.candID}
            style={{marginBottom: '20px'}}
         >
-          Return to timepoint list
+          Return to candidate profile
         </a>
         <br />
         <Tabs tabs={tabList} defaultTab='candidateInfo' updateURL={true}>

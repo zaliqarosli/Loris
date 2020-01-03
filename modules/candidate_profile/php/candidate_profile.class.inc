@@ -209,13 +209,38 @@ class Candidate_Profile extends \NDB_Page
         $cand_CenterID     = $candidate->getData('RegistrationCenterID');
         $isDataEntryPerson = $user->hasCenterPermission("data_entry", $cand_CenterID);
 
+        // Get participant status
+        $query = "SELECT pso.Description AS participant_status
+                      FROM participant_status ps
+                      LEFT JOIN participant_status_options pso
+                      ON (ps.participant_status=pso.ID) WHERE CandID=:candid";
+        $row   = $DB->pselectRow($query, ['candid' => $this->candID]);
+        $participant_status = !empty($row['participant_status']) ? $row['participant_status']
+        : '-';
+
+        // Get consent data
+        $listOfConsents = \Utility::getConsentList();
+        $consentData    = $candidate->getConsents();
+        $consent        = array();
+
+        foreach ($listOfConsents as $consentID => $consentDetail) {
+            $consent[$consentID]['Label']  = $consentDetail['Label'];
+            if (empty($consentData[$consentID])) {
+                $consent[$consentID]['Status'] = null;
+            } else {
+                $consent[$consentID]['Status'] = $consentData[$consentID]['Status'];
+            }
+        }
+
         $this->jsonData = array(
-            'candID'            => $candidate->getData('CandID'),
-            'pscid'             => $candidate->getPSCID(),
-            'candidateData'     => $candidate->getData(),
-            'timepointData'     => $timePoints,
-            'subprojectID'      => $subprojectID,
-            'isDataEntryPerson' => $isDataEntryPerson,
+            'candID'             => $candidate->getData('CandID'),
+            'pscid'              => $candidate->getPSCID(),
+            'candidateData'      => $candidate->getData(),
+            'timepointData'      => $timePoints,
+            'subprojectID'       => $subprojectID,
+            'isDataEntryPerson'  => $isDataEntryPerson,
+            'participant_status' => $participant_status,
+            'consentData'        => $consent,
         );
     }
     /**
