@@ -324,6 +324,19 @@ class CandidateProfileIndex extends Component {
         />
       );
     });
+    const picThumbnail = (
+      <div className='imaging_browser_pic'>
+        <img
+          className='img-checkpic img-responsive'
+          src={this.state.data.imagingData.checkPic}
+          style={{
+            width: '90%',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        />
+      </div>
+    );
     return (
       <Card
         id='imaging_info'
@@ -334,7 +347,9 @@ class CandidateProfileIndex extends Component {
           {imagingCount}
           {cardInfo}
         </div>
-        <p style={{textAlign: 'center'}}>Click for more details</p>
+        {picThumbnail}
+        <br />
+        <p style={{textAlign: 'center'}}>Click for Imaging Browser</p>
       </Card>
     );
   }

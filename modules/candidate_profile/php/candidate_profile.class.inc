@@ -238,13 +238,27 @@ class Candidate_Profile extends \NDB_Page
             (SELECT ID FROM session WHERE CandID=:candid)";
         $numberOfMincs = $DB->pselectOne($imaging_count, array('candid' => $this->candID));
 
-        $upload_query = "SELECT UploadDate from mri_upload where SessionID IN
+        $upload_query = "SELECT UploadID, UploadDate FROM mri_upload WHERE SessionID IN
             (SELECT ID FROM session WHERE CandID=:candid) ORDER BY UploadDate DESC LIMIT 1";
         $lastInserted = $DB->pselect($upload_query, array('candid' => $this->candID));
+
+        $uploadID        = $lastInserted[0]['UploadID'];
+        $file_query  = "SELECT FileID FROM files WHERE SessionID=(SELECT SessionID FROM
+            mri_upload WHERE UploadID=:uploadid) ORDER BY FileID DESC LIMIT 1";
+        $file_result = $DB->pselect($file_query, array('uploadid' => $uploadID));
+        $fileID      = $file_result[0]['FileID'] ?? null;
+
+        // Get imaging thumbnail pic
+        $mriFileObj       = new \MRIFile($fileID);
+        $checkPicFilename = $mriFileObj->getParameter(
+            'check_pic_filename'
+        ) ?? '';
+        $checkPic         = "/mri/jiv/get_file.php?file=pic/". $checkPicFilename;
 
         $imagingData = array(
             'numberOfMincs' => $numberOfMincs ?? null,
             'lastInserted'  => $lastInserted[0]['UploadDate'] ?? null,
+            'checkPic'      => $checkPic,
         );
         $this->jsonData = array(
             'candID'             => $candidate->getData('CandID'),
