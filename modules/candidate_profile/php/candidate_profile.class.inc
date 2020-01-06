@@ -249,16 +249,18 @@ class Candidate_Profile extends \NDB_Page
         $fileID      = $file_result[0]['FileID'] ?? null;
 
         // Get imaging thumbnail pic
-        $mriFileObj       = new \MRIFile($fileID);
-        $checkPicFilename = $mriFileObj->getParameter(
-            'check_pic_filename'
-        ) ?? '';
-        $checkPic         = "/mri/jiv/get_file.php?file=pic/". $checkPicFilename;
+        if ($fileID) {
+            $mriFileObj       = new \MRIFile($fileID);
+            $checkPicFilename = $mriFileObj->getParameter(
+                'check_pic_filename'
+            ) ?? '';
+            $checkPic         = "/mri/jiv/get_file.php?file=pic/". $checkPicFilename;
+        }
 
         $imagingData = array(
             'numberOfMincs' => $numberOfMincs ?? null,
             'lastInserted'  => $lastInserted[0]['UploadDate'] ?? null,
-            'checkPic'      => $checkPic,
+            'checkPic'      => $checkPic ?? null,
         );
         $this->jsonData = array(
             'candID'             => $candidate->getData('CandID'),

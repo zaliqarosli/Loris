@@ -312,7 +312,7 @@ class CandidateProfileIndex extends Component {
     );
     const data = [
       {
-        value: this.state.data.imagingData.lastInserted,
+        value: this.state.data.imagingData.lastInserted || '-',
         label: 'Most recent insert',
       },
     ];
