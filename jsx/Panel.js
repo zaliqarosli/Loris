@@ -60,7 +60,12 @@ class Panel extends Component {
     return (
       <div className="panel panel-primary">
         {panelHeading}
-        <div id={this.props.id} className={this.panelClass} role="tabpanel">
+        <div
+          id={this.props.id}
+          className={this.panelClass}
+          role="tabpanel"
+          style={{background: this.props.backgroundColor}}
+        >
           <div className="panel-body" style={{height: this.props.height}}>
             {this.props.children}
           </div>
@@ -74,11 +79,13 @@ Panel.propTypes = {
   id: PropTypes.string,
   height: PropTypes.string,
   title: PropTypes.string,
+  backgroundColor: PropTypes.string,
 };
 Panel.defaultProps = {
   initCollapsed: false,
   id: 'default-panel',
   height: '100%',
+  backgroundColor: 'white',
 };
 
 export default Panel;

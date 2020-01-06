@@ -197,6 +197,7 @@ class CandidateProfileIndex extends Component {
   }
 
   renderCandInfoCard() {
+    const active = (this.state.data.participant_status === 'Inactive') ? 'No' : 'Yes';
     const dataLeft = [
       {
         value: this.state.data.pscid,
@@ -221,7 +222,7 @@ class CandidateProfileIndex extends Component {
         label: 'Project',
       },
       {
-        value: this.state.data.candidateData.Active,
+        value: active,
         label: 'Active',
       },
       {
@@ -267,10 +268,12 @@ class CandidateProfileIndex extends Component {
         />
       );
     });
+    const backgroundColor = (active === 'Yes') ? '#b6d7a8' : '#ea9999';
     return (
       <Card
         id='candidate_info'
         title='Candidate Info'
+        backgroundColor={backgroundColor}
       >
         <div style={{display: 'flex'}}>
           <div style={{flexGrow: '1', order: '1'}}>

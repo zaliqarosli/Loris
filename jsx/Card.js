@@ -32,6 +32,7 @@ class Card extends Component {
       <Panel
         id={this.props.id}
         title={this.props.title}
+        backgroundColor={this.props.backgroundColor}
       >
         <div
           onClick={this.handleClick}
@@ -48,9 +49,11 @@ Card.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   onClick: PropTypes.func,
+  backgroundColor: PropTypes.string,
 };
 
 Card.defaultProps = {
+  backgroundColor: 'white',
 };
 
 export default Card;
