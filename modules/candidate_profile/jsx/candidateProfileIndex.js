@@ -293,10 +293,27 @@ class CandidateProfileIndex extends Component {
   }
 
   renderImagingCard() {
+    const imagingCount = (
+      <StaticElement
+        text={
+          <span>
+            <h3
+              style={{
+                lineHeight: '1.42857143',
+                marginTop: '-7px',
+              }}
+            >
+              {this.state.data.imagingData.numberOfMincs}
+            </h3>
+          </span>
+        }
+        label='Number of MINCS inserted'
+      />
+    );
     const data = [
       {
-        value: '',
-        label: 'Number of MINCS inserted',
+        value: this.state.data.imagingData.lastInserted,
+        label: 'Most recent insert',
       },
     ];
     const cardInfo = data.map((info) => {
@@ -313,7 +330,10 @@ class CandidateProfileIndex extends Component {
         title='Imaging Dataset'
         onClick={this.viewImagingDataset}
       >
-        {cardInfo}
+        <div className="form-horizontal">
+          {imagingCount}
+          {cardInfo}
+        </div>
         <p style={{textAlign: 'center'}}>Click for more details</p>
       </Card>
     );
@@ -350,8 +370,10 @@ class CandidateProfileIndex extends Component {
         title='Candidate Parameters'
         onClick={this.viewCandParams}
       >
-        {participantStatus}
-        {consentData}
+        <div className="form-horizontal">
+          {participantStatus}
+          {consentData}
+        </div>
         <p style={{textAlign: 'center'}}>Click for more details</p>
       </Card>
     );

@@ -100,7 +100,7 @@ class Candidate_Profile extends \NDB_Page
      */
     function setup()
     {
-        // create candidate object
+        // Create candidate object
         $candidate =& \Candidate::singleton($this->candID);
         $DB        =& \Database::singleton();
         $user      =& \User::singleton();
@@ -108,6 +108,7 @@ class Candidate_Profile extends \NDB_Page
         $this->pscid      = $candidate->getPSCID();
         $listOfTimePoints = $candidate->getListOfTimePoints();
 
+        // Get timepoint data
         if (!empty($listOfTimePoints)) {
             $username = $user->getData('UserID');
             $feedback_select_inactive = null;
@@ -232,6 +233,19 @@ class Candidate_Profile extends \NDB_Page
             }
         }
 
+        // Get imaging data
+        $imaging_count = "SELECT COUNT(*) FROM files WHERE SessionID IN
+            (SELECT ID FROM session WHERE CandID=:candid)";
+        $numberOfMincs = $DB->pselectOne($imaging_count, array('candid' => $this->candID));
+
+        $upload_query = "SELECT UploadDate from mri_upload where SessionID IN
+            (SELECT ID FROM session WHERE CandID=:candid) ORDER BY UploadDate DESC LIMIT 1";
+        $lastInserted = $DB->pselect($upload_query, array('candid' => $this->candID));
+
+        $imagingData = array(
+            'numberOfMincs' => $numberOfMincs ?? null,
+            'lastInserted'  => $lastInserted[0]['UploadDate'] ?? null,
+        );
         $this->jsonData = array(
             'candID'             => $candidate->getData('CandID'),
             'pscid'              => $candidate->getPSCID(),
@@ -241,6 +255,7 @@ class Candidate_Profile extends \NDB_Page
             'isDataEntryPerson'  => $isDataEntryPerson,
             'participant_status' => $participant_status,
             'consentData'        => $consent,
+            'imagingData'        => $imagingData,
         );
     }
     /**
