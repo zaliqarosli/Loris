@@ -275,7 +275,7 @@ class CandidateProfileIndex extends Component {
         title='Candidate Info'
         backgroundColor={backgroundColor}
       >
-        <div style={{display: 'flex'}}>
+        <div style={{display: 'flex', flexFlow: 'wrap'}}>
           <div style={{flexGrow: '1', order: '1'}}>
             <FormElement
               name='candinfo_form1'
@@ -310,7 +310,7 @@ class CandidateProfileIndex extends Component {
             </h3>
           </span>
         }
-        label='Number of MINCS inserted'
+        label='Number of scans inserted'
       />
     );
     const data = [
@@ -503,8 +503,6 @@ class CandidateProfileIndex extends Component {
             style={{
               display: 'flex',
               order: '1',
-              flexGrow: '1',
-              flexShrink: '5',
               flexDirection: 'column',
               marginRight: '5px',
               width: '30%',
