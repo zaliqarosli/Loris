@@ -29,18 +29,20 @@ class Card extends Component {
       cursor: 'pointer',
     } : null;
     return (
-      <Panel
-        id={this.props.id}
-        title={this.props.title}
-        backgroundColor={this.props.backgroundColor}
-      >
-        <div
-          onClick={this.handleClick}
-          style={cursorStyle}
+      <div style={{marginLeft: '5px', marginRight: '5px'}}>
+        <Panel
+          id={this.props.id}
+          title={this.props.title}
+          backgroundColor={this.props.backgroundColor}
         >
-          {this.props.children}
-        </div>
-      </Panel>
+          <div
+            onClick={this.handleClick}
+            style={cursorStyle}
+          >
+            {this.props.children}
+          </div>
+        </Panel>
+      </div>
     );
   }
 }

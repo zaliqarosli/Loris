@@ -490,7 +490,7 @@ class CandidateProfileIndex extends Component {
           id='cardblock_top'
           style={{
             display: 'flex',
-            // flexWrap: 'wrap',
+            flexWrap: 'wrap',
             flexGrow: '2',
             order: '1',
             justifyContent: 'space-between',
@@ -504,8 +504,8 @@ class CandidateProfileIndex extends Component {
               display: 'flex',
               order: '1',
               flexDirection: 'column',
-              marginRight: '5px',
               width: '30%',
+              flexGrow: '1',
             }}
           >
             {candInfoCard}
@@ -516,9 +516,9 @@ class CandidateProfileIndex extends Component {
             style={{
               display: 'flex',
               order: '2',
-              flexGrow: '5',
+              flexGrow: '1',
               flexDirection: 'column',
-              marginLeft: '5px',
+              minWidth: '69%',
             }}
           >
             {this.renderImagingCard()}

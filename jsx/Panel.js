@@ -64,7 +64,7 @@ class Panel extends Component {
           id={this.props.id}
           className={this.panelClass}
           role="tabpanel"
-          style={{background: this.props.backgroundColor}}
+          style={{background: this.props.backgroundColor, overflowX: 'auto'}}
         >
           <div className="panel-body" style={{height: this.props.height}}>
             {this.props.children}
