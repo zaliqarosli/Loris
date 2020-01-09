@@ -36,7 +36,6 @@ class CandidateProfileIndex extends Component {
     this.renderCandParameters = this.renderCandParameters.bind(this);
     this.renderSpecimenCard = this.renderSpecimenCard.bind(this);
     this.renderBVLCard = this.renderBVLCard.bind(this);
-    this.renderBVLCard2 = this.renderBVLCard2.bind(this);
     this.renderTimepoints = this.renderTimepoints.bind(this);
   }
 
@@ -482,53 +481,8 @@ class CandidateProfileIndex extends Component {
   }
 
   renderBVLCard() {
-    const data = this.state.data.bvl_result.map((instrument) => {
-      return (
-        [
-          instrument.Visit_label,
-          instrument.SessionID,
-          instrument.Date_visit,
-          instrument.Current_stage,
-          instrument.Test_name,
-          instrument.Screening,
-          instrument.Visit,
-          instrument.Approval,
-          instrument.NumOfConflict,
-        ]
-      );
-    });
-    return (
-      <Card
-        id='behavioural'
-        title='Behavioural Data'
-      >
-        <DataTable
-          fields={[
-            {label: 'Visit Label', show: true},
-            {label: 'Session ID', show: false},
-            {label: 'Date of Visit', show: true},
-            {label: 'Status', show: true},
-            {label: 'Instrument', show: true},
-            {label: 'Screening', show: false},
-            {label: 'Visit', show: false},
-            {label: 'Approval', show: false},
-            {label: 'Conflict', show: true},
-          ]}
-          data={data}
-          getFormattedCell={this.formatBVLTable}
-          hide={{
-            rowsPerPage: true,
-            downloadCSV: true,
-            defaultColumn: false,
-          }}
-        />
-      </Card>
-    );
-  }
-
-  renderBVLCard2() {
-    const tables = Object.keys(this.state.data.bvlData2).map((visitLabel) => {
-      const behavioural = this.state.data.bvlData2[visitLabel];
+    const tables = Object.keys(this.state.data.bvlData).map((visitLabel) => {
+      const behavioural = this.state.data.bvlData[visitLabel];
       const data = behavioural.map((instrument) => {
         return (
           [
@@ -546,7 +500,7 @@ class CandidateProfileIndex extends Component {
       });
       return (
         <div key={visitLabel + '_table'}>
-          <h3 style={{margin: '14px'}}>{visitLabel}</h3>
+          <h3 style={{margin: '14px', textAlign: 'center'}}>{visitLabel}</h3>
           <DataTable
             fields={[
               {label: 'Visit Label', show: true},
@@ -707,7 +661,6 @@ class CandidateProfileIndex extends Component {
           >
             {this.renderImagingCard()}
             {this.renderBVLCard()}
-            {this.renderBVLCard2()}
           </div>
         </div>
         <div
