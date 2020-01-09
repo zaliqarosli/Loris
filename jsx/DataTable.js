@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import PaginationLinks from 'jsx/PaginationLinks';
-import createFragment from 'react-addons-create-fragment';
 
 /**
  * Data Table component
@@ -425,6 +424,7 @@ class DataTable extends Component {
             let cell = null;
 
             let row = {};
+            row[this.props.rowNumLabel] = index[i].Content;
             this.props.fields
               .forEach((field, k) => row[field.label] = rowData[k]);
 
@@ -438,11 +438,9 @@ class DataTable extends Component {
             }
             if (cell !== null) {
                 // Note: Can't currently pass a key, need to update columnFormatter
-                // to not return a <td> node. Using createFragment instead.
+                // to not return a <td> node.
                 // let key = 'td_col_' + j;
                 curRow.push(cell);
-            } else {
-                curRow.push(createFragment({celldata}));
             }
         }
 

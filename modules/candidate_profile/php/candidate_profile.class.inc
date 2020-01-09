@@ -242,7 +242,7 @@ class Candidate_Profile extends \NDB_Page
             (SELECT ID FROM session WHERE CandID=:candid) ORDER BY UploadDate DESC LIMIT 1";
         $lastInserted = $DB->pselect($upload_query, array('candid' => $this->candID));
 
-        $uploadID        = $lastInserted[0]['UploadID'];
+        $uploadID    = $lastInserted[0]['UploadID'];
         $file_query  = "SELECT FileID FROM files WHERE SessionID=(SELECT SessionID FROM
             mri_upload WHERE UploadID=:uploadid) ORDER BY FileID DESC LIMIT 1";
         $file_result = $DB->pselect($file_query, array('uploadid' => $uploadID));
@@ -256,13 +256,80 @@ class Candidate_Profile extends \NDB_Page
             ) ?? '';
             $checkPic         = "/mri/jiv/get_file.php?file=pic/". $checkPicFilename;
         }
-
         $imagingData = array(
             'numberOfMincs' => $numberOfMincs ?? null,
             'lastInserted'  => $lastInserted[0]['UploadDate'] ?? null,
             'checkPic'      => $checkPic ?? null,
         );
+
+        // Get behavioural data
+        $bvl_query  = "SELECT s.Visit_label, s.ID AS SessionID, s.Date_visit, f.Test_name,
+		        s.Current_stage, s.Screening, s.Visit, s.Approval, count(cu.ConflictID) AS NumOfConflict
+	          FROM session s LEFT JOIN flag f ON (s.ID = f.SessionID)
+	          LEFT JOIN conflicts_unresolved cu ON (cu.CommentId1=f.CommentID)
+            LEFT JOIN candidate c USING (CandID)
+            WHERE s.Active='Y' AND c.CandID=:candid
+	          GROUP BY s.Visit_label, s.ID, s.Date_visit, f.Test_name, s.Current_stage, s.Screening,
+            s.Visit, s.Approval
+	          ORDER BY s.Visit_label, f.Test_name";
+        $bvl_result = $DB->pselect($bvl_query, array('candid' => $this->candID));
+
+        $bvlData2       = array();
+        $visitLabelList = $candidate->getListOfVisitLabels();
+        $instrumentList = \Utility::getAllInstruments();
+        // Replace test names with full name
+        foreach ($bvl_result as $key => $row) {
+          $bvl_result[$key]['Test_name'] = $instrumentList[$row['Test_name']];
+        }
+
+        foreach ($visitLabelList as $visitLabel) {
+          $bvlData2[$visitLabel] = array();
+          $bvl_result_keys = array_keys(array_column($bvl_result, 'Visit_label'), $visitLabel);
+          foreach($bvl_result_keys as $bvl_result_key) {
+            $bvlData2[$visitLabel][] = $bvl_result[$bvl_result_key];
+          }
+        }        
+        
+        $bvlData = array();
+        // Get candidate's visit labels
+        $timepointList  = $candidate->getListOfTimePoints();
+        foreach ($timepointList as $timepoint) {
+            $timepointObj  = new \Timepoint();
+            $timepointObj->select($timepoint);
+            $visitLabel    = $timepointObj->getVisitLabel();
+            $instruments   = $timepointObj->getInstrumentNames();
+
+            // Replace test_name with full name
+            if (!empty($instruments)) {
+                foreach ($instruments as $key => $testName) {
+                    // Get conflict query
+                    $conflict_query  = "SELECT count(cu.ConflictID) AS NumOfConflict
+	                    FROM session s LEFT JOIN flag f ON (s.ID = f.SessionID)
+	                    LEFT JOIN conflicts_unresolved cu ON (cu.CommentId1=f.CommentID)
+                      WHERE s.Active='Y' AND s.ID=:sessionID AND f.Test_name=:test_name";
+                    $conflict_where  = array (
+                        'sessionID' => $timepoint,
+                        'test_name' => $testName,
+                    );
+                    $numOfConflict     = $DB->pselectOne($conflict_query, $conflict_where);
+                    $instruments[$key] = array(
+                        'name'          => $instrumentList[$testName],
+                        'numOfConflict' => $numOfConflict,
+                    );
+                }
+            }
+            $bvlData[] = array(
+              'visitLabel'      => $visitLabel,
+              'dateOfVisit'     => $timepointObj->getDateOfVisit(),
+              'currentStage'    => $timepointObj->getCurrentStage(),
+              'currentStatus'   => $timepointObj->getCurrentStatus(),
+              'instruments'     => empty($instruments) ? null : $instruments,
+              'noOfInstruments' => count($instruments),
+            );
+        }
+        
         $this->jsonData = array(
+            'instrumentList'     => $instrumentList,
             'candID'             => $candidate->getData('CandID'),
             'pscid'              => $candidate->getPSCID(),
             'candidateData'      => $candidate->getData(),
@@ -271,6 +338,9 @@ class Candidate_Profile extends \NDB_Page
             'isDataEntryPerson'  => $isDataEntryPerson,
             'participant_status' => $participant_status,
             'consentData'        => $consent,
+            'bvl_result'         => $bvl_result,
+            'bvlData'            => $bvlData,
+            'bvlData2'           => $bvlData2,
             'imagingData'        => $imagingData,
         );
     }

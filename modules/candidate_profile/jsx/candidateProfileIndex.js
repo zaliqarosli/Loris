@@ -26,13 +26,17 @@ class CandidateProfileIndex extends Component {
     this.fetchData = this.fetchData.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.setFormData = this.setFormData.bind(this);
-    this.formatDataTable = this.formatDataTable.bind(this);
+    this.formatBVLTable = this.formatBVLTable.bind(this);
+    this.formatTimepointTable = this.formatTimepointTable.bind(this);
     this.createTimepoint = this.createTimepoint.bind(this);
     this.viewImagingDataset = this.viewImagingDataset.bind(this);
     this.viewCandParams = this.viewCandParams.bind(this);
     this.renderCandInfoCard = this.renderCandInfoCard.bind(this);
     this.renderImagingCard = this.renderImagingCard.bind(this);
     this.renderCandParameters = this.renderCandParameters.bind(this);
+    this.renderSpecimenCard = this.renderSpecimenCard.bind(this);
+    this.renderBVLCard = this.renderBVLCard.bind(this);
+    this.renderBVLCard2 = this.renderBVLCard2.bind(this);
     this.renderTimepoints = this.renderTimepoints.bind(this);
   }
 
@@ -123,7 +127,7 @@ class CandidateProfileIndex extends Component {
   }
 
   /**
-   * Modify behaviour of specified column cells in the Data Table component
+   * Modify behaviour of specified column cells in the Behavioural Data Table component
    *
    * @param {string} column - column name
    * @param {string} cell - cell content
@@ -131,12 +135,81 @@ class CandidateProfileIndex extends Component {
    *
    * @return {*} a formated table cell for a given column
    */
-  formatDataTable(column, cell, row) {
+  formatBVLTable(column, cell, row) {
+    let result = <td>{cell}</td>;
+    switch (column) {
+      case 'Visit Label':
+        if (row['No.'] == 1) {
+          const url = loris.BaseURL + '/instrument_list/?candID=' + this.state.data.candID + '&sessionID=' + row['Session ID'];
+          result = <td rowspan='0'><a href={url}>{cell}</a></td>;
+        } else {
+          result = null;
+        }
+        break;
+      case 'Date of Visit':
+        if (row['No.'] == 1) {
+          result = <td rowspan='0'>{cell}</td>;
+        } else {
+          result = null;
+        }
+        break;
+      case 'Instrument':
+        if (row['Status'] === 'Not Started') {
+          result = null;
+        }
+        break;
+      case 'Status':
+        if (row['No.'] == 1) {
+          if (cell === 'Not Started') {
+            result = <td colspan='2' rowspan='0' style={{background: '#ea9999'}}>{cell}</td>;
+          } else if (cell === 'Screening') {
+            result = <td rowspan='0' style={{background: '#f9cb9c'}}>{cell} - {row['Screening']}</td>;
+          } else if (cell === 'Visit') {
+            result = <td rowspan='0' style={{background: '#ffe599'}}>{cell} - {row['Visit']}</td>;
+          } else if (cell === 'Approval') {
+            result = <td rowspan='0' style={{background: '#b6d7a8'}}>{cell} - {row['Approval']}</td>;
+          }
+        } else {
+          result = null;
+        }
+        break;
+      case 'Conflict':
+        if (cell != '0') {
+          result = <td><i className='fas fa-exclamation-circle' style={{color: 'red'}}></i></td>;
+        } else {
+          result = <td></td>;
+        }
+        break;
+    }
+    return result;
+  }
+
+  /**
+   * Modify behaviour of specified column cells in the Timepoint Data Table component
+   *
+   * @param {string} column - column name
+   * @param {string} cell - cell content
+   * @param {object} row - row content indexed by column
+   *
+   * @return {*} a formated table cell for a given column
+   */
+  formatTimepointTable(column, cell, row) {
     let result = <td>{cell}</td>;
     switch (column) {
       case 'Visit Label':
         const url = loris.BaseURL + '/instrument_list/?candID=' + this.state.data.candID + '&sessionID=' + row['Session ID'];
         result = <td><a href={url}>{cell}</a></td>;
+        break;
+      case 'Stage':
+        if (cell === 'Not Started') {
+          result = <td colspan='3'>{cell}</td>;
+        }
+        break;
+      case 'Stage Status':
+      case 'Date of Stage':
+        if (row['Stage'] === 'Not Started') {
+          result = null;
+        }
         break;
       case 'Sent To DCC':
         if (cell === 'Y') {
@@ -397,6 +470,116 @@ class CandidateProfileIndex extends Component {
     );
   }
 
+  renderSpecimenCard() {
+    return (
+      <Card
+        id='specimen'
+        title='Biospecimen Data'
+        onClick={this.viewCandParams}
+      >
+      </Card>
+    );
+  }
+
+  renderBVLCard() {
+    const data = this.state.data.bvl_result.map((instrument) => {
+      return (
+        [
+          instrument.Visit_label,
+          instrument.SessionID,
+          instrument.Date_visit,
+          instrument.Current_stage,
+          instrument.Test_name,
+          instrument.Screening,
+          instrument.Visit,
+          instrument.Approval,
+          instrument.NumOfConflict,
+        ]
+      );
+    });
+    return (
+      <Card
+        id='behavioural'
+        title='Behavioural Data'
+      >
+        <DataTable
+          fields={[
+            {label: 'Visit Label', show: true},
+            {label: 'Session ID', show: false},
+            {label: 'Date of Visit', show: true},
+            {label: 'Status', show: true},
+            {label: 'Instrument', show: true},
+            {label: 'Screening', show: false},
+            {label: 'Visit', show: false},
+            {label: 'Approval', show: false},
+            {label: 'Conflict', show: true},
+          ]}
+          data={data}
+          getFormattedCell={this.formatBVLTable}
+          hide={{
+            rowsPerPage: true,
+            downloadCSV: true,
+            defaultColumn: false,
+          }}
+        />
+      </Card>
+    );
+  }
+
+  renderBVLCard2() {
+    const tables = Object.keys(this.state.data.bvlData2).map((visitLabel) => {
+      const behavioural = this.state.data.bvlData2[visitLabel];
+      const data = behavioural.map((instrument) => {
+        return (
+          [
+            instrument.Visit_label,
+            instrument.SessionID,
+            instrument.Date_visit,
+            instrument.Current_stage,
+            instrument.Test_name,
+            instrument.Screening,
+            instrument.Visit,
+            instrument.Approval,
+            instrument.NumOfConflict,
+          ]
+        );
+      });
+      return (
+        <div key={visitLabel + '_table'}>
+          <h3 style={{margin: '14px'}}>{visitLabel}</h3>
+          <DataTable
+            fields={[
+              {label: 'Visit Label', show: true},
+              {label: 'Session ID', show: false},
+              {label: 'Date of Visit', show: true},
+              {label: 'Status', show: true},
+              {label: 'Instrument', show: true},
+              {label: 'Screening', show: false},
+              {label: 'Visit', show: false},
+              {label: 'Approval', show: false},
+              {label: 'Conflict', show: true},
+            ]}
+            data={data}
+            getFormattedCell={this.formatBVLTable}
+            hide={{
+              rowsPerPage: true,
+              downloadCSV: true,
+              defaultColumn: false,
+            }}
+          />
+        </div>
+      );
+    });
+    return (
+      <Card
+        id='behavioural'
+        title='Behavioural Data'
+      >
+        {tables}
+      </Card>
+    );
+  }
+
   renderTimepoints() {
     const data = this.state.data.timepointData.map((timepoint) => {
       return (
@@ -455,7 +638,7 @@ class CandidateProfileIndex extends Component {
             {label: 'Session ID', show: false},
           ]}
           data={data}
-          getFormattedCell={this.formatDataTable}
+          getFormattedCell={this.formatTimepointTable}
           hide={{
             rowsPerPage: true,
             downloadCSV: true,
@@ -510,6 +693,7 @@ class CandidateProfileIndex extends Component {
           >
             {candInfoCard}
             {this.renderCandParameters()}
+            {this.renderSpecimenCard()}
           </div>
           <div
             id='cardblock_right'
@@ -522,6 +706,8 @@ class CandidateProfileIndex extends Component {
             }}
           >
             {this.renderImagingCard()}
+            {this.renderBVLCard()}
+            {this.renderBVLCard2()}
           </div>
         </div>
         <div
