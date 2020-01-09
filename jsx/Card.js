@@ -34,6 +34,7 @@ class Card extends Component {
           id={this.props.id}
           title={this.props.title}
           backgroundColor={this.props.backgroundColor}
+          initCollapsed={this.props.initCollapsed}
         >
           <div
             onClick={this.handleClick}
@@ -52,10 +53,13 @@ Card.propTypes = {
   title: PropTypes.string.isRequired,
   onClick: PropTypes.func,
   backgroundColor: PropTypes.string,
+  initCollapsed: PropTypes.bool,
 };
 
 Card.defaultProps = {
+  onClick: null,
   backgroundColor: 'white',
+  initCollapsed: false,
 };
 
 export default Card;

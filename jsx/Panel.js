@@ -76,6 +76,7 @@ class Panel extends Component {
 }
 
 Panel.propTypes = {
+  initCollapsed: PropTypes.bool,
   id: PropTypes.string,
   height: PropTypes.string,
   title: PropTypes.string,
@@ -85,6 +86,7 @@ Panel.defaultProps = {
   initCollapsed: false,
   id: 'default-panel',
   height: '100%',
+  title: '',
   backgroundColor: 'white',
 };
 

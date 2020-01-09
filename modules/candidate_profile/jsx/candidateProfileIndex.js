@@ -570,6 +570,7 @@ class CandidateProfileIndex extends Component {
       <Card
         id='timepoint_list'
         title='Timepoints'
+        initCollapsed={true}
       >
         {createTimepointButton}
         <DataTable
