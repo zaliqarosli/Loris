@@ -172,6 +172,44 @@ class CandidateProfileIndex extends Component {
           result = null;
         }
         break;
+      case 'Completion':
+        const value = cell + '%';
+        if (cell == 100) {
+          result = <td style={{background: '#b6d7a8'}}>{value}</td>;
+        } else if (50 <= cell && cell < 100) {
+          result = (
+            <td style={{padding: '0'}}>
+              <div
+                style={{
+                  background: '#ffe599',
+                  width: value,
+                  padding: '8px',
+                  borderRight: '1px solid #C3D5DB',
+                  marginTop: '-1px',
+                }}>
+                {value}
+              </div>
+            </td>
+          );
+        } else if (0 < cell && cell < 50) {
+          result = (
+            <td style={{padding: '0'}}>
+              <div
+                style={{
+                  background: '#f9cb9c',
+                  width: value,
+                  padding: '8px',
+                  borderRight: '1px solid #C3D5DB',
+                  marginTop: '-1px',
+                }}>
+                {value}
+              </div>
+            </td>
+          );
+        } else if (cell == 0) {
+          result = <td>{cell}%</td>;
+        }
+        break;
       case 'Conflict':
         if (cell != '0') {
           result = <td><i className='fas fa-exclamation-circle' style={{color: 'red'}}></i></td>;

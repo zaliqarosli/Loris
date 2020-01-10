@@ -296,7 +296,7 @@ class Candidate_Profile extends \NDB_Page
                 false
             );
             $completion = $instrument->determineDataEntryCompletionProgress();
-            $bvl_result[$key]['Completion'] = $completion . '%';
+            $bvl_result[$key]['Completion'] = $completion;
         }
 
         // Group results by visit label
