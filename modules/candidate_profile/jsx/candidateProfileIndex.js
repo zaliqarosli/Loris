@@ -423,10 +423,29 @@ class CandidateProfileIndex extends Component {
         label='Number of scans inserted'
       />
     );
+    const imageLinks = this.state.data.timepointData.map((timepoint) => {
+      if (timepoint.Scan_done === 'Y') {
+        const url = loris.BaseURL + '/imaging_browser/viewSession/?sessionID=' + timepoint.SessionID;
+        return <a href={url}>{timepoint.Visit_label}</a>;
+      }
+    });
+    const linkValue = (
+      <span>
+        <p>
+          {imageLinks.reduce((prev, link) => {
+            return [prev, ' ', link];
+          })}
+        </p>
+      </span>
+    );
     const data = [
       {
         value: this.state.data.imagingData.lastInserted || '-',
         label: 'Most recent insert',
+      },
+      {
+        value: linkValue,
+        label: 'View images',
       },
     ];
     const cardInfo = data.map((info) => {
