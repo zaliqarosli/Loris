@@ -440,12 +440,12 @@ class CandidateProfileIndex extends Component {
     );
     const data = [
       {
-        value: this.state.data.imagingData.lastInserted || '-',
-        label: 'Most recent insert',
-      },
-      {
         value: linkValue,
         label: 'View images',
+      },
+      {
+        value: this.state.data.imagingData.lastInserted || '-',
+        label: 'Most recent insert',
       },
     ];
     const cardInfo = data.map((info) => {
@@ -634,7 +634,6 @@ class CandidateProfileIndex extends Component {
       <Card
         id='timepoint_list'
         title='Timepoints'
-        initCollapsed={true}
       >
         {createTimepointButton}
         <DataTable
@@ -642,17 +641,17 @@ class CandidateProfileIndex extends Component {
             {label: 'Visit Label', show: true},
             {label: 'Subproject', show: true},
             {label: 'Site', show: true},
-            {label: 'Stage', show: true},
-            {label: 'Stage Status', show: true},
-            {label: 'Date of Stage', show: true},
-            {label: 'Sent To DCC', show: true},
-            {label: 'Imaging Scan Done', show: true},
-            {label: 'Feedback', show: true},
+            {label: 'Stage', show: false},
+            {label: 'Stage Status', show: false},
+            {label: 'Date of Stage', show: false},
+            {label: 'Sent To DCC', show: false},
+            {label: 'Imaging Scan Done', show: false},
+            {label: 'Feedback', show: false},
             {label: 'Feedback Count', show: false},
             {label: 'Feedback Color', show: false},
-            {label: 'BVL QC', show: true},
+            {label: 'BVL QC', show: false},
             {label: 'BVL QC Status', show: false},
-            {label: 'BVL Exclusion', show: true},
+            {label: 'BVL Exclusion', show: false},
             {label: 'Registered By', show: true},
             {label: 'Session ID', show: false},
           ]}
@@ -712,6 +711,7 @@ class CandidateProfileIndex extends Component {
           >
             {candInfoCard}
             {this.renderCandParameters()}
+            {this.renderTimepoints()}
             {this.renderSpecimenCard()}
           </div>
           <div
@@ -735,7 +735,6 @@ class CandidateProfileIndex extends Component {
             order: '2',
           }}
         >
-            {this.renderTimepoints()}
         </div>
       </div>
     );
