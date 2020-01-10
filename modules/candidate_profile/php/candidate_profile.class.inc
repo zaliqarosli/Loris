@@ -244,40 +244,59 @@ class Candidate_Profile extends \NDB_Page
 
         $uploadID    = $lastInserted[0]['UploadID'];
         $file_query  = "SELECT FileID FROM files WHERE SessionID=(SELECT SessionID FROM
-            mri_upload WHERE UploadID=:uploadid) ORDER BY FileID DESC LIMIT 1";
+            mri_upload WHERE UploadID=:uploadid) ORDER BY FileID DESC LIMIT 2";
         $file_result = $DB->pselect($file_query, array('uploadid' => $uploadID));
-        $fileID      = $file_result[0]['FileID'] ?? null;
 
-        // Get imaging thumbnail pic
-        if ($fileID) {
-            $mriFileObj       = new \MRIFile($fileID);
-            $checkPicFilename = $mriFileObj->getParameter(
-                'check_pic_filename'
-            ) ?? '';
-            $checkPic         = "/mri/jiv/get_file.php?file=pic/". $checkPicFilename;
+        $picArr = array();
+        if (!empty($file_result)) {
+            foreach ($file_result as $key => $result) {
+              $fileID      = $result['FileID'];
+              // Get imaging thumbnail pic
+              if ($fileID) {
+                  $mriFileObj       = new \MRIFile($fileID);
+                  $checkPicFilename = $mriFileObj->getParameter(
+                      'check_pic_filename'
+                  ) ?? '';
+                  $checkPic         = "/mri/jiv/get_file.php?file=pic/". $checkPicFilename;
+                  $picArr[]         = $checkPic ?? null;
+              }
+            }
         }
         $imagingData = array(
             'numberOfMincs' => $numberOfMincs ?? null,
             'lastInserted'  => $lastInserted[0]['UploadDate'] ?? null,
-            'checkPic'      => $checkPic ?? null,
+            'checkPics'      => $picArr,
         );
 
         // Get behavioural data
-        $bvl_query  = "SELECT s.Visit_label, s.ID AS SessionID, s.Date_visit, f.Test_name,
+        $bvl_query  = "SELECT s.Visit_label, s.ID AS SessionID, s.Date_visit, f.Test_name, f.CommentID,
 		        s.Current_stage, s.Screening, s.Visit, s.Approval, count(cu.ConflictID) AS NumOfConflict
 	          FROM session s LEFT JOIN flag f ON (s.ID = f.SessionID)
 	          LEFT JOIN conflicts_unresolved cu ON (cu.CommentId1=f.CommentID)
             LEFT JOIN candidate c USING (CandID)
-            WHERE s.Active='Y' AND c.CandID=:candid
-	          GROUP BY s.Visit_label, s.ID, s.Date_visit, f.Test_name, s.Current_stage, s.Screening,
+            WHERE s.Active='Y' AND c.CandID=:candid AND f.CommentID NOT LIKE 'DDE%'
+	          GROUP BY s.Visit_label, s.ID, s.Date_visit, f.Test_name, f.CommentID, s.Current_stage, s.Screening,
             s.Visit, s.Approval
 	          ORDER BY s.Visit_label, f.Test_name";
         $bvl_result = $DB->pselect($bvl_query, array('candid' => $this->candID));
 
-        // Replace test names with full name
         $instrumentList = \Utility::getAllInstruments();
         foreach ($bvl_result as $key => $row) {
-          $bvl_result[$key]['Test_name'] = $instrumentList[$row['Test_name']];
+            $testName = $row['Test_name'];
+            $commentID = $row['CommentID'];
+
+            // Replace test names with full name
+            $bvl_result[$key]['Test_name'] = $instrumentList[$testName];
+
+            // Get instrument completion progress
+            $instrument = \NDB_BVL_Instrument::factory(
+                $testName,
+                $commentID,
+                '',
+                false
+            );
+            $completion = $instrument->determineDataEntryCompletionProgress();
+            $bvl_result[$key]['Completion'] = $completion . '%';
         }
 
         // Group results by visit label
@@ -290,7 +309,9 @@ class Candidate_Profile extends \NDB_Page
             $bvlData[$visitLabel][] = $bvl_result[$bvl_result_key];
           }
         }        
-        
+
+        // Get behavioural
+ 
         $this->jsonData = array(
             'instrumentList'     => $instrumentList,
             'candID'             => $candidate->getData('CandID'),

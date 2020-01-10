@@ -399,19 +399,22 @@ class CandidateProfileIndex extends Component {
         />
       );
     });
-    const picThumbnail = (
-      <div className='imaging_browser_pic'>
-        <img
-          className='img-checkpic img-responsive'
-          src={this.state.data.imagingData.checkPic}
-          style={{
-            width: '90%',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-          }}
-        />
-      </div>
-    );
+    const picThumbnail = this.state.data.imagingData.checkPics.map((pic) => {
+      return (
+        <div className='imaging_browser_pic'>
+          <img
+            className='img-checkpic img-responsive'
+            src={pic}
+            style={{
+              padding: '5px',
+              width: '400px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          />
+        </div>
+      );
+    });
     return (
       <Card
         id='imaging_info'
@@ -422,7 +425,9 @@ class CandidateProfileIndex extends Component {
           {imagingCount}
           {cardInfo}
         </div>
-        {picThumbnail}
+        <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center'}}>
+          {picThumbnail}
+        </div>
         <br />
         <p style={{textAlign: 'center'}}>Click for Imaging Browser</p>
       </Card>
@@ -494,6 +499,7 @@ class CandidateProfileIndex extends Component {
             instrument.Screening,
             instrument.Visit,
             instrument.Approval,
+            instrument.Completion,
             instrument.NumOfConflict,
           ]
         );
@@ -511,6 +517,7 @@ class CandidateProfileIndex extends Component {
               {label: 'Screening', show: false},
               {label: 'Visit', show: false},
               {label: 'Approval', show: false},
+              {label: 'Completion', show: true},
               {label: 'Conflict', show: true},
             ]}
             data={data}
@@ -660,8 +667,8 @@ class CandidateProfileIndex extends Component {
               minWidth: '69%',
             }}
           >
-            {this.renderImagingCard()}
             {this.renderBVLCard()}
+            {this.renderImagingCard()}
           </div>
         </div>
         <div
