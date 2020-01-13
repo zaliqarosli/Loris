@@ -1524,7 +1524,7 @@ abstract class NDB_BVL_Instrument extends NDB_Page
 
         if ($unanswered == 0) {
             return 100;
-        } else if ($unaswered == $totalElements) {
+        } else if ($unanswered == $totalElements) {
             return 0;
         } else {
             return (($totalElements-$unanswered)/$totalElements)*100;
