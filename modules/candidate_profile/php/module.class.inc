@@ -50,4 +50,9 @@ class Module extends \Module
         $page = $this->loadPage("candidate_profile");
         return $page->process($request, $page);
     }
+
+    public function getLongName() : string
+    {
+        return "Candidate Profile";
+    }
 }
