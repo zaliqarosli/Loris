@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import PaginationLinks from 'jsx/PaginationLinks';
-import createFragment from 'react-addons-create-fragment';
 
 /**
  * Data Table component
@@ -439,7 +438,6 @@ class DataTable extends Component {
           filterLength = Object.keys(this.props.filter).length;
         }
 
-        let key = 'td_col_' + j;
 
         // Get custom cell formatting if available
         if (this.props.getFormattedCell) {
@@ -448,6 +446,7 @@ class DataTable extends Component {
           } else {
             // create mapping between rowHeaders and rowData in a row Object
             const row = {};
+            row[this.props.rowNumLabel] = index[i].Content;
             this.props.fields.forEach((field, k) => {
               row[field.label] = this.props.data[index[i].RowIdx][k];
             });
@@ -459,11 +458,10 @@ class DataTable extends Component {
           }
           if (data !== null) {
             // Note: Can't currently pass a key, need to update columnFormatter
-            // to not return a <td> node. Using createFragment instead.
-            curRow.push(createFragment({data}));
+            // to not return a <td> node.
+            // let key = 'td_col_' + j;
+            curRow.push(data);
           }
-        } else {
-          curRow.push(<td key={key}>{data}</td>);
         }
       }
 
@@ -603,18 +601,20 @@ class DataTable extends Component {
 }
 DataTable.propTypes = {
   data: PropTypes.array.isRequired,
+  fields: PropTypes.array,
   rowNumLabel: PropTypes.string,
+  filter: PropTypes.obj,
   // Function of which returns a JSX element for a table cell, takes
   // parameters of the form: func(ColumnName, CellData, EntireRowData)
   getFormattedCell: PropTypes.func,
   onSort: PropTypes.func,
-  actions: PropTypes.object,
+  actions: PropTypes.array,
   hide: PropTypes.object,
   nullTableShow: PropTypes.bool,
 };
 DataTable.defaultProps = {
-  headers: [],
-  data: {},
+  data: [],
+  fields: [],
   rowNumLabel: 'No.',
   filter: {},
   hide: {
