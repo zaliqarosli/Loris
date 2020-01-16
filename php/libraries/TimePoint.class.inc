@@ -126,7 +126,8 @@ class TimePoint
                          s.Current_stage, s.Screening, s.Date_screening, s.Visit,
                          s.Date_visit, s.Approval, s.Date_approval, s.Active,
                          s.registeredBy, s.UserID, u.Real_name, s.Hardcopy_request,
-                         s.BVLQCStatus, s.BVLQCType, s.BVLQCExclusion, s.Scan_done
+                         s.BVLQCStatus, s.BVLQCType, s.BVLQCExclusion, s.Scan_done,
+                         p.Alias as SiteAlias
                     FROM session AS s
                         LEFT JOIN psc AS p USING (CenterID)
                         LEFT JOIN users AS u on (s.registeredBy=u.UserID)
