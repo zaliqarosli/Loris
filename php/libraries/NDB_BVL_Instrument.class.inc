@@ -1490,9 +1490,12 @@ abstract class NDB_BVL_Instrument extends NDB_Page
         $unanswered    = 0;
         $totalElements = count($this->_requiredElements);
         foreach ($this->_requiredElements as $field) {
-            // this shouldn't be just empty() b/c 0 is a valid
+            // consider status field if not_answered chosen as an answer
+            $statusField = $field . '_status';
+            // field shouldn't be just empty() b/c 0 is a valid
             // value for some required fields
-            if (is_null($allData[$field]) || $allData[$field] === "") {
+            if ((is_null($allData[$field]) || $allData[$field] === "")
+                && empty($allData[$statusField])) {
                 $unanswered++;
             }
         }
