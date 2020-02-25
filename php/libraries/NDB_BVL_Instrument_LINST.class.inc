@@ -412,8 +412,8 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
                 $addElements = true;
             }
 
-            $parsingPage       = 'top';
-            $firstSelectOfPage = true;
+            $parsingPage      = 'top';
+            $firstFieldOfPage = true;
 
             $Group = array(
                       'Name'      => null,
@@ -435,6 +435,10 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
                     || $fieldname == "Window_Difference"
                     || $fieldname == "Examiner"
                 ) {
+                    if ($firstFieldOfPage) {
+                        $this->_requiredElements[] = $fieldname;
+                        $firstFieldOfPage = false;
+                    }
                     continue;
                 }
                 switch($type) {
@@ -454,7 +458,7 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
                     } else {
                         $addElements = false;
                     }
-                    $firstSelectOfPage = true;
+                    $firstFieldOfPage = true;
                     break;
                 case 'table':
                     $this->testName = trim($pieces[1]);
@@ -528,9 +532,9 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
                             $this->addTextElement($pieces[1], $pieces[2]);
                         }
                     }
-                    if ($firstSelectOfPage) {
-                        $this->_requiredElements[] = $pieces[1];
-                        $firstSelectOfPage         = false;
+                    if ($firstFieldOfPage) {
+                        $this->_requiredElements[] = $fieldname;
+                        $firstFieldOfPage         = false;
                     }
                     $this->LinstQuestions[$pieces[1]] = array('type' => 'text');
                     break;
@@ -546,9 +550,9 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
                             $this->addTextAreaElement($pieces[1], $pieces[2]);
                         }
                     }
-                    if ($firstSelectOfPage) {
-                        $this->_requiredElements[] = $pieces[1];
-                        $firstSelectOfPage         = false;
+                    if ($firstFieldOfPage) {
+                        $this->_requiredElements[] = $fieldname;
+                        $firstFieldOfPage         = false;
                     }
                     $this->LinstQuestions[$pieces[1]] = array('type' => 'textarea');
                     break;
@@ -602,9 +606,9 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
                             );
                         }
                     }
-                    if ($firstSelectOfPage) {
-                        $this->_requiredElements[] = $pieces[1];
-                        $firstSelectOfPage         = false;
+                    if ($firstFieldOfPage) {
+                        $this->_requiredElements[] = $fieldname;
+                        $firstFieldOfPage         = false;
                     }
                     $this->LinstQuestions[$pieces[1]] = array('type' => 'date');
                     break;
@@ -612,9 +616,9 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
                     if ($addElements) {
                         $this->addNumericElement($pieces[1], $pieces[2]);
                     }
-                    if ($firstSelectOfPage) {
-                        $this->_requiredElements[] = $pieces[1];
-                        $firstSelectOfPage         = false;
+                    if ($firstFieldOfPage) {
+                        $this->_requiredElements[] = $fieldname;
+                        $firstFieldOfPage         = false;
                     }
                     // FIXME: This variable is never populated.
                     $options = array();
@@ -688,9 +692,9 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
 
                         }
                     }
-                    if ($firstSelectOfPage) {
-                        $this->_requiredElements[] = $pieces[1];
-                        $firstSelectOfPage         = false;
+                    if ($firstFieldOfPage) {
+                        $this->_requiredElements[] = $fieldname;
+                        $firstFieldOfPage         = false;
                     }
                     $this->LinstQuestions[$pieces[1]] = array('type' => 'select');
                     break;
