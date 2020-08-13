@@ -16,7 +16,7 @@ import AddHeaderItemForm from './addHeaderItemForm';
 import AddNumericItemForm from './addNumericItemForm';
 import AddPageForm from './addPageForm';
 import AddSectionForm from './addSectionForm';
-import AddMultipartForm from './addMultipartForm';
+// import AddMultipartForm from './addMultipartForm';
 import AddTableForm from './addTableForm';
 
 class InstrumentBuilderApp extends Component {
@@ -450,14 +450,14 @@ class InstrumentBuilderApp extends Component {
                     onEdit={editSubActivity}
                   />;
         break;
-      case 'multipart':
-        addForm = <AddMultipartForm
-                    mode='add'
-                    formData={this.state.newSubActivity}
-                    onSave={this.addSubActivity}
-                    onEdit={editSubActivity}
-                  />;
-        break;
+      // case 'multipart':
+      //   addForm = <AddMultipartForm
+      //               mode='add'
+      //               formData={this.state.newSubActivity}
+      //               onSave={this.addSubActivity}
+      //               onEdit={editSubActivity}
+      //             />;
+      //   break;
       case 'addTable':
         addForm = <AddTableForm
                     mode='add'
