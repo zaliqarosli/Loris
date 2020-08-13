@@ -224,7 +224,7 @@ class InstrumentBuilderIndex extends Component {
       }},
       {label: 'Date Updated', show: true},
       {label: 'Updated By', show: true},
-      {label: 'Schema URI', show: true},
+      {label: 'Schema JSON', show: false},
     ];
     const actions = [
       {name: 'loadInstrument', label: 'Load Instrument', action: this.openModal},

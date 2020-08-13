@@ -37,18 +37,15 @@ class InstrumentRowProvisioner extends \LORIS\Data\Provisioners\DBRowProvisioner
     {
         // TODO: update description to be meaningful
         parent::__construct(
-            "SELECT i_s.InstrumentSchemaID AS id,
-                    tn.Full_name AS name,
-                    tn.Full_name AS description,
-                    i_s.DateUpdated AS dateUpdated,
+            "SELECT ib.InstrumentBuilderID as id,
+                    ib.Name as name,
+                    ib.Description AS description,
+                    ib.DateUpdated AS dateUpdated,
                     u.Real_name AS updatedBy,
-                    i_s.SchemaURI AS schemaURI
-            FROM test_names tn
-                LEFT JOIN instrument_schema i_s USING
-                    (InstrumentSchemaID)
+                    ib.SchemaJSON AS schemaJson
+            FROM instrument_builder ib
                 LEFT JOIN users u ON
-                    (u.ID=i_s.UsersID)
-            WHERE tn.InstrumentSchemaID IS NOT NULL",
+                    (u.ID=ib.UsersID)",
             array()
         );
     }
