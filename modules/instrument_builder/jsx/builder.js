@@ -16,133 +16,57 @@ import AddHeaderItemForm from './addHeaderItemForm';
 import AddNumericItemForm from './addNumericItemForm';
 import AddPageForm from './addPageForm';
 import AddSectionForm from './addSectionForm';
-// import AddMultipartForm from './addMultipartForm';
 import AddTableForm from './addTableForm';
 
-class InstrumentBuilderApp extends Component {
+class Builder extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      schemaData: {},
       error: false,
+      isLoaded: false,
       formData: {
         schema: {
+          '@type': 'reproschema:Activity',
           '@id': '',
-          '@type': ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'],
-          'http://schema.ord/description': [{
-            '@language': 'en',
-            '@value': '',
-          }],
-          'http://schema.org/schemaVersion': [{
-            '@language': 'en',
-            '@value': '0.0.1',
-          }],
-          'http://schema.org/version': [{
-            '@language': 'en',
-            '@value': '0.0.1',
-          }],
-          'http://schema.repronim.org/preamble': [{
-            '@language': 'en',
-            '@value': '',
-          }],
-          'http://www.w3.org/2004/02/skos/core#altLabel': [{
-            '@language': 'en',
-            '@value': '',
-          }],
-          'http://www.w3.org/2004/02/skos/core#prefLabel': [{
-            '@language': 'en',
-            '@value': '',
-          }],
-          'https://schema.repronim.org/addStatus': [{}],
-          'https://schema.repronim.org/order': [{
-            '@list': [{
-              '@id': 'page1',
-            }],
-          }],
-          'https://schema.repronim.org/required': [{}],
-          'https://schema.repronim.org/statusOptions': [{
-            '@list': [],
-          }],
-          'https://schema.repronim.org/visibility': [{}],
+          'altLabel': {},
+          'prefLabel': {},
+          'description': '',
+          'schemaVersion': '1.0.0-rc1',
+          'version': '0.0.1',
+          'preamble': {},
+          'ui': {
+            'order': [{}],
+          },
         },
         fields: [{
-          '@id': 'field_1',
-          '@type': ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field'],
-          'http://schema.org/description': [{
-            '@language': 'en',
-            '@value': '',
-          }],
-          'http://schema.org/question': [{
-            '@language': 'en',
-            '@value': '',
-          }],
-          'http://schema.org/schemaVersion': [{
-            '@language': 'en',
-            '@value': '0.0.1',
-          }],
-          'http://schema.org/version': [{
-            '@language': 'en',
-            '@value': '0.0.1',
-          }],
-          'http://schema.repronim.org/preamble': [{
-            '@language': 'en',
-            '@value': '',
-          }],
-          'http://www.w3.org/2004/02/skos/core#altLabel': [{
-            '@language': 'en',
-            '@value': 'field_1',
-          }],
-          'http://www.w3.org/2004/02/skos/core#prefLabel': [{
-            '@language': 'en',
-            '@value': 'Field 1',
-          }],
-          'https://schema.repronim.org/headerLevel': [{
-            '@type': 'http://www.w3.org/2001/XMLSchema#int',
-            '@value': '3',
-          }],
-          'https://schema.repronim.org/inputType': [{
-            '@type': 'http://www.w3.org/2001/XMLSchema#string',
-            '@value': 'header',
-          }],
-          'https://schema.repronim.org/valueconstraints': null,
+          '@type': 'reproschema:Field',
+          '@id': '',
+          'altLabel': {},
+          'prefLabel': {},
+          'description': '',
+          'schemaVersion': '1.0.0-rc1',
+          'version': '0.0.1',
+          'question': {},
+          'ui': {
+            'inputType': '',
+          },
         }],
         multiparts: [],
         pages: [{
-          '@id': 'page1',
-          '@type': ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'],
-          'http://schema.ord/description': [{
-            '@language': 'en',
-            '@value': '',
-          }],
-          'http://schema.org/schemaVersion': [{
-            '@language': 'en',
-            '@value': '0.0.1',
-          }],
-          'http://schema.org/version': [{
-            '@language': 'en',
-            '@value': '0.0.1',
-          }],
-          'http://schema.repronim.org/preamble': [{
-            '@language': 'en',
-            '@value': '',
-          }],
-          'http://www.w3.org/2004/02/skos/core#altLabel': [{
-            '@language': 'en',
-            '@value': 'page1',
-          }],
-          'http://www.w3.org/2004/02/skos/core#prefLabel': [{
-            '@language': 'en',
-            '@value': 'Page 1',
-          }],
-          'https://schema.repronim.org/inputType': [{
-            '@type': 'http://www.w3.org/2001/XMLSchema#string',
-            '@value': 'page',
-          }],
-          'https://schema.repronim.org/order': [{
-            '@list': [{
-              '@id': 'field_1',
-            }],
-          }],
+          '@type': 'reproschema:Activity',
+          '@id': '',
+          'altLabel': {},
+          'prefLabel': {},
+          'description': '',
+          'schemaVersion': '1.0.0-rc1',
+          'version': '0.0.1',
+          'preamble': {},
+          'ui': {
+            'inputType': 'page',
+            'order': [{}],
+          },
         }],
         sections: [],
         tables: [],
@@ -217,7 +141,7 @@ class InstrumentBuilderApp extends Component {
 
   updateProfile(element, value) {
     let formData = Object.assign({}, this.state.formData);
-    const fullKeyName = 'http://www.w3.org/2004/02/skos/core#' + element;
+    const fullKeyName = element;
     formData.schema[fullKeyName][0]['@value'] = value;
     this.setState({formData});
   }
@@ -227,10 +151,10 @@ class InstrumentBuilderApp extends Component {
     const currentItemType = currentItem[0];
     const currentItemIndex = currentItem[1];
     let formData = Object.assign({}, this.state.formData);
-    const itemID = formData[currentItemType][currentItemIndex]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
+    const itemID = formData[currentItemType][currentItemIndex]['altLabel'][0]['@value'];
     let branchingLogicIndex = null;
-    if (formData.schema.hasOwnProperty('https://schema.repronim.org/visibility')) {
-      (formData.schema['https://schema.repronim.org/visibility']).forEach((object, index) => {
+    if (formData.schema.hasOwnProperty('isVis')) {
+      (formData.schema['isVis']).forEach((object, index) => {
         if (object['@index'] == itemID) {
           branchingLogicIndex = index;
         }
@@ -238,49 +162,49 @@ class InstrumentBuilderApp extends Component {
     }
     switch (elementName) {
       case 'itemID':
-        formData[currentItemType][currentItemIndex]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'] = value;
+        formData[currentItemType][currentItemIndex]['altLabel'][0]['@value'] = value;
         break;
       case 'description':
-        formData[currentItemType][currentItemIndex]['http://schema.org/description'][0]['@value'] = value;
-        formDatap[currentItemType][currentItemIndex]['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'] = value;
+        formData[currentItemType][currentItemIndex]['description'][0]['@value'] = value;
+        formDatap[currentItemType][currentItemIndex]['prefLabel'][0]['@value'] = value;
         break;
       case 'preamble':
-        formData[currentItemType][currentItemIndex]['https://schema.repronim.org/preamble'][0]['@value'] = value;
+        formData[currentItemType][currentItemIndex]['preamble'][0]['@value'] = value;
         break;
       case 'branching':
-        formData.schema['https://schema.repronim.org/visibility'][branchingLogicIndex]['@value'] = value;
+        formData.schema['isVis'][branchingLogicIndex]['@value'] = value;
         break;
       case 'noOfRows':
         // TODO: Fix that you can't change value by keyboard
-        const currentNumber = formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].length;
+        const currentNumber = formData.tables[currentItemIndex]['tablerows'][0]['@list'].length;
         let lastIndex = currentNumber - 1;
-        const rowToCopy = formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'][0];
+        const rowToCopy = formData.tables[currentItemIndex]['tablerows'][0]['@list'][0];
         if (value === '') {
           value = currentNumber;
         }
         const toAdd = value - currentNumber;
         if (toAdd > 0) {
           for (let i = 0; i < value; i++) {
-            formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].splice(lastIndex, 0, rowToCopy);
+            formData.tables[currentItemIndex]['tablerows'][0]['@list'].splice(lastIndex, 0, rowToCopy);
             lastIndex += 1;
           }
         } else if (toAdd < 0) {
-          formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].splice(toAdd);
+          formData.tables[currentItemIndex]['tablerows'][0]['@list'].splice(toAdd);
         }
         break;
       default:
         // for table elements
         const index = (elementName.split('_'))[1];
         if (elementName.includes('header')) {
-          formData.tables[currentItemIndex]['https://schema.repronim.org/tableheaders'][0]['@list'][index]['@value'] = value;
+          formData.tables[currentItemIndex]['tableheaders'][0]['@list'][index]['@value'] = value;
         } else if (elementName.includes('rowitem')) {
-          formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].forEach((row, rowIndex) => {
+          formData[currentItemType][currentItemIndex]['tablerows'][0]['@list'].forEach((row, rowIndex) => {
             // row['https://schema.repronim.org/order'][0]['@list'][index]['@id'] = value;
             // what is saved above is the id, not the altLabel
             // TODO: figure out what happens when you change altLabel (i.e. front-end id) of items inside subActivity
           });
         } else if (elementName.includes('list')) {
-          formData[currentItemType][currentItemIndex]['https://schema.repronim.org/order'][0]['@list'].forEach((item, index) => {
+          formData[currentItemType][currentItemIndex]['order'][0]['@list'].forEach((item, index) => {
             // TODO: figure out what happens when you change id of items inside subActivity
           });
         }
@@ -291,16 +215,16 @@ class InstrumentBuilderApp extends Component {
   editField(elementName, value) {
     const currentField = (this.state.selectedItem).split('_')[1];
     let formData = Object.assign({}, this.state.formData);
-    const itemID = formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
+    const itemID = formData.fields[currentField]['altLabel'][0]['@value'];
     let requiredValueIndex = null;
-    (formData.schema['https://schema.repronim.org/required']).forEach((object, index) => {
+    (formData.schema['valueRequired']).forEach((object, index) => {
       if (object['@index'] == itemID) {
         requiredValueIndex = index;
       }
     });
     let scoringLogicIndex = null;
-    if (formData.schema.hasOwnProperty('https://schema.repronim.org/scoringLogic')) {
-      (formData.schema['https://schema.repronim.org/scoringLogic']).forEach((object, index) => {
+    if (formData.schema.hasOwnProperty('jsExpression')) {
+      (formData.schema['jsExpression']).forEach((object, index) => {
         if (object['@index'] == itemID) {
           scoringLogicIndex = index;
         }
@@ -308,37 +232,37 @@ class InstrumentBuilderApp extends Component {
     }
     switch (elementName) {
       case 'itemID':
-        formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'] = value;
+        formData.fields[currentField]['altLabel']['en'] = value;
         break;
       case 'description':
-        formData.fields[currentField]['http://schema.org/description'][0]['@value'] = value;
-        formData.fields[currentField]['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'] = value;
+        formData.fields[currentField]['description'] = value;
+        formData.fields[currentField]['prefLabel']['en'] = value;
         break;
       case 'question':
-        formData.fields[currentField]['http://schema.org/question'][0]['@value'] = value;
+        formData.fields[currentField]['question']['en'] = value;
         break;
       case 'headerLevel':
-        formData.fields[currentField]['https://schema.repronim.org/headerLevel'][0]['@value'] = value;
+        formData.fields[currentField]['ui']['headerLevel'] = value;
         break;
       case 'multipleChoice':
-         formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/multipleChoice'][0]['@value'] = value;
+         formData.fields[currentField]['responseOptions']['multipleChoice'] = value;
         break;
       case 'branching':
-        formData.schema['https://schema.repronim.org/visibility'][currentField]['@value'] = value;
+        formData.schema['isVis'][currentField]['@value'] = value;
         break;
       case 'scoring':
-        formData.schema['https://schema.repronim.org/scoringLogic'][scoringLogicIndex]['@value'] = value;
+        formData.schema['jsExpression'][scoringLogicIndex]['@value'] = value;
         break;
       case 'requiredValue':
-        formData.schema['https://schema.repronim.org/required'][requiredValueIndex]['@value'] = value;
+        formData.schema['valueRequired'][requiredValueIndex]['@value'] = value;
         break;
       default:
         // for value constraint choice options
         const index = (elementName.split('_'))[1];
         if (elementName.includes('name')) {
-         formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'][index]['http://schema.org/name'][0]['@value'] = value;
+         formData.fields[currentField]['responseOptions']['choices'][index]['name']['en'] = value;
         } else if (elementName.includes('value')) {
-         formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'][index]['http://schema.org/value'][0]['@value'] = value;
+         formData.fields[currentField]['responseOptions']['choices'][0][index]['value'] = value;
         }
     }
     this.setState({formData});
@@ -348,16 +272,12 @@ class InstrumentBuilderApp extends Component {
     const currentField = this.state.selectedItem;
     let formData = Object.assign({}, this.state.formData);
     const newValueConstraint = {
-      'http://schema.org/name': [{
-        '@language': 'en',
-        '@value': '',
-      }],
-      'http://schema.org/value': [{
-        '@language': 'en',
-        '@value': '',
-      }],
+      'name': {
+        'en': '',
+      },
+      'value': '',
     };
-    (formData.fields[currentField]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list']).push(newValueConstraint);
+    (formData.fields[currentField]['valueconstraints'][0]['itemListElement'][0]['@list']).push(newValueConstraint);
     this.setState({formData});
   }
 
@@ -592,7 +512,7 @@ class InstrumentBuilderApp extends Component {
     const fromParentIndex = fromParentInfo[1];
     // get dragged item order in parent's order list
     let fromOrder = null;
-    (formData[fromParentType][fromParentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
+    (formData[fromParentType][fromParentIndex]['order'][0]['@list']).forEach((item, index) => {
       if (item['@id'] === fromID) {
         fromOrder = index;
       }
@@ -609,7 +529,7 @@ class InstrumentBuilderApp extends Component {
     const toParentIndex = toParentInfo[1];
     // get over item order in parent's order list
     let toOrder = null;
-    (formData[toParentType][toParentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
+    (formData[toParentType][toParentIndex]['order'][0]['@list']).forEach((item, index) => {
       if (item['@id'] === toID) {
         toOrder = index;
       }
@@ -620,8 +540,8 @@ class InstrumentBuilderApp extends Component {
     // case where field gets pulled out of subactivity into another parent subactivity
 
     // start splicing
-    const elementToAdd = ((formData[fromParentType][fromParentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(fromOrder, 1))[0];
-    (formData[toParentType][toParentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(toOrder, 0, elementToAdd);
+    const elementToAdd = ((formData[fromParentType][fromParentIndex]['order'][0]['@list']).splice(fromOrder, 1))[0];
+    (formData[toParentType][toParentIndex]['order'][0]['@list']).splice(toOrder, 0, elementToAdd);
     this.setState({formData});
   }
 
@@ -681,56 +601,40 @@ class InstrumentBuilderApp extends Component {
 
   addField(e) {
     let formDataCopy = Object.assign({}, this.state.formData);
-    const valueConstraints = this.state.newField.choices.map((choice, index) => {
+    const choices = this.state.newField.choices.map((choice, index) => {
       return {
-        'http://schema.org/name': [{
-          '@language': 'en',
-          '@value': choice.name,
-        }],
-        'http://schema.org/value': [{
-          '@language': 'en',
-          '@value': choice.value,
-        }],
+        'name': {
+          'en': choice.name,
+        },
+        'value': choice.value,
       };
     });
     let field = {
+      '@type': 'reproschema:Field',
       '@id': this.state.newField.itemID,
-      '@type': ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field'],
-      'http://schema.org/description': [{
-        '@language': 'en',
-        '@value': this.state.newField.description,
-      }],
-      'http://schema.org/question': [{
-        '@language': 'en',
-        '@value': this.state.newField.question,
-      }],
-      'http://www.w3.org/2004/02/skos/core#altLabel': [{
-        '@language': 'en',
-        '@value': this.state.newField.itemID,
-      }],
-      'http://www.w3.org/2004/02/skos/core#prefLabel': [{
-        '@language': 'en',
-        '@value': this.state.newField.description,
-      }],
-      'https://schema.repronim.org/inputType': [{
-        '@type': 'http://www.w3.org/2001/XMLSchema#string',
-        '@value': this.state.selectedItemType,
-      }],
-      'https://schema.repronim.org/valueconstraints': [{
-        'http://schema.org/itemListElement': [{
-          '@list': valueConstraints,
-        }],
-      }],
-      'http://schema.repronim.org/multipleChoice': [{
-        '@type': 'http://schema.org/Boolean',
-        '@value': this.state.newField.multipleChoice,
-      }],
+      'altLabel': {
+        'en': this.state.newField.itemID,
+      },
+      'prefLabel': {
+        'en': this.state.newField.description,
+      },
+      'description': this.state.newField.description,
+      'schemaVersion': '1.0.0-rc1',
+      'version': '0.0.1',
+      'question': {
+        'en': this.state.newField.question,
+      },
+      'ui': {
+        'inputType': this.state.selectedItemType,
+      },
+      'responseOptions': {
+        'valueType': '',
+        'multipleChoice': this.state.newField.multipleChoice,
+        'choices': choices,
+      },
     };
     if (this.state.selectedItemType === 'header') {
-      field['https://schema.repronim.org/headerLevel'] = [{
-        '@type': 'http://www.w3.org/2001/XMLSchema#int',
-        '@value': this.state.newField.headerLevel,
-      }];
+      field['ui']['headerLevel'] = this.state.newField.headerLevel;
     }
     formDataCopy.fields.push(field);
     const formData = this.addItemToParent(this.state.newField.itemID, formDataCopy);
@@ -754,80 +658,64 @@ class InstrumentBuilderApp extends Component {
         case 'select':
         case 'text':
         case 'textarea':
-          contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Field'];
+          contentType = 'reproschema:Field';
           itemType = 'fields';
-          displayText = 'http://schema.org/question';
+          displayText = 'question';
           break;
         case 'multipart':
-          contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'];
+          contentType = 'reproschema:Activity';
           itemType = 'multiparts';
-          displayText = 'http://schema.repronim.org/preamble';
+          displayText = 'preamble';
           break;
         case 'section':
-          contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'];
+          contentType = 'reproschema:Activity';
           itemType = 'sections';
-          displayText = 'http://schema.repronim.org/preamble';
+          displayText = 'preamble';
           break;
         case 'table':
-          contentType = ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'];
+          contentType = 'reproschema:Activity';
           itemType = 'tables';
-          displayText = 'http://schema.repronim.org/preamble';
+          displayText = 'preamble';
           break;
       }
       let content = {
-        '@id': item.list,
         '@type': contentType,
-        'http://schema.org/description': [{
-          '@language': 'en',
-          '@value': '',
-        }],
-        [displayText]: [{
-          '@language': 'en',
-          '@value': '',
-        }],
-        'http://www.w3.org/2004/02/skos/core#altLabel': [{
-          '@language': 'en',
-          '@value': item.list,
-        }],
-        'http://www.w3.org/2004/02/skos/core#prefLabel': [{
-          '@language': 'en',
-          '@value': '',
-        }],
-        'https://schema.repronim.org/inputType': [{
-          '@type': 'http://www.w3.org/2001/XMLSchema#string',
-          '@value': item.inputType,
-        }],
-        'https://schema.repronim.org/valueconstraints': [{
-          'http://schema.org/itemListElement': [{
-            '@list': [{
-              'http://schema.org/name': [{
-                '@language': 'en',
-                '@value': '',
-              }],
-              'http://schema.org/value': [{
-                '@language': 'en',
-                '@value': '',
-              }],
-            }],
-          }],
-        }],
-        'http://schema.repronim.org/multipleChoice': [{
-          '@type': 'http://schema.org/Boolean',
-          '@value': '',
-        }],
+        '@id': item.list,
+        'altLabel': {
+          'en': item.list,
+        },
+        'prefLabel': {
+          'en': '',
+        },
+        'description': '',
+        [displayText]: {
+          'en': '',
+        },
+        'ui': {
+          'inputType': item.inputType,
+        },
+        'responseOptions': {
+          'multipleChoice': '',
+          'choices': [
+            {
+              'name': {
+                'en': '',
+              },
+              'value': '',
+            },
+           ],
+        },
       };
       if (item.inputType === 'header') {
-        content['https://schema.repronim.org/headerLevel'] = [{
-          '@type': 'http://www.w3.org/2001/XMLSchema#int',
-          '@value': '',
-        }];
+        content['ui']['headerLevel'] = '';
       }
       if (item.inputType === 'multipart' || item.inputType === 'section' || item.inputType === 'table') {
-        content['https://schema.repronim.org/order'] = [{
-          '@list': [{
+        content['ui']['order'] = [
+          {
+            '@type': 'reproschema:Field',
             '@id': '',
-          }],
-        }];
+          },
+        ];
       }
       console.log(itemType);
       formData[itemType].push(content);
@@ -843,32 +731,21 @@ class InstrumentBuilderApp extends Component {
     });
     let subActivity = {
       '@id': this.state.newSubActivity.itemID,
-      '@type': ['https://raw.githubusercontent.com/ReproNim/schema-standardization/master/schemas/Activity'],
-      'http://schema.org/description': [{
-        '@language': 'en',
-        '@value': this.state.newSubActivity.description,
-      }],
-      'http://schema.repronim.org/preamble': [{
-        '@language': 'en',
-        '@value': this.state.newSubActivity.preamble,
-      }],
-      'http://www.w3.org/2004/02/skos/core#altLabel': [{
-        '@language': 'en',
-        '@value': this.state.newSubActivity.itemID,
-      }],
-      'http://www.w3.org/2004/02/skos/core#prefLabel': [{
-        '@language': 'en',
-        '@value': this.state.newSubActivity.description,
-      }],
-      'https://schema.repronim.org/inputType': [{
-        '@type': 'http://www.w3.org/2001/XMLSchema#string',
-        '@value': subActivityType,
-      }],
-      'https://schema.repronim.org/order': [
-        {
-          '@list': orderList,
-        },
-      ],
+      '@type': 'reproschema:Activity',
+      'altLabel': {
+        'en': this.state.newSubActivity.itemID,
+      },
+      'prefLabel': {
+        'en': this.state.newSubActivity.description,
+      },
+      'description': this.state.newSubActivity.description,
+      'preamble': {
+        'en': this.state.newSubActivity.preamble,
+      },
+      'ui': {
+        'inputType': subActivityType,
+        'order': orderList,
+      },
     };
     switch (subActivityType) {
       case 'pageBreak':
@@ -892,25 +769,25 @@ class InstrumentBuilderApp extends Component {
     const parentType = parentInfo[0];
     const parentIndex = parentInfo[1];
     let itemOrder = null;
-    formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list'].forEach((item, index) => {
+    formDataCopy[parentType][parentIndex]['order'][0]['@list'].forEach((item, index) => {
       if (item['@id'] === itemID) {
         itemOrder = index;
       }
     });
     // splice out that index
-    (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(itemOrder, 1);
+    (formDataCopy[parentType][parentIndex]['order'][0]['@list']).splice(itemOrder, 1);
     return formDataCopy;
   }
 
   deletePageFromSchema(pageID, formDataCopy) {
     let pageOrder = null;
-    formDataCopy.schema['https://schema.repronim.org/order'][0]['@list'].forEach((page, index) => {
+    formDataCopy.schema['order'][0]['@list'].forEach((page, index) => {
       if (page['@id'] === pageID) {
         pageOrder = index;
       }
     });
     // splice out that index
-    (formDataCopy.schema['https://schema.repronim.org/order'][0]['@list']).splice(pageOrder, 1);
+    (formDataCopy.schema['order'][0]['@list']).splice(pageOrder, 1);
     return formDataCopy;
   }
 
@@ -921,14 +798,14 @@ class InstrumentBuilderApp extends Component {
     const currentPageIndex = pageIdInfo[1];
     const currentPageItemId = formDataCopy.pages[currentPageIndex]['@id'];
     let currentPageOrder = null;
-    (formDataCopy.schema['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
+    (formDataCopy.schema['order'][0]['@list']).forEach((item, index) => {
       if (item['@id'] === currentPageItemId) {
         currentPageOrder = index;
       }
     });
     // insert new page in correct location of schema's order list
     // correct location is directly after currentPageOrder
-    (formDataCopy.schema['https://schema.repronim.org/order'][0]['@list']).splice(currentPageOrder+1, 0, {
+    (formDataCopy.schema['order'][0]['@list']).splice(currentPageOrder+1, 0, {
       '@id': pageID,
     });
 
@@ -969,7 +846,7 @@ class InstrumentBuilderApp extends Component {
     const parentIndex = parentItem[1];
     const order = siblingsID.map((id) => {
       let siblingOrder = null;
-      (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).forEach((item, index) => {
+      (formDataCopy[parentType][parentIndex]['order'][0]['@list']).forEach((item, index) => {
         if (item['@id'] === id) {
           siblingOrder = index;
         }
@@ -978,11 +855,11 @@ class InstrumentBuilderApp extends Component {
     });
     // insert new item ID in correct location of order list
     if ((order[0]+1 == order[1]) || order[0] == undefined) {
-      (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).splice(order[1], 0, {
+      (formDataCopy[parentType][parentIndex]['order'][0]['@list']).splice(order[1], 0, {
         '@id': itemID,
       });
     } else if (order[1] == undefined) {
-      (formDataCopy[parentType][parentIndex]['https://schema.repronim.org/order'][0]['@list']).push({
+      (formDataCopy[parentType][parentIndex]['order'][0]['@list']).push({
         '@id': itemID,
       });
     } else {
@@ -1079,7 +956,7 @@ class InstrumentBuilderApp extends Component {
   addTableHeader(e) {
     let tableIndex = this.state.selectedItem.split('_')[1];
     let formData = Object.assign({}, this.state.formData);
-    formData.tables[tableIndex]['https://schema.repronim.org/tableheaders'][0]['@list'].push({
+    formData.tables[tableIndex]['tableheaders'][0]['@list'].push({
       '@language': 'en',
       '@value': '',
     });
@@ -1099,10 +976,10 @@ class InstrumentBuilderApp extends Component {
 
     // Setup variables for toolbar component
     let profile = {};
-    if (this.state.formData.schema['http://www.w3.org/2004/02/skos/core#altLabel'] && this.state.formData.schema['http://www.w3.org/2004/02/skos/core#prefLabel']) {
+    if (this.state.formData.schema['altLabel'] && this.state.formData.schema['prefLabel']) {
       profile = {
-        name: this.state.formData.schema['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'],
-        fullName: this.state.formData.schema['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'],
+        name: this.state.formData.schema['altLabel'][0]['@value'],
+        fullName: this.state.formData.schema['prefLabel'][0]['@value'],
       };
     }
 
@@ -1111,8 +988,8 @@ class InstrumentBuilderApp extends Component {
     let inputType = null;
     // Define required boolean
     let requiredValues = {};
-    if (this.state.formData.schema.hasOwnProperty('https://schema.repronim.org/required')) {
-      (this.state.formData.schema['https://schema.repronim.org/required']).map((required, index) => {
+    if (this.state.formData.schema.hasOwnProperty('valueRequired')) {
+      (this.state.formData.schema['valueRequired']).map((required, index) => {
         requiredValues[required['@index']] = required['@value'];
       });
     }
@@ -1123,26 +1000,24 @@ class InstrumentBuilderApp extends Component {
       // Define choices
       let choices = [];
       let multipleChoice = null;
-      if (this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/valueconstraints']) {
-        if ((this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.org/itemListElement')) {
-          choices = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/valueconstraints'][0]['http://schema.org/itemListElement'][0]['@list'].map((valueConstraint, index) => {
+      if (this.state.formData[currentItemType][currentItemIndex]['responseOptions']['choices']) {
+          choices = this.state.formData[currentItemType][currentItemIndex]['responseOptions']['choices'].map((choice, index) => {
             return ({
-              name: valueConstraint['http://schema.org/name'][0]['@value'],
-              value: valueConstraint['http://schema.org/value'][0]['@value'],
+              name: choice['name']['en'],
+              value: choice['value'],
             });
           });
-        }
         // Define multiplechoice boolean
-        if ((this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/valueconstraints'][0]).hasOwnProperty('http://schema.repronim.org/multipleChoice')) {
-          multipleChoice = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/multipleChoice'][0]['@value'];
+        if ((this.state.formData[currentItemType][currentItemIndex]['responseOptions']).hasOwnProperty('multipleChoice')) {
+          multipleChoice = this.state.formData[currentItemType][currentItemIndex]['responseOptions']['multipleChoice'];
         }
       }
       // Define branching logic string
       // Find visibility array index where '@index' = currentItem's altLabel
-      const itemID = this.state.formData[currentItemType][currentItemIndex]['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
+      const itemID = this.state.formData[currentItemType][currentItemIndex]['altLabel'][0]['@value'];
       let branching = '';
-      if (this.state.formData.schema['https://schema.repronim.org/visibility']) {
-        (this.state.formData.schema['https://schema.repronim.org/visibility']).forEach((object, index) => {
+      if (this.state.formData.schema['isVis']) {
+        (this.state.formData.schema['isVis']).forEach((object, index) => {
           if (object['@index'] == itemID) {
             branching = object['@value'];
           }
@@ -1151,8 +1026,8 @@ class InstrumentBuilderApp extends Component {
       // Define scoring logic string
       // Find scoringLogic array index where '@index' = currentItem's altLabel
       let scoring = '';
-      if (this.state.formData.schema['https://schema.repronim.org/scoringLogic']) {
-        (this.state.formData.schema['https://schema.repronim.org/scoringLogic']).forEach((object, index) => {
+      if (this.state.formData.schema['jsExpression']) {
+        (this.state.formData.schema['jsExpression']).forEach((object, index) => {
           if (object['@index'] == itemID) {
             scoring = object['@value'];
           }
@@ -1160,46 +1035,46 @@ class InstrumentBuilderApp extends Component {
       }
       // Define header level if it exists
       let headerLevel = '';
-      if (this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/headerLevel']) {
-        headerLevel = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/headerLevel'][0]['@value'];
+      if (this.state.formData[currentItemType][currentItemIndex]['headerLevel']) {
+        headerLevel = this.state.formData[currentItemType][currentItemIndex]['headerLevel'][0]['@value'];
       }
 
       // Define preamble and question if it exists
       let question = '';
       let preamble = '';
-      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('http://schema.org/question')) {
-        question = this.state.formData[currentItemType][currentItemIndex]['http://schema.org/question'][0]['@value'];
+      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('question')) {
+        question = this.state.formData[currentItemType][currentItemIndex]['question'][0]['@value'];
       }
-      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('http://schema.repronim.org/preamble')) {
-        preamble = this.state.formData[currentItemType][currentItemIndex]['http://schema.repronim.org/preamble'][0]['@value'];
+      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('preamble')) {
+        preamble = this.state.formData[currentItemType][currentItemIndex]['preamble'][0]['@value'];
       }
       let tableHeaders = [];
       let noOfRows = null;
       if (currentItemType === 'tables') {
         // Define table headers if it exists
-        if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tableheaders')) {
-          tableHeaders = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tableheaders'][0]['@list'].map((header) => {
+        if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('tableheaders')) {
+          tableHeaders = this.state.formData[currentItemType][currentItemIndex]['tableheaders'][0]['@list'].map((header) => {
             return header['@value'];
           });
         }
         // Define table rows if it exists
-        if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tablerows')) {
-          noOfRows = this.state.formData.tables[currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'].length;
+        if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('tablerows')) {
+          noOfRows = this.state.formData.tables[currentItemIndex]['tablerows'][0]['@list'].length;
         }
       }
 
       // Define order inside subActivity
       let order = [];
-      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('https://schema.repronim.org/order')) {
-        order = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/order'][0]['@list'].map((field) => {
+      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('order')) {
+        order = this.state.formData[currentItemType][currentItemIndex]['order'][0]['@list'].map((field) => {
           const fieldID = field['@id'];
           let altLabel = null;
           let inputType = null;
           // TODO: Access sections/multiparts if those are the child of pages, not only fields
           this.state.formData.fields.forEach((field) => {
             if (field['@id'] === fieldID) {
-              altLabel = field['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
-              inputType = field['https://schema.repronim.org/inputType'][0]['@value'];
+              altLabel = field['altLabel'][0]['@value'];
+              inputType = field['inputType'][0]['@value'];
             }
           });
           return ({
@@ -1208,15 +1083,15 @@ class InstrumentBuilderApp extends Component {
           });
         });
       }
-      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('https://schema.repronim.org/tablerows')) {
-        order = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/tablerows'][0]['@list'][0]['https://schema.repronim.org/order'][0]['@list'].map((row) => {
+      if ((this.state.formData[currentItemType][currentItemIndex]).hasOwnProperty('tablerows')) {
+        order = this.state.formData[currentItemType][currentItemIndex]['tablerows'][0]['@list'][0]['order'][0]['@list'].map((row) => {
           const fieldID = row['@id'];
           let altLabel = null;
           let inputType = null;
           this.state.formData.fields.forEach((field) => {
             if (field['@id'] === fieldID) {
-              altLabel = field['http://www.w3.org/2004/02/skos/core#altLabel'][0]['@value'];
-              inputType = field['https://schema.repronim.org/inputType'][0]['@value'];
+              altLabel = field['altLabel'][0]['@value'];
+              inputType = field['inputType'][0]['@value'];
             }
           });
           return ({
@@ -1229,7 +1104,7 @@ class InstrumentBuilderApp extends Component {
       // Create field object to pass as prop to edit drawer component
       item = {
         itemID: itemID,
-        description: this.state.formData[currentItemType][currentItemIndex]['http://schema.org/description'][0]['@value'],
+        description: this.state.formData[currentItemType][currentItemIndex]['description'][0]['@value'],
         question: question,
         preamble: preamble,
         choices: choices,
@@ -1242,7 +1117,7 @@ class InstrumentBuilderApp extends Component {
         noOfRows: noOfRows,
         order: order,
       };
-      inputType = this.state.formData[currentItemType][currentItemIndex]['https://schema.repronim.org/inputType'][0]['@value'];
+      inputType = this.state.formData[currentItemType][currentItemIndex]['inputType'][0]['@value'];
     }
     return (
       <div>
@@ -1284,12 +1159,21 @@ class InstrumentBuilderApp extends Component {
   }
 }
 
-InstrumentBuilderApp.propTypes = {
-  schemaURI: PropTypes.string.isRequired,
+Builder.propTypes = {
+  DataURL: PropTypes.string.isRequired,
 };
 
-InstrumentBuilderApp.defaultProps = {
-  schemaURI: null,
-};
-
-export default InstrumentBuilderApp;
+$(function() {
+  const id = location.href.splt('/build/')[1];
+  const builder = (
+    <div id='builder'>
+      <Builder
+        DataURL={`${loris.BaseURL}/instrument_builder/build/${id}`}
+      />
+    </div>
+  );
+  ReactDOM.render(
+    builder,
+    document.getElementById('lorisworkspace')
+  );
+});

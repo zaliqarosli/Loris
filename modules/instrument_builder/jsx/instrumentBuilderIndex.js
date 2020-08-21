@@ -7,7 +7,7 @@ import Loader from 'Loader';
 import {Tabs, TabPane} from 'Tabs';
 import FilterableDataTable from 'FilterableDataTable';
 
-import InstrumentBuilderApp from './instrumentBuilderApp';
+// import Builder from './Builder';
 
 class InstrumentBuilderIndex extends Component {
   constructor(props) {
@@ -120,8 +120,8 @@ class InstrumentBuilderIndex extends Component {
     let result = <td>{cell}</td>;
     switch (column) {
       case 'Instrument':
-        const url = loris.BaseURL + '/instrument_builder?uri=' +
-                      row['Schema URI'] + '#buildInstruments';
+        const url = loris.BaseURL + '/instrument_builder/build/' +
+                      row['Instrument'];
         result = <td><a href={url}>{cell}</a></td>;
         break;
       case 'Schema URI':
@@ -230,7 +230,7 @@ class InstrumentBuilderIndex extends Component {
       {name: 'loadInstrument', label: 'Load Instrument', action: this.openModal},
     ];
 
-    const schemaURI = this.props.schemaURI || '';
+    // const schemaURI = this.props.schemaURI || '';
 
     return (
       <Tabs
@@ -252,9 +252,7 @@ class InstrumentBuilderIndex extends Component {
         <TabPane
           TabId={'buildInstruments'}
         >
-          <InstrumentBuilderApp
-            schemaURI={schemaURI}
-          />
+          {'This is a test'}
         </TabPane>
       </Tabs>
     );

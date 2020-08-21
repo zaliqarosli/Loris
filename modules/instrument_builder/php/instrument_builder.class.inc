@@ -1,6 +1,7 @@
 <?php
 /**
- * Instrument_builder class
+ * The index data table and selection filter page of the
+ * Instrument Builder module
  *
  * PHP Version 7
  *
@@ -17,7 +18,8 @@ use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
 
 /**
- * Instrument_builder class
+ * The index data table and selection filter page of the
+ * Instrument Builder module
  *
  * PHP Version 7
  *
@@ -99,7 +101,7 @@ class Instrument_Builder extends \NDB_Menu_Filter_Form
      */
     function toJSON()
     {
-        $db            = \NDB_Factory::singleton()->database();
+        $db    = \NDB_Factory::singleton()->database();
 
         $table = (new \LORIS\Data\Table())
             ->withDataFrom($this->getDataProvisioner());

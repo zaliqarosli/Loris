@@ -28,15 +28,17 @@ namespace LORIS\instrument_builder;
 class InstrumentRow implements \LORIS\Data\DataInstance
 {
     protected $DBRow;
+    protected $SchemaJSON;
 
     /**
      * Create a new Instrument Row Instance.
      *
      * @param array $row The Instrument Row Instance
      */
-    public function __construct(array $row)
+    public function __construct(array $row, string $schemaJSON)
     {
         $this->DBRow = $row;
+        $this->SchemaJSON = $schemaJSON;
     }
 
     /**
@@ -47,5 +49,15 @@ class InstrumentRow implements \LORIS\Data\DataInstance
     public function toJSON(): string
     {
         return json_encode($this->DBRow);
+    }
+
+    /**
+     * Returns the SchemaJSON for this row.
+     *
+     * @return string The instrument JSON schema
+     */
+    public function getSchemaJSON(): string
+    {
+        return $this->SchemaJSON;
     }
 }

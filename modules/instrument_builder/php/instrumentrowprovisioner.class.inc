@@ -31,23 +31,27 @@ namespace LORIS\instrument_builder;
 class InstrumentRowProvisioner extends \LORIS\Data\Provisioners\DBRowProvisioner
 {
     /**
-     * Create an InstrumentRowProvisioner, which gets rows for the instrument_builder menu table.
+     * Create an InstrumentRowProvisioner, which gets rows for the instrument_builder table.
      */
-    function __construct()
+    function __construct(string $schemaID = '')
     {
-        // TODO: update description to be meaningful
-        parent::__construct(
-            "SELECT ib.InstrumentBuilderID as id,
-                    ib.Name as name,
-                    ib.Description AS description,
-                    ib.DateUpdated AS dateUpdated,
-                    u.Real_name AS updatedBy,
-                    ib.SchemaJSON AS schemaJson
-            FROM instrument_builder ib
-                LEFT JOIN users u ON
-                    (u.ID=ib.UsersID)",
-            array()
-        );
+       $query   = "SELECT ib.InstrumentBuilderID as id,
+                        ib.Name as name,
+                        ib.Description AS description,
+                        ib.DateUpdated AS dateUpdated,
+                        u.Real_name AS updatedBy,
+                        ib.SchemaJSON AS schemaJson
+                    FROM instrument_builder ib
+                      LEFT JOIN users u ON
+                      (u.ID=ib.UsersID)";
+        $params = array();
+
+        if (!empty($schemaID)) {
+            $query .= " WHERE ib.Name=:schemaID";
+            $params = array('schemaID' => $schemaID);
+        }
+
+        parent::__construct($query,$params);
     }
 
     /**
@@ -60,6 +64,7 @@ class InstrumentRowProvisioner extends \LORIS\Data\Provisioners\DBRowProvisioner
      */
     public function getInstance($row) : \LORIS\Data\DataInstance
     {
-        return new InstrumentRow($row);
+        $schemaJSON = $row['schemaJson'];
+        return new InstrumentRow($row, $schemaJSON);
     }
 }
