@@ -85,16 +85,19 @@ class Build extends \NDB_Form
      * @param string $schemaID The identifying name of the
      *                         instrument schema
      *
-     * @return string The json encoded JSON schema
+     * @return array The json decoded JSON schema
      */
-    function handleGET(string $schemaID): string
+    function handleGET(string $schemaID): array
     {
         $provisioner = new InstrumentRowProvisioner($schemaID);
         $instance    = (new \LORIS\Data\Table())
                         ->withDataFrom($provisioner)
                         ->toArray(\User::singleton());
 
-        return $instance[0]['schemaJson'];
+        return json_decode(
+            html_entity_decode(
+                html_entity_decode($instance[0]['schemaJson'])
+            ), true);
     }
 
     /**

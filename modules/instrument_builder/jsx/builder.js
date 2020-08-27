@@ -139,9 +139,12 @@ class Builder extends Component {
    */
   fetchData() {
      return fetch(this.props.DataURL, {credentials: 'same-origin'})
-    .then((resp) => resp.json())
+    .then((resp) => {
+        console.log(resp);
+        return resp.json();
+    })
     .then((data) => {
-      this.setState({schemaData: data['schemaJSON']});
+      this.setState({schemaData: data});
     })
     .catch((error) => {
       this.setState({error: true});
@@ -317,17 +320,6 @@ class Builder extends Component {
 
 
   renderModal() {
-    // If error occurs, return a message.
-    // XXX: Replace this with a UI component for 500 errors.
-    if (this.state.error) {
-      return <h3>An error occurred while loading the page.</h3>;
-    }
-
-    // Waiting for async data to load
-    if (!this.state.isLoaded) {
-      return <Loader/>;
-    }
-
     let addForm = null;
     const addValueConstraint = () => {
       let newField = Object.assign({}, this.state.newField);
@@ -984,6 +976,17 @@ class Builder extends Component {
   }
 
   render() {
+    // If error occurs, return a message.
+    // XXX: Replace this with a UI component for 500 errors.
+    if (this.state.error) {
+      return <h3>An error occurred while loading the page.</h3>;
+    }
+
+    // Waiting for async data to load
+    if (!this.state.isLoaded) {
+      return <Loader/>;
+    }
+
     const divStyle = {
       border: '1px solid #C3D5DB',
       borderRadius: '4px',
@@ -999,8 +1002,8 @@ class Builder extends Component {
     let profile = {};
     if (this.state.formData.schema['altLabel'] && this.state.formData.schema['prefLabel']) {
       profile = {
-        name: this.state.formData.schema['altLabel'][0]['@value'],
-        fullName: this.state.formData.schema['prefLabel'][0]['@value'],
+        name: this.state.formData.schema['altLabel']['en'] || this.state.formData.schema['altLabel'],
+        fullName: this.state.formData.schema['prefLabel']['en'] || this.state.formData.schema['prefLabel'],
       };
     }
 
