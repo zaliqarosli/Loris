@@ -44,16 +44,6 @@ class Build extends \NDB_Form
     }
 
     /**
-     * Sets up required items for this page
-     *
-     * @return void
-     */
-    function setup()
-    {
-        parent::setup();
-    }
-
-    /**
      * Handles the incoming request for the builder. 
      *
      * @param ServerRequestInterface $request The incoming PSR7 request
@@ -68,10 +58,14 @@ class Build extends \NDB_Form
           if (empty($this->schemaID) && $this->schemaID != "new") {
               return (new \LORIS\Http\Response\NotFound());
           }
-          return (new \LORIS\Http\Response\JsonResponse(
-                  $this->handleGET($this->schemaID)
-              )
-          );
+          return (new \LORIS\Http\Response())
+              ->withBody(
+                  new \LORIS\Http\StringStream(
+                      json_encode([
+                          'schemaJSON' => $this->handleGET($this->schemaID)
+                      ])
+                  )
+              );
         case 'PUT':
           return $this->handlePUT();
         case 'PATCH':

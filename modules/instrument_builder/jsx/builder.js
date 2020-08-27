@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
-import JsonLDExpander from './../../../htdocs/js/JsonLDExpander';
+// import JsonLDExpander from './../../../htdocs/js/JsonLDExpander';
 import swal from 'sweetalert2';
 import Modal from 'Modal';
+import Loader from 'Loader';
 
 import Toolbar from './toolbar';
 import Canvas from './canvas';
@@ -126,17 +127,26 @@ class Builder extends Component {
     this.addTableHeader = this.addTableHeader.bind(this);
   }
 
-  async componentDidMount() {
-    if (this.state.schemaURI !== '') {
-      try {
-        // Have to do this twice because deep cloning doesn't seem to be working currently
-        const formData = await JsonLDExpander.expandFull(this.state.schemaURI);
-        // const schemaData = Object.assign({}, formData);
-        this.setState({formData});
-      } catch (error) {
-        console.error(error);
-      }
-    }
+  componentDidMount() {
+    this.fetchData()
+      .then(() => this.setState({isLoaded: true}));
+  }
+
+  /**
+   * Retrieve data from the provided URL and save it in state
+   *
+   * @return {object}
+   */
+  fetchData() {
+     return fetch(this.props.DataURL, {credentials: 'same-origin'})
+    .then((resp) => resp.json())
+    .then((data) => {
+      this.setState({schemaData: data['schemaJSON']});
+    })
+    .catch((error) => {
+      this.setState({error: true});
+      console.error(error);
+    });
   }
 
   updateProfile(element, value) {
@@ -307,6 +317,17 @@ class Builder extends Component {
 
 
   renderModal() {
+    // If error occurs, return a message.
+    // XXX: Replace this with a UI component for 500 errors.
+    if (this.state.error) {
+      return <h3>An error occurred while loading the page.</h3>;
+    }
+
+    // Waiting for async data to load
+    if (!this.state.isLoaded) {
+      return <Loader/>;
+    }
+
     let addForm = null;
     const addValueConstraint = () => {
       let newField = Object.assign({}, this.state.newField);
@@ -1163,8 +1184,8 @@ Builder.propTypes = {
   DataURL: PropTypes.string.isRequired,
 };
 
-$(function() {
-  const id = location.href.splt('/build/')[1];
+const id = location.href.split('/build/')[1];
+window.addEventListener('load', () => {
   const builder = (
     <div id='builder'>
       <Builder
