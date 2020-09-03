@@ -60,9 +60,7 @@ class InstrumentJSON extends \NDB_Page
               return (new \LORIS\Http\Response\NotFound());
           }
           return (new \LORIS\Http\Response\JsonResponse(
-              [
-                  'schemaJSON' => $this->handleGET($this->schemaID)
-              ]
+              $this->handleGET($this->schemaID)
           ));
         case 'PUT':
           return $this->handlePUT();
@@ -92,9 +90,6 @@ class InstrumentJSON extends \NDB_Page
                         ->withDataFrom($provisioner)
                         ->toArray(\User::singleton());
 
-        return json_decode(
-            html_entity_decode(
-                html_entity_decode($instance[0]['schemaJson'])
-            ), true);
+        return json_decode($instance[0]['schemaJson'], true);
     }
 }
