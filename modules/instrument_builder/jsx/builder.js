@@ -1192,7 +1192,7 @@ window.addEventListener('load', () => {
   const builder = (
     <div id='builder'>
       <Builder
-        DataURL={`${loris.BaseURL}/instrument_builder/build/${id}`}
+        DataURL={`${loris.BaseURL}/instrument_builder/InstrumentJSON/${id}`}
       />
     </div>
   );

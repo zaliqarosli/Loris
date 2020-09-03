@@ -44,63 +44,6 @@ class Build extends \NDB_Form
     }
 
     /**
-     * Handles the incoming request for the builder. 
-     *
-     * @param ServerRequestInterface $request The incoming PSR7 request
-     *
-     * @return ResponseInterface The outgoing PSR7 response
-     */
-    public function handle(ServerRequestInterface $request) : ResponseInterface
-    {
-        switch($request->getMethod()) {
-        case 'GET':
-          $this->schemaID = basename($request->getURI()->getPath());
-          if (empty($this->schemaID) && $this->schemaID != "new") {
-              return (new \LORIS\Http\Response\NotFound());
-          }
-          return (new \LORIS\Http\Response())
-              ->withBody(
-                  new \LORIS\Http\StringStream(
-                      json_encode([
-                          'schemaJSON' => $this->handleGET($this->schemaID)
-                      ])
-                  )
-              );
-        case 'PUT':
-          return $this->handlePUT();
-        case 'PATCH':
-          return $this->handlePATCH();
-        case 'POST':
-          return $this->handlePOST();
-        default:
-          return (new \LORIS\Http\Response\JSON\MethodNotAllowed(
-              ["GET,PUT,PATCH,POST"]
-          ));
-        }
-    }
-
-    /**
-     * Handles the builder GET request
-     *
-     * @param string $schemaID The identifying name of the
-     *                         instrument schema
-     *
-     * @return array The json decoded JSON schema
-     */
-    function handleGET(string $schemaID): array
-    {
-        $provisioner = new InstrumentRowProvisioner($schemaID);
-        $instance    = (new \LORIS\Data\Table())
-                        ->withDataFrom($provisioner)
-                        ->toArray(\User::singleton());
-
-        return json_decode(
-            html_entity_decode(
-                html_entity_decode($instance[0]['schemaJson'])
-            ), true);
-    }
-
-    /**
      * Include additional CSS files
      *
      * @return array of CSS to be inserted
