@@ -86,9 +86,9 @@ class Canvas extends Component {
 
   renderField(fieldIndex, inTable = false) {
     const field = this.props.fields[fieldIndex];
-    const name = field['altLabel']['en'] || field['altLabel'];
+    const name = field['prefLabel']['en'] || field['prefLabel'];
     const question = field['question']['en'] || field['question'];
-    const inputType = field['inputType'];
+    const inputType = field.ui['inputType'];
     let mapped = [];
     if (field['responseOptions']) {
       const choices = field['responseOptions']['choices'];

@@ -85,7 +85,7 @@ class Builder extends Component {
         question: '',
         choices: [{name: '', value: ''}],
         multipleChoice: false,
-        branching: '',
+        isVis: true,
         scoring: '',
         requiredValue: false,
         headerLevel: '',
@@ -94,7 +94,7 @@ class Builder extends Component {
         itemID: '',
         description: '',
         preamble: '',
-        branching: '',
+        isVis: '',
         order: [{list: '', inputType: ''}],
         tableHeaders: [''],
         noOfRows: undefined,
@@ -140,11 +140,34 @@ class Builder extends Component {
   fetchData() {
      return fetch(this.props.DataURL, {credentials: 'same-origin'})
     .then((resp) => {
-        console.log(resp);
         return resp.json();
     })
     .then((data) => {
-      this.setState({schemaData: data});
+      // Transfer compute and addProperties so it's usable
+      const compute = {};
+      const isVis = {};
+      const requiredValue = {};
+      if (data.compute) {
+        data.compute.map((child, index) => {
+          compute[child['variableName']] = child['jsExpression'];
+        });
+      }
+      if (data.ui.addProperties) {
+        data.ui.addProperties.map((child, index) => {
+          isVis[child['variableName']] = child['isVis'];
+          requiredValue[child['variableName']] = child['requiredValue'];
+        });
+      }
+      // Copy the schema onto formData
+      const formData = JSON.parse(JSON.stringify(this.state.formData));
+      formData.schema = data;
+      formData.scoring = compute;
+      formData.isVis = isVis;
+      formData.requiredValue = requiredValue;
+      this.setState({
+        schemaData: data,
+        formData: formData,
+      });
     })
     .catch((error) => {
       this.setState({error: true});
@@ -155,7 +178,11 @@ class Builder extends Component {
   updateProfile(element, value) {
     let formData = Object.assign({}, this.state.formData);
     const fullKeyName = element;
-    formData.schema[fullKeyName][0]['@value'] = value;
+    if (formData.schema[fullKeyName]['en']) {
+      formData.schema[fullKeyName]['en'] = value;
+    } else {
+      formData.schema[fullKeyName] = value;
+    }
     this.setState({formData});
   }
 
@@ -184,7 +211,7 @@ class Builder extends Component {
       case 'preamble':
         formData[currentItemType][currentItemIndex]['preamble'][0]['@value'] = value;
         break;
-      case 'branching':
+      case 'isVis':
         formData.schema['isVis'][branchingLogicIndex]['@value'] = value;
         break;
       case 'noOfRows':
@@ -260,7 +287,7 @@ class Builder extends Component {
       case 'multipleChoice':
          formData.fields[currentField]['responseOptions']['multipleChoice'] = value;
         break;
-      case 'branching':
+      case 'isVis':
         formData.schema['isVis'][currentField]['@value'] = value;
         break;
       case 'scoring':
@@ -305,7 +332,7 @@ class Builder extends Component {
       question: '',
       choices: [{name: '', value: ''}],
       multipleChoice: false,
-      branching: '',
+      isVis: '',
       scoring: '',
       requiredValue: false,
       headerLevel: null,
@@ -317,7 +344,6 @@ class Builder extends Component {
     let openDrawer = !this.state.openDrawer;
     this.setState({openDrawer});
   }
-
 
   renderModal() {
     let addForm = null;
@@ -1000,9 +1026,9 @@ class Builder extends Component {
 
     // Setup variables for toolbar component
     let profile = {};
-    if (this.state.formData.schema['altLabel'] && this.state.formData.schema['prefLabel']) {
+    if (this.state.formData.schema['@id'] && this.state.formData.schema['prefLabel']) {
       profile = {
-        name: this.state.formData.schema['altLabel']['en'] || this.state.formData.schema['altLabel'],
+        name: this.state.formData.schema['@id'].replace('.jsonld', ''),
         fullName: this.state.formData.schema['prefLabel']['en'] || this.state.formData.schema['prefLabel'],
       };
     }
@@ -1010,13 +1036,26 @@ class Builder extends Component {
     // Setup variables for drawer component
     let item = {};
     let inputType = null;
-    // Define required boolean
-    let requiredValues = {};
-    if (this.state.formData.schema.hasOwnProperty('valueRequired')) {
-      (this.state.formData.schema['valueRequired']).map((required, index) => {
-        requiredValues[required['@index']] = required['@value'];
-      });
-    }
+    // Define required boolean and branching logic
+    // OLD: Find visibility array index where '@index' = currentItem's altLabel
+    // const itemID = this.state.formData.schema.ui.order[currentItemIndex]['@id'];
+    // let requiredValue = {};
+    // let isVis= {};
+    // if (this.state.formData.schema.ui.hasOwnProperty('addProperties')) {
+    //   (this.state.formData.schema.ui['addProperties']).map((child, index) => {
+    //     requiredValue[child['variableName']] = child['requiredValue'];
+    //     isVis[child['variableName']] = child['isVis'];
+    //   });
+    // }
+    // Define scoring logic
+    // OLD: Find scoringLogic array index where '@index' = currentItem's altLabel
+    // let scoring = {};
+    // if (this.state.formData.schema.hasOwnProperty('compute')) {
+    //   (this.state.formData.schema['compute']).map((child, index) => {
+    //     scoring[child['variableName']] = child['jsExpression'];
+    //   });
+    // }
+
     if (this.state.selectedItem != null) {
       const currentItem = this.state.selectedItem.split('_');
       const currentItemType = currentItem[0];
@@ -1024,7 +1063,7 @@ class Builder extends Component {
       // Define choices
       let choices = [];
       let multipleChoice = null;
-      if (this.state.formData[currentItemType][currentItemIndex]['responseOptions']['choices']) {
+      if (this.state.formData.schema.ui.order[currentItemIndex]['responseOptions']['choices']) {
           choices = this.state.formData[currentItemType][currentItemIndex]['responseOptions']['choices'].map((choice, index) => {
             return ({
               name: choice['name']['en'],
@@ -1032,35 +1071,14 @@ class Builder extends Component {
             });
           });
         // Define multiplechoice boolean
-        if ((this.state.formData[currentItemType][currentItemIndex]['responseOptions']).hasOwnProperty('multipleChoice')) {
-          multipleChoice = this.state.formData[currentItemType][currentItemIndex]['responseOptions']['multipleChoice'];
+        if ((this.state.formData.schema.ui.order[currentItemIndex]['responseOptions']).hasOwnProperty('multipleChoice')) {
+          multipleChoice = this.state.formData.schema.ui.order[currentItemIndex]['responseOptions']['multipleChoice'];
         }
-      }
-      // Define branching logic string
-      // Find visibility array index where '@index' = currentItem's altLabel
-      const itemID = this.state.formData[currentItemType][currentItemIndex]['altLabel'][0]['@value'];
-      let branching = '';
-      if (this.state.formData.schema['isVis']) {
-        (this.state.formData.schema['isVis']).forEach((object, index) => {
-          if (object['@index'] == itemID) {
-            branching = object['@value'];
-          }
-        });
-      }
-      // Define scoring logic string
-      // Find scoringLogic array index where '@index' = currentItem's altLabel
-      let scoring = '';
-      if (this.state.formData.schema['jsExpression']) {
-        (this.state.formData.schema['jsExpression']).forEach((object, index) => {
-          if (object['@index'] == itemID) {
-            scoring = object['@value'];
-          }
-        });
       }
       // Define header level if it exists
       let headerLevel = '';
-      if (this.state.formData[currentItemType][currentItemIndex]['headerLevel']) {
-        headerLevel = this.state.formData[currentItemType][currentItemIndex]['headerLevel'][0]['@value'];
+      if (this.state.formData.ui.order[currentItemIndex].ui['headerLevel']) {
+        headerLevel = this.state.formData.ui.order[currentItemIndex].ui['headerLevel'];
       }
 
       // Define preamble and question if it exists
@@ -1133,10 +1151,10 @@ class Builder extends Component {
         preamble: preamble,
         choices: choices,
         multipleChoice: multipleChoice,
-        branching: branching,
-        requiredValue: requiredValues[itemID] || false,
+        isVis: this.state.formData.isVis[itemID] || true,
+        requiredValue: this.state.formData.requiredValue[itemID] || false,
         headerLevel: headerLevel,
-        scoring: scoring,
+        scoring: this.state.formData.scoring[itemID] || '',
         tableHeaders: tableHeaders,
         noOfRows: noOfRows,
         order: order,
@@ -1153,12 +1171,12 @@ class Builder extends Component {
           >
           </Toolbar>
           <Canvas
-            fields={this.state.formData.fields}
+            fields={this.state.formData.schema.ui.order}
             multiparts={this.state.formData.multiparts}
             pages={this.state.formData.pages}
             sections={this.state.formData.sections}
             tables={this.state.formData.tables}
-            requiredValues={requiredValues}
+            requiredValues={this.state.formData.requiredValue}
             onDropFieldType={this.onDropFieldType}
             reIndexField={this.reIndexField}
             deletePage={this.deletePage}
