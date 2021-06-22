@@ -82,7 +82,7 @@ const config = [{
   },
   resolve: {
     alias: {
-      util: path.resolve(__dirname, './htdocs/js/util'),
+      lorisutil: path.resolve(__dirname, './htdocs/js/util'),
       jsx: path.resolve(__dirname, './jsx'),
       Breadcrumbs: path.resolve(__dirname, './jsx/Breadcrumbs'),
       DataTable: path.resolve(__dirname, './jsx/DataTable'),
@@ -92,6 +92,7 @@ const config = [{
       FilterForm: path.resolve(__dirname, './jsx/FilterForm'),
       Form: path.resolve(__dirname, './jsx/Form'),
       Loader: path.resolve(__dirname, './jsx/Loader'),
+      LoadingBar: path.resolve(__dirname, './jsx/LoadingBar'),
       Markdown: path.resolve(__dirname, './jsx/Markdown'),
       Modal: path.resolve(__dirname, './jsx/Modal'),
       MultiSelectDropdown: path.resolve(__dirname, './jsx/MultiSelectDropdown'),
