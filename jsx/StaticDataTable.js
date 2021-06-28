@@ -18,10 +18,6 @@ import createFragment from 'react-addons-create-fragment';
  * Displays a set of data that is receives via props.
  */
 class StaticDataTable extends Component {
-  /**
-   * @constructor
-   * @param {object} props - React Component properties
-   */
   constructor(props) {
     super(props);
 
@@ -43,9 +39,6 @@ class StaticDataTable extends Component {
     this.hasFilterKeyword = this.hasFilterKeyword.bind(this);
   }
 
-  /**
-   * Called by React when the component has been rendered on the page.
-   */
   componentDidMount() {
     if (jQuery.fn.DynamicTable) {
       if (this.props.freezeColumn) {
@@ -83,13 +76,6 @@ class StaticDataTable extends Component {
     // Make prefs accesible within component
     this.modulePrefs = modulePrefs;
   }
-
-  /**
-   * Called by React when the component is updated.
-   *
-   * @param {object} prevProps - Previous React Component properties
-   * @param {object} prevState - Previous React Component state
-   */
   componentDidUpdate(prevProps, prevState) {
     if (jQuery.fn.DynamicTable) {
       if (this.props.freezeColumn) {
@@ -109,26 +95,12 @@ class StaticDataTable extends Component {
     }
   }
 
-  /**
-   * Set the component page variable
-   * to a new value
-   *
-   * @param {int} pageNo - Page index
-   */
   changePage(pageNo) {
     this.setState({
       PageNumber: pageNo,
     });
   }
 
-  /**
-   * Update the sort column
-   * If component sortColumn is already set to colNumber
-   * Toggle SortOrder ASC/DESC
-   *
-   * @param {int} colNumber - The column index
-   * @return {function(e)} - onClick Event Handler
-   */
   setSortColumn(colNumber) {
     return function(e) {
       if (this.state.SortColumn === colNumber) {
@@ -143,11 +115,6 @@ class StaticDataTable extends Component {
     };
   }
 
-  /**
-   * Update the number of rows per page
-   *
-   * @param {object} val
-   */
   changeRowsPerPage(val) {
     let rowsPerPage = val.target.value;
     let modulePrefs = this.modulePrefs;
@@ -164,11 +131,6 @@ class StaticDataTable extends Component {
     });
   }
 
-  /**
-   * Export the filtered rows and columns into a csv
-   *
-   * @param {[]} csvData - The csv data
-   */
   downloadCSV(csvData) {
     let csvworker = new Worker(loris.BaseURL + '/js/workers/savecsv.js');
 
@@ -237,11 +199,6 @@ class StaticDataTable extends Component {
     });
   }
 
-  /**
-   * Get the number of filtered rows
-   *
-   * @return {int}
-   */
   countFilteredRows() {
     let useKeyword = false;
     let filterMatchCount = 0;
@@ -290,12 +247,6 @@ class StaticDataTable extends Component {
     return (filterMatchCount === 0) ? tableData.length : filterMatchCount;
   }
 
-  /**
-   * Convert a string to CamelCase
-   *
-   * @param {string} str
-   * @return {string}
-   */
   toCamelCase(str) {
     return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
       if (Number(match) === 0) return '';
@@ -303,11 +254,6 @@ class StaticDataTable extends Component {
     });
   }
 
-  /**
-   * Sort the rows according to the sort configuration
-   *
-   * @return {Object[]}
-   */
   getSortedRows() {
     const index = [];
 
@@ -435,12 +381,6 @@ class StaticDataTable extends Component {
     }
     return result;
   }
-
-  /**
-   * Renders the React component.
-   *
-   * @return {JSX} - React markup for the component
-   */
   render() {
     if (this.props.Data === null || this.props.Data.length === 0) {
       return (
@@ -469,10 +409,7 @@ class StaticDataTable extends Component {
           );
         } else {
           headers.push(
-            <th
-              key={'th_col_' + colIndex}
-              onClick={this.setSortColumn(i).bind(this)}
-            >
+            <th key={'th_col_' + colIndex} onClick={this.setSortColumn(i).bind(this)}>
               {this.props.Headers[i]}
             </th>
           );
@@ -637,15 +574,12 @@ class StaticDataTable extends Component {
     return (
       <div className="panel panel-default">
         {header}
-        <table
-          className="table table-hover table-primary table-bordered"
-          id="dynamictable"
-        >
+        <table className="table table-hover table-primary table-bordered" id="dynamictable">
           <thead>
-          <tr className="info">{headers}</tr>
+            <tr className="info">{headers}</tr>
           </thead>
           <tbody>
-          {rows}
+            {rows}
           </tbody>
         </table>
         {footer}

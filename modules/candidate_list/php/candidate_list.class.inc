@@ -59,13 +59,11 @@ class Candidate_List extends \NDB_Menu_Filter
                           'c.PSCID',
                           'c.CandID AS DCCID',
                           'GROUP_CONCAT(DISTINCT s.Visit_label) AS VisitLabel',
-                          'GROUP_CONCAT(DISTINCT d.Name) as Diagnosis',
                           'psc.Name AS RegistrationSite',
                           'GROUP_CONCAT(DISTINCT sp.title) as Subproject',
                           'c.Entity_type AS EntityType',
                           'MAX(s.Scan_done) as scanDone',
                           'COALESCE(pso.Description,"Active") AS ParticipantStatus',
-                          '(SELECT FLOOR(DATEDIFF(CURDATE(), c.DoB)/365.25)) as Age',
                           'DATE_FORMAT(c.DoB,\'%Y-%m-%d\') AS DoB',
                           'c.Sex',
                           'COUNT(DISTINCT s.Visit_label) AS VisitCount',
@@ -81,8 +79,6 @@ class Candidate_List extends \NDB_Menu_Filter
         $this->query = " FROM candidate c
             LEFT JOIN psc ON (c.RegistrationCenterID=psc.CenterID)
             LEFT JOIN session s ON (c.CandID = s.CandID AND s.Active = 'Y')
-            LEFT JOIN candidate_diagnosis_rel cdr ON (c.CandID=cdr.CandID)
-            LEFT JOIN diagnosis d ON (d.DiagnosisID=cdr.DiagnosisID)
             LEFT JOIN feedback_bvl_thread
                 ON (c.CandID=feedback_bvl_thread.CandID)
             LEFT JOIN participant_status ps ON (ps.CandID=c.CandID)
@@ -119,6 +115,9 @@ class Candidate_List extends \NDB_Menu_Filter
         $user   = \User::singleton();
         $config = \NDB_Config::singleton();
 
+        // get the list of visit labels
+        $visit_label_options = \Utility::getVisitList();
+
         // get the list of sites available for the user
         if ($user->hasPermission('access_all_profiles')) {
             $list_of_sites = \Utility::getSiteList();
@@ -150,6 +149,7 @@ class Candidate_List extends \NDB_Menu_Filter
         }
 
         $this->fieldOptions = [
+                               'visitlabel'        => $visit_label_options,
                                'site'              => $site_options,
                                'project'           => $project_options,
                                'subproject'        => $subproject_options,
