@@ -1,3 +1,10 @@
+/**
+ * This file contains the React Component for a Modal Window.
+ *
+ * @author Henri Rabalais
+ * @version 1.1.0
+ *
+ */
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import swal from 'sweetalert2';

@@ -230,7 +230,6 @@ class Visit extends \Loris\API\Candidates\Candidate
                     $centerID
                 );
                 $this->header("HTTP/1.1 201 Created");
-                $this->JSON="success";
             }
         }
     }

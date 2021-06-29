@@ -456,11 +456,8 @@ class NDB_BVL_Instrument_LINST extends \NDB_BVL_Instrument
                     }
                     $firstSelectOfPage = true;
                     break;
-                case 'test':
-                    $this->testName = trim($pieces[1]);
-                    break;
                 case 'table':
-                    $this->testName = isset($this->testName) ? $this->testName:trim($pieces[1]);
+                    $this->testName = trim($pieces[1]);
                     $this->table    = trim($pieces[1]);
                     break;
                 case 'title':
