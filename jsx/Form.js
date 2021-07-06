@@ -1070,6 +1070,7 @@ class DateElement extends Component {
     if (this.props.hasError) {
       errorMessage = <span>{this.props.errorMessage}</span>;
       elementClass = 'row form-group has-error';
+    }
 
     // Check if props minYear and maxYear are valid values if supplied
     let minYear = this.props.minYear;
