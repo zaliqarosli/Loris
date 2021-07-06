@@ -1127,9 +1127,9 @@ class DateElement extends Component {
                 required={required}
                 disabled={disabled}
               />
+              {errorMessage}
             </div>
             {todayButton}
-              {errorMessage}
           </div>
         </div>
       </div>
